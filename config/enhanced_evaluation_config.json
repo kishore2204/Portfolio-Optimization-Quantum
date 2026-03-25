@@ -1,0 +1,149 @@
+{
+  "dataset_candidates": [
+    "Dataset/prices_timeseries_complete.csv",
+    "data/prices_timeseries.csv"
+  ],
+  "base_seed": 42,
+  "k_stocks": 10,
+  "min_train_coverage": 0.8,
+  "min_test_points": 20,
+  "qubo": {
+    "downside_beta": 0.3,
+    "lambda_penalty": null,
+    "lambda_base": 50.0,
+    "lambda_scale": 10.0,
+    "max_iter": 2000,
+    "covariance_shrinkage_enabled": true,
+    "covariance_shrinkage_alpha": "auto",
+    "covariance_shrinkage_diag_eps": 1e-8,
+    "ensemble_enabled": true,
+    "ensemble_num_seeds": 7,
+    "ensemble_seed_step": 101
+  },
+  "weight_optimization": {
+    "min_weight": 0.0,
+    "max_weight": 0.4,
+    "budget": 1000000
+  },
+  "crash_scenarios": {
+    "COVID Peak Crash": {
+      "train_start": "2019-02-20",
+      "train_end": "2020-02-19",
+      "test_start": "2020-02-20",
+      "test_end": "2020-04-30",
+      "description": "12M train before COVID crash peak, test during crash peak"
+    },
+    "China Bubble Burst Peak": {
+      "train_start": "2014-06-12",
+      "train_end": "2015-06-11",
+      "test_start": "2015-06-12",
+      "test_end": "2015-09-30",
+      "description": "12M train before China crash, test peak drawdown months"
+    },
+    "European Debt Stress": {
+      "train_start": "2011-03-14",
+      "train_end": "2012-03-13",
+      "test_start": "2012-03-14",
+      "test_end": "2012-09-30",
+      "description": "12M train before Euro stress, test during stress window"
+    },
+    "2022 Global Bear Phase": {
+      "train_start": "2021-01-01",
+      "train_end": "2021-12-31",
+      "test_start": "2022-01-01",
+      "test_end": "2022-06-30",
+      "description": "12M train before 2022 bear phase, test in first drawdown half"
+    }
+  },
+  "artifacts": {
+    "enabled": true,
+    "output_dir": "results/enhanced_artifacts",
+    "include_full_qubo_matrix": false
+  },
+  "sector_constraints": {
+    "enabled": true,
+    "max_sector_weight": 0.45,
+    "metadata_path": "../dataset/stock_metadata.csv",
+    "symbol_column": "Symbol",
+    "sector_column": "Industry"
+  },
+  "walkforward": {
+    "start_test": "2020-01-01",
+    "train_months": 12,
+    "test_months": 6,
+    "step_months": 12,
+    "min_remaining_days": 30
+  },
+  "regime_scenarios": {
+    "Bear Market - Crashes": {
+      "COVID Peak Crash": {
+        "train_start": "2019-02-20",
+        "train_end": "2020-02-19",
+        "test_start": "2020-02-20",
+        "test_end": "2020-04-30",
+        "description": "12M train before COVID crash peak, test during crash peak",
+        "regime": "Crash"
+      },
+      "China Bubble Burst Peak": {
+        "train_start": "2014-06-12",
+        "train_end": "2015-06-11",
+        "test_start": "2015-06-12",
+        "test_end": "2015-09-30",
+        "description": "12M train before China crash, test peak drawdown months",
+        "regime": "Crash"
+      },
+      "European Debt Stress": {
+        "train_start": "2011-03-14",
+        "train_end": "2012-03-13",
+        "test_start": "2012-03-14",
+        "test_end": "2012-09-30",
+        "description": "~12M train before Euro stress, test during stress window",
+        "regime": "Crash"
+      },
+      "2022 Global Bear Phase": {
+        "train_start": "2021-01-01",
+        "train_end": "2021-12-31",
+        "test_start": "2022-01-01",
+        "test_end": "2022-06-30",
+        "description": "12M train before 2022 bear phase, test in first drawdown half",
+        "regime": "Crash"
+      }
+    },
+    "Bull Market - Recovery/Profit": {
+      "Post-COVID Recovery": {
+        "train_start": "2019-04-01",
+        "train_end": "2020-03-31",
+        "test_start": "2020-04-01",
+        "test_end": "2021-03-31",
+        "description": "Train pre-recovery, test in strong recovery year",
+        "regime": "Normal"
+      },
+      "2023 Bull Run": {
+        "train_start": "2022-01-01",
+        "train_end": "2022-12-31",
+        "test_start": "2023-01-01",
+        "test_end": "2023-12-31",
+        "description": "Train in 2022, test full 2023 bull year",
+        "regime": "Normal"
+      },
+      "2024 Momentum Year": {
+        "train_start": "2023-01-01",
+        "train_end": "2023-12-31",
+        "test_start": "2024-01-01",
+        "test_end": "2024-12-31",
+        "description": "Train in 2023, test full 2024 momentum year",
+        "regime": "Normal"
+      }
+    },
+    "Present": {
+      "Present to Mar-11-2026": {
+        "train_start": "2024-03-11",
+        "train_end": "2025-03-10",
+        "test_start": "2025-03-11",
+        "test_end": "2026-03-11",
+        "description": "Train 1Y before present period, test until latest available date",
+        "regime": "Present"
+      }
+    }
+  }
+}

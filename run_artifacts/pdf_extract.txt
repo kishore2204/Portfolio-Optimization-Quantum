@@ -1,0 +1,862 @@
+Advanced Quantum Technologies 
+www.advquantumtech.com
+RESEARCH ARTICLE
+End-to-End Portfolio Optimization with Hybrid Quantum 
+Annealing 
+Sai Nandan Morapakula1 , 2 Sangram Deshpande1 , 3 Rakesh Yata1 Rushikesh Ubale1 Uday Wad1 Kazuki Ikeda2 , 4 
+1 Qkrishi Quantum Pvt Ltd, Gurgaon, Haryana, India 2 Department of Physics, University of Massachusetts, Boston, MA, USA 3 Department of Electrical and 
+Computer Engineering, North Carolina State University, Raleigh, NC, USA 4 Center for Nuclear Theory, Department of Physics and Astronomy, Stony Brook 
+University, NY, USA 
+Correspondence: Sai Nandan Morapakula ( s.morapakula001@umb.edu) 
+Received: 12 September 2025 Revised: 10 November 2025 Accepted: 20 November 2025 
+Keywords: asset allocation | asset selection | combinatorial optimization | quantum annealing | QUBO 
+ABSTRACT 
+Hybrid quantum-classical optimization has emerged as a promising direction for addressing financial decision problems under 
+current quantum hardware constraints. In this work we present a practical end-to-end portfolio optimization pipeline that 
+combines (i) a continuous mean-variance and Sharpe-ratio formulation, (ii) a QUBO/CQM-based discrete asset selection stage 
+solved using D-Wave’s hybrid quantum annealing solver, (iii) classical convex optimization for computing optimal asset weights, 
+and (iv) a quarterly rebalancing mechanism. Rather than claiming quantum advantage, our goal is to evaluate the feasibility and 
+integration of these components within a deployable financial workflow. We empirically compare our hybrid pipeline against 
+a fund manager in real time and indexes used in Indian stock market. The results indicate that the proposed framework can 
+construct diversified portfolios and achieve competitive returns. We also report computational considerations and scalability 
+observations drawn from the hybrid solver behavior. While the experiments are limited to moderate sized portfolios dictated by 
+current annealing hardware and QUBO embedding constraints, the study illustrates how quantum assisted selection and classical 
+allocation can be combined coherently in a real-world setting. This work emphasizes methodological reproducibility and practical 
+applicability, and aims to serve as a step toward larger-scale financial optimization workflows as quantum annealers continue to 
+mature. 
+1 Introduction 
+In the evolving landscape of financial technology, the task of 
+optimizing investment portfolios presents both challenges and 
+opportunities. Traditional methods for portfolio optimization, 
+while well-established, often struggle under the complexity and 
+large data requirements of modern financial markets. As the 
+demand for faster and more efficient solutions grows, the integra- 
+tion of quantum technology into financial strategies emerges as a 
+new approach. This paper examines how classical and quantum 
+methods can be combined to enhance the process of financial 
+portfolio optimization, focusing on the intricacies of modern 
+investment environments. 
+Portfolio optimization is a core financial task that seeks to allocate 
+assets in a manner that maximizes returns while minimizing 
+risk. Traditionally, this process relies on mathematical models 
+such as Modern Portfolio Theory (MPT) [ 1 ] and Mean-Variance 
+Optimization (MVO) [ 2 ], which use classical algorithms to assess 
+and predict the behavior of various asset classes. However, these 
+classical solutions often encounter limitations in scalability and 
+speed [ 3–6 ], particularly when dealing with large datasets or 
+complex asset interactions. 
+Quantum methods, characterized by the potential to process 
+information at scales beyond conventional technology limits, 
+offers an alternative framework to address these challenges. By 
+This is an open access article under the terms of the Creative Commons Attribution License,whichpermitsuse,distributionandreproduction  in any medium, provided the original work is properly 
+cited. 
+©2025 The Author(s). Advanced Quantum Technologies published by Wiley-VCH GmbH 
+Advanced Quantum Technologies , 2025; 0:e00753 
+https://doi.org/10.1002/qute.202500753
+1of10
+
+FIGURE 1 Hybrid quantum classical flow diagram. 
+FIGURE 2 Fully quantum flow diagram. 
+leveraging principles of quantum mechanics, such as super- 
+position and entanglement, quantum algorithms can search 
+extensive solution spaces more efficiently, potentially identi- 
+fying improved portfolio allocations with greater speed and 
+accuracy. Furthermore, the emergence of hybrid models that 
+combine classical and quantum techniques provides a balanced 
+approach, optimizing asset selection with quantum algorithms 
+while using classical methods for asset allocation and risk 
+assessment. 
+FIGURE 3 Comparison of both the portfolios. 
+FIGURE 4 Comparison of both the portfolios after rebalancing as 
+explained in 3.5 . 
+This paper outlines these methodologies and provides both 
+empirical analysis and theoretical insights into their effective- 
+ness. By integrating quantum annealing into portfolio opti- 
+mization [ 7, 8 ], we aim to establish a more adaptive and 
+efficient framework that can operate in the dynamic and often 
+unpredictable realm of financial markets. 
+The specific achievements we produced through our results are 
+summarized as follows: 
+∙The hybrid quantum classical model was able to allocate 
+better weights to the stocks compared to a fund manager in 
+real life, as presented in Figure 3 . 
+∙Rebalancing using the fully quantum version improved the 
+bank’s portfolio, as observed in Figure 4 . 
+This study does not claim that quantum annealing or the hybrid 
+CQM solver provides superior runtime or scalability relative to 
+tuned classical solvers. We refrain from drawing conclusions 
+about asymptotic scaling or computational speed. The contri- 
+bution of this work lies in demonstrating a feasible, end-to-end 
+integration of quantum-assisted discrete selection with classical 
+allocation and rebalancing on real financial data, rather than 
+establishing quantum computational advantage. 
+In the remainder of this introduction, we review related work in 
+finance using quantum hardware (Section 2 ). Next, we present 
+the methodology (Section 3 ) employed to obtain our findings. In 
+Section 4 , we discuss the results in detail, and finally, we conclude 
+the paper in Section 5 . 
+2of10 AdvancedQuantumTechnologies ,2025
+ 25119044, 0, Downloaded from https://advanced.onlinelibrary.wiley.com/doi/10.1002/qute.202500753, Wiley Online Library on [05/03/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+2 Background and Related Work 
+Quantum annealing (QA) [ 9 ] has emerged as a practical approach 
+for solving combinatorial optimization problems in finance. D- 
+Wave Systems has developed several generations of quantum 
+annealers, including the 2000Q and the Advantage family, which 
+employ transverse-field Ising architectures for energy minimiza- 
+tion [ 10–13 ]. These systems implement optimization problems 
+formulated as Quadratic Unconstrained Binary Optimization 
+(QUBO) or Ising models, following the early mappings proposed 
+by Rosenberg [ 14 ] and Glover [ 8 ]. Recent work has also extended 
+this framework to polynomial unconstrained binary optimization 
+(PUBO) [ 15 ]. 
+Applications of QA to financial modeling began with Ven- 
+turelli and Kondratyev [ 16 ], who addressed multi-period portfolio 
+optimization with transaction costs on physical D-Wave hard- 
+ware, demonstrating early scalability. Subsequent studies have 
+adopted both annealing and gate-based paradigms. The Quantum 
+Approximate Optimization Algorithm (QAOA) [ 17 ] has been 
+explored for portfolio allocation and rebalancing [ 18, 19 ], though 
+results remain hardware-limited. Comparative benchmarks [ 20–
+22 ] indicate that quantum methods currently perform compara- 
+bly to classical heuristics such as simulated annealing and genetic 
+algorithms, with hardware precision and connectivity constraints 
+being the main bottlenecks. Hybrid strategies that combine classi- 
+cal optimizers with quantum subroutines are therefore viewed as 
+the most feasible near-term route [ 23 ]. Related advances include 
+decomposition-based hybrid frameworks for large portfolios [ 24 ] 
+and hybrid eigensolver models [ 25 ]. 
+Beyond portfolio optimization, quantum techniques have been 
+applied to risk analysis, option pricing, and arbitrage detection. 
+For instance, Woerner and Egger [ 26 ] employed amplitude 
+estimation to accelerate Value-at-Risk (VaR) and conditional 
+VaR computations, while Stamatopoulos et al. [ 27 ] demonstrated 
+quantum-based option pricing speedups. Orús et al. [ 28 ] provided 
+a comprehensive survey of such applications, emphasizing both 
+the promise and the practical limitations of current devices. 
+While several prior works have explored hybrid quantum–
+classical approaches for portfolio optimization [ 16, 29, 30 ], 
+most studies remain constrained by simplified datasets, limited 
+covariance structures, and a lack of dynamic rebalancing. Few 
+integrate the entire pipeline from mean–variance formulation 
+through QUBO mapping, annealing, decoding, and time-series- 
+based rebalancing within a unified financial framework. Our 
+work addresses these gaps by presenting a comprehensive end-to- 
+end quantum annealing model that (1) reformulates continuous 
+mean–variance and Sharpe-ratio objectives into QUBO form 
+without ad-hoc linearization, (2) employs D-Wave’s hybrid solver 
+to capture real-market correlations from the Indian equity 
+market, and (3) demonstrates reproducible rebalancing that 
+outperforms the fund manager in both return and risk metrics. 
+3 Methodology 
+In this section, we elucidate the problem formulation methodolo- 
+gies employed in this study. A prominent technique is quantum 
+annealing, which leverages the adiabatic theorem. According to 
+this theorem, a quantum system remains in its ground state 
+provided that the Hamiltonian evolves sufficiently slowly over 
+time. Although practical implementations may not fully satisfy 
+the adiabatic condition, they still approximate it closely enough to 
+be useful in practice. To address an optimization problem, a time- 
+dependent Hamiltonian 𝐻( 𝑡) is constructed. Initially, the system 
+is prepared in the ground state of an easily realizable Hamiltonian 
+𝐻0 . Over time, the system evolves toward the target Hamiltonian 
+𝐻1 , with its ground state encapsulating the solution. The gradual 
+transition is defined as follows [ 9 ]: 
+𝐻( 𝑡) =
+(
+1 − 𝑡 
+𝜏
+)
+𝐻0 + 𝑡 
+𝜏𝐻1 , 0 ≤ 𝑡 ≤ 𝜏, (1) 
+where 𝜏represents the entire annealing time. According to the 
+adiabatic theorem, if this evolution is slow enough, the system 
+will remain in its instantaneous ground state throughout, result- 
+ing in the ground state of 𝐻1 when 𝑡 = 𝜏. Typically, the initial 
+Hamiltonian is defined as 𝐻0 = − ∑
+𝑖 𝑋𝑖 , where 𝑋𝑖 represents 
+the Pauli-X operator acting on the 𝑖-th qubit. The problem 
+Hamiltonian takes the form of an Ising model: 
+𝐻1 =
+∑
+𝑖> 𝑗 
+𝐽𝑖𝑗 𝑍𝑖 𝑍𝑗 +
+∑
+𝑖 
+ℎ𝑖 𝑍𝑖 , (2) 
+where 𝐽𝑖𝑗 represents couplings between qubits 𝑖and 𝑗, ℎ𝑖 denotes 
+external fields, and 𝑍𝑖 is the Pauli-Z operator. 
+This principle is realized by commercial quantum annealers, 
+such as those created by D-Wave Systems, which use quantum 
+processing units (QPU). 
+Specifically, we will utilize the constrained quadratic model 
+(CQM). The CQM solver can handle problems with binary 
+and integer variables and supports both equality and inequal- 
+ity constraints. It is reported that the CQM solver demon- 
+strates superior performance in solving problems characterized 
+by a large number of constraints, compared to other hybrid 
+approaches like the Binary Quadratic Model (BQM) and the 
+Discrete Quadratic Model (DQM) [ 31 ]. In this work, we have used 
+the CQM solver (hereinafter referred to as the hybrid solver), 
+hybrid_constrained_quadratic_model_version1, provided by D- 
+Wave to simulate the problem. This approach is better suited for 
+constraint-based issues than the conventional QUBO formulation 
+used in quantum annealing. 
+3.1 Modern Portfolio Theory (MPT) formulation 
+Based on [ 1 ], for 𝑛stocks with average monthly return 𝜇𝑖 per 
+dollar spent on stock 𝑖and covariance 𝜎𝑖𝑗 between stocks 𝑖and 𝑗, 
+the portfolio optimization problem, given a budget of 𝐵dollars, 
+involves determining the optimal number of shares 𝑥𝑖 of each 
+stock 𝑖purchased at price 𝑝𝑖 per share at risk 𝑞 > 0 . This can be 
+formulated as: 
+min 𝑞
+( 𝑛 ∑
+𝑖= 1 
+𝑛 ∑
+𝑗= 1 
+𝜎𝑖𝑗 ( 𝑝𝑖 𝑥𝑖 )( 𝑝𝑗 𝑥𝑗 )
+) 
+−
+( 𝑛 ∑
+𝑖= 1 
+𝜇𝑖 ( 𝑝𝑖 𝑥𝑖 )
+) 
+(3) 
+subject to: 
+𝑛 ∑
+𝑖= 1 
+( 𝑝𝑖 𝑥𝑖 ) ≤ 𝐵 (4) 
+AdvancedQuantumTechnologies ,2025 3of10
+ 25119044, 0, Downloaded from https://advanced.onlinelibrary.wiley.com/doi/10.1002/qute.202500753, Wiley Online Library on [05/03/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+Equation ( 4 ) is the budget constraint which means that a user 
+cannot spend more than the budget and it should always be less 
+than or equivalent to it. Likewise, Equation ( 3 ) is a non-negative 
+constraint meaning that the user cannot buy negative shares 
+of any stock simply put, number of shares of any stock should 
+always be positive. Here, 𝑞 > 0 is the risk aversion coefficient, 
+i.e., the trade-off coefficient between the risk (variance) and the 
+returns. 
+The number of shares 𝑥𝑖 affects the portfolio risk through its 
+contribution to the overall variance term. Since the variance 
+is calculated using the covariances 𝜎𝑖𝑗 , the individual standard 
+deviation 𝜎𝑖 = √𝜎𝑖𝑖 indirectly influences the portfolio’s total risk 
+depending on the amount invested in asset 𝑖, i.e., 𝑝𝑖 𝑥𝑖 . Thus, 
+higher allocations to more volatile stocks (with high 𝜎𝑖 ) increases 
+the portfolio variance. 
+3.2 Sharpe Ratio Maximization 
+A classical method usually maximizes the Sharpe ratio, a measure 
+for the performance of investments [ 2 ]: 
+Sharpe ratio =
+𝐸[ 𝑅𝑝 − 𝑅𝑓 ] 
+𝜎𝑝 
+=
+𝐸[ 𝑅𝑝 − 𝑅𝑓 ] 
+√  
+𝑣𝑎 𝑟 [ 𝑅𝑝 − 𝑅𝑓 ] 
+, (5) 
+where 𝑅𝑝 is the return of the portfolio, 𝑅𝑓 is the risk-free rate, 
+𝐸[ 𝑅𝑝 − 𝑅𝑓 ] is the expected value of excess of portfolio returns and 
+𝜎𝑝 is standard deviation of the portfolio’s excess return. 
+For simplicity, we take 𝑅𝑓 = 0 and substitute it in Equation ( 5 ). 
+We get, 
+Sharpe ratio =
+𝐸[ 𝑅𝑝 ] 
+√  
+𝑣𝑎 𝑟 [ 𝑅𝑝 ] 
+= 𝜇𝑇 𝑥 
+√
+𝑥𝑇 Σ𝑥 
+, 𝑥 ∈ℝ𝑛 . (6) 
+A Sharpe ratio above 1.0 is deemed good, with 2.0 being very 
+good and 3.0 or higher considered excellent. Ratios below 1.0 are 
+considered sub-optimal. 
+The above formulation is non-convex. In general, non-convex 
+problems are very difficult to solve. Fortunately, there exists a 
+convex reformulation, i.e. 
+min 𝑦𝑇 Σ𝑦, 
+s.t. ( 𝜇− 𝑟)𝑇 𝑦 = 1and 𝑦 ≥ 0 . 
+(7) 
+We consider 𝑟𝑓 = 0 . Then map the optimal solution 𝑦∗ back to the 
+original problem via the transformation. 
+𝑤∗ 
+𝑖 ∶ =
+𝑦∗ 
+𝑖 
+∑𝑛 
+𝑗= 1 𝑦∗ 
+𝑗 
+𝑖 = 1 , . . . , 𝑛. 
+We first use the classical convex formulation, which does not 
+impose any explicit cardinality requirements, to practically imple- 
+ment a cardinality constraint in our portfolio optimization. The 
+optimal continuous portfolio vector 𝑦∗ is obtained by solving this 
+convex optimization. Through the explicit computation of 
+𝑘 =
+𝑛 ∑
+𝑗= 1 
+𝑦∗ 
+𝑗 . 
+We derive the desired cardinality from this solution by assessing 
+the sum of its constituents. The optimal number of assets is 
+indicated by the resulting value 𝑘, which offers a well-informed 
+and theoretically supported cardinality restriction. Then, in a 
+new discrete or quantum-based optimization experiment, we 
+explicitly impose this derived cardinality 𝑘. 
+0 ≤ 𝑦 ≤ 𝑘𝑥 
+1𝑇 𝑥 = 𝜅
+We combine the computational efficiency and robustness of 
+convex optimization with the usefulness of discrete cardinality 
+constraints appropriate for quantum or combinatorial optimiza- 
+tion techniques by using this two-step approach, which involves 
+first solving a convex formulation to determine an optimal 
+cardinality and then using that cardinality as a fixed parameter 
+in a subsequent optimization. This hybrid approach guarantees 
+that the finished portfolio has a theoretically sound base while 
+adhering to real-world investment constraints. 
+3.3 Mean-Variance Portfolio Optimization 
+(MVO) 
+The MVO formulation aims to maximize the returns as well 
+as minimize the risk [ 2 ]. For solving the problem on quantum 
+computers, we need to formulate it as a QUBO problem. 
+min 
+𝑥∈{0 , 1}𝑛 𝑞 𝑥𝑇 𝐶𝑥 − 𝜇𝑇 𝑥 
+subject to: 1𝑇 𝑥 = 𝐵, 
+where we use the following notation: 
+∙𝑥 ∈{ 0 , 1}𝑛 denotes the vector of binary decision variables, 
+which indicate which assets to pick ( 𝑥[ 𝑖] = 1 ) and which not 
+to pick ( 𝑥[ 𝑖] = 0 ) 
+∙𝜇∈ℝ𝑛 defines the expected returns for the assets 
+∙𝐶 ∈ℝ𝑛×𝑛 specifies the covariances between the assets 
+∙𝑞 > 0 controls the risk appetite of the decision-maker 
+∙and 𝐵denotes the budget, i.e. the number of assets to be 
+selected out of 𝑛
+cov for covarience but not sigma as it is confusing To convert 
+the budget equality constraint 1⊤𝑥 = 𝐵into an unconstrained 
+QUBO, we add a positive quadratic penalty term 𝜆𝑏 (1⊤𝑥 − 𝐵)2 
+to the objective. For a minimization problem, violations of the 
+constraint must increase the objective, hence the penalty enters 
+with a positive sign. 
+min 
+𝑥∈{0 , 1}𝑛 𝑞 𝑥⊤𝐶𝑥 − 𝜇⊤𝑥 + 𝜆𝑏 (1⊤𝑥 − 𝐵)2 , (8) 
+4of10 AdvancedQuantumTechnologies ,2025
+ 25119044, 0, Downloaded from https://advanced.onlinelibrary.wiley.com/doi/10.1002/qute.202500753, Wiley Online Library on [05/03/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+where 𝜆is called the Lagrange multiplier which acts as a 
+penalty term (tunable). This will serve as the hamiltonian for 
+our simulation. The below explains the hamiltonian below 
+elaborately: 
+∙Risk term : 𝑞 𝑥𝑇 𝐶𝑥 
+This term represents the portfolio risk , measured as a 
+quadratic form over the covariance matrix. It penalizes portfo- 
+lios with high variance. The scalar 𝑞 > 0 reflects the investor’s 
+risk aversion —larger  values of 𝑞prioritize risk minimization. 
+∙Return term : − 𝜇𝑇 𝑥
+This term rewards portfolios with higher expected return . 
+The negative sign ensures that higher returns reduce the 
+overall energy, thereby making them more favorable in the 
+optimization. 
+∙Budget constraint penalty : − 𝜆𝑏 (1𝑇 𝑥 − 𝐵)2 
+This is a quadratic penalty enforcing the selection of exactly 𝐵
+assets. The Lagrange multiplier 𝜆controls the strength of this 
+constraint. Higher values penalize deviations from the budget 
+more severely. 
+The penalty weight 𝜆𝑏 is chosen large enough that any violation 
+of 1⊤𝑥 = 𝐵yields a higher objective than the best feasible 
+improvement. Following standard practice, we initialize 𝜆𝑏 using 
+the magnitude of the QUBO coefficients and increase it iteratively 
+until the constraint is satisfied within a small tolerance. We 
+convert the QUBO problem ( 8 ) into an Ising Hamiltonian [ 7 ]. As 
+the Ising model has spin variables 𝑠𝑖 ∈{ − 1 , 1} , 𝑥𝑖 is transformed 
+to (1 + 𝑠𝑖 )/2. The classical Ising Hamiltonian of our QUBO problem 
+is given as follows: 
+min 
+𝑠 
+⎛ 
+⎜ 
+⎜ 
+⎝ 
+∑
+𝑖 
+ℎ𝑖 𝑠𝑖 +
+∑
+𝑖𝑗 
+𝐽𝑖𝑗 𝑠𝑖 𝑠𝑗 + 𝜆
+( 
+∑
+𝑖 
+𝜋𝑖 𝑠𝑖 − 𝛽
+) 2 ⎞ 
+⎟ 
+⎟ 
+⎠ 
+(9) 
+s.t. 𝑠𝑖 ∈{ − 1 , 1} ∀𝑖, 
+where 𝐽𝑖𝑗 is the coupling term between two variables. To imple- 
+ment this Hamiltonian on a D-Wave quantum annealer, we first 
+transform the problem into the language of the Pauli 𝑍operators, 
+which have eigenvalues of ± 1 . The Ising Hamiltonian is: 
+𝐻 =
+∑
+𝑖 
+ℎ𝑖 𝑍𝑖 +
+∑
+𝑖𝑗 
+𝐽𝑖𝑗 𝑍𝑖 𝑍𝑗 + 𝜆
+( 
+∑
+𝑖 
+𝜋𝑖 𝑍𝑖 − 𝛽
+) 2 
+. (10) 
+3.4 Hybrid Quantum-Classical Formulation 
+Based on the formulations above, the hybrid quantum-classical 
+approach involves using a quantum computer for asset selection 
+and a classical solver for asset weight allocation, as illustrated in 
+Figure 1 . The MVO formulation is employed for selecting assets, 
+while both MVO and the maximum Sharpe ratio (maximizing 
+Equation ( 5 ) with respect to 𝑅𝑝 − 𝑅𝑓 ) can be used for allocating 
+weights to the selected assets. 
+3.5 Rebalancing 
+The idea is to rebalance portfolio at each time period until the 
+target time is reached. 
+3.5.1 Risk Identification 
+Risk identification in a portfolio involves closely analyzing the 
+historical performance and volatility of individual assets to 
+predict potential risks and returns. Risky companies/assets are 
+identified by observing the expected daily returns of stocks over a 
+period of time. This analysis not only helps in identifying which 
+companies or assets may be riskier but also aids in understanding 
+how these risks could impact the overall portfolio. 
+3.5.2 Portfolio Health Check 
+Every three months, we conduct a comprehensive review of 
+each asset’s mean returns. We monitor the portfolio value and 
+calculate the profit. Underperforming assets, identified as those 
+with unsatisfactory performance and elevated risk levels, are sys- 
+tematically removed from the portfolio. This process ensures that 
+the portfolio remains aligned with our rebalancing specifications 
+and maintains optimal health in regard to risk and returns. 
+A detailed description of rebalancing technique is given below: 
+Input : initial holdings 𝐻(0) ; sector map 𝑠 ( 𝑖) ; budget 𝐵 ; risk- 
+aversion 𝑞; sell count 𝐾sell . 
+Output : new portfolio, its portfolio value, and risk/return 
+metrics. (1) Estimate returns/covariance per quarter : compute HP- 
+filtered prices, log-returns on, then annualized mean 𝜇( 𝑘 ) and 
+covariance Σ( 𝑘) . (2) Identify underperformers : rank the current 
+holdings in 𝐻(0) by 𝜇( 𝑘 ) ; mark the lowest as underperformers 
+and liquidate them. (3) Sector-matched candidate set : collect 
+replacements from the same sectors as the sold names, available 
+in the universe at quarter end. (4) Discrete selection (QUBO) : 
+solve equation 8 using a classical SA sampler for the QUBO to 
+pick new assets. (5) Integer allocation (CQM, hybrid) : for chosen 
+names, solve a single-period CQM on D-Wave’s hybrid solver, 
+update holdings and wallet. (6) Record metrics : compute portfolio 
+value, return, risk, and Sharpe ratio of the new portoflio. In our 
+implementation, “risky companies” refers not to high-variance 
+names but to underperformers by expected return 𝜇. 
+Figure 2 illustrates the flow diagram of rebalancing, where fully 
+quantum approach has been used in generating the results. 
+Although the underlying optimization models follow the stan- 
+dard Modern Portfolio Theory and Mean–Variance formula- 
+tions, our implementation introduces several key innovations 
+in translating these into a QUBO/Ising framework. First, the 
+continuous portfolio weights are discretized through a struc- 
+tured mapping that preserves convexity and avoids arbitrary 
+thresholding. Second, an adaptive penalty factor 𝜆is applied 
+within the constraint Hamiltonian 𝐻𝑐 to dynamically balance 
+AdvancedQuantumTechnologies ,2025 5of10
+ 25119044, 0, Downloaded from https://advanced.onlinelibrary.wiley.com/doi/10.1002/qute.202500753, Wiley Online Library on [05/03/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+TABLE 1 Attribution Report of a real world portfolio. Note: Port = Portfolio, Bench = Benchmark, Ret = Return. Start date = 1 January 2023, end 
+date = 29 February 2024 Values represent percentage weights and returns. 
+Average Weight [%] Tot Return [%] 
+Security Port Bench + /– Port Ret Bench Ret + /–
+NIFTY TOP 10 100.00 100.00 0.00 22.79 26.91 − 4.13 
+Information Technology 28.66 13.64 15.02 16.61 19.11 − 2.49 
+TATA CONSULTANCY SVCS LTD 20.25 4.17 16.08 19.70 19.70 0.00 
+INFOSYSLTD 8.41 6.07 2.34 9.90 9.90 0.00 
+Financials 18.29 36.37 − 18.08 9.05 8.92 0.13 
+HDFCBANKLIMITED  9.36 11.20 − 1.85 − 11.60 − 11.60 0.00 
+ICICIBANKLTD  5.52 7.76 − 2.24 25.35 25.35 0.00 
+STATE BANK OF INDIA 3.42 2.64 0.78 46.71 46.71 0.00 
+ConsumerStaples 17.44 9.38 8.06 − 2.18 15.37 − 17.56 
+HINDUSTANUNILEVERLTD  14.91 2.68 12.23 − 5.16 − 5.16 0.00 
+ITCLTD 2.53 4.49 − 1.96 19.20 19.20 0.00 
+Industrials 15.88 5.40 10.48 63.59 73.15 − 9.56 
+LARSEN&TOUBROLTD  15.88 3.84 12.04 63.59 63.59 0.00 
+Energy 14.49 11.89 2.60 40.04 50.74 − 10.70 
+RELIANCEINDUSTRIESLTD  14.49 9.89 4.60 40.04 40.04 0.00 
+CommunicationServices 5.23 2.63 2.60 44.99 44.99 0.00 
+BHARTIAIRTELLTD  5.23 2.63 2.60 44.99 44.99 0.00 
+the trade-off between the return–risk objective and the budget or 
+cardinality constraints during the annealing process. Third, after 
+sampling from the annealer, a normalization-based decoding 
+step ensures that the resulting bitstrings correspond to feasible 
+weight allocations whose total sum equals the capital budget. 
+Finally, the Hamiltonian includes a temporal continuity term 
+that links portfolios across rebalancing intervals, encouraging 
+smoother transitions and reduced turnover. These additions col- 
+lectively form the methodological contribution of our work and 
+distinguish the proposed framework from existing static or single- 
+period QUBO formulations used in earlier quantum finance 
+studies. 
+4 Results and Discussion 
+In this section, we delve into the empirical results achieved 
+through our research. We first to examine the dataset utilized in 
+our experiments facilitated by D-Wave’s Quantum Annealer. The 
+data, reflecting real-time financial conditions, was supplied by a 
+banking institution. Unless explicitly stated, all monetary values 
+referenced herein are denominated in Indian Rupees (INR). 
+Table 1 presents an overview of a representative user’s portfolio at 
+a specific point in time, which serves as a comparative framework 
+for our analysis. For benchmarking purposes, we employ the 
+HDFCNIFTY50 ETF, and the user’s portfolio itself becomes 
+the benchmark against which our results using the quantum 
+annealer are evaluated. Through this meticulous comparison, we 
+aim to validate the performance enhancements derived from our 
+quantum approach. 
+Before computing the value of the portfolio, here we assign the 
+weights to all the given stocks. The weights are allocated based 
+on the classical algorithm that we discussed above. Taking the 
+weights into consideration we calculate the sharpe ratio, returns, 
+risk and diversification ratio of the given stocks. 
+Table 2 presents a comparative analysis of the asset allocation 
+weights determined by our algorithm against those provided by 
+the bank’s benchmark. This table also includes key financial 
+metrics such as risk, return, Sharpe ratio, and diversification 
+ratios. Our algorithm’s allocation strategy results in superior 
+financial performance. Specifically, the algorithm’s weight distri- 
+bution yields higher returns and a more favorable Sharpe ratio 
+in comparison to the benchmark distribution. This demonstrates 
+the efficacy of our method in optimizing asset allocation to 
+achieve enhanced performance metrics. It is important to note 
+that the weight allocations in Table 2 are derived from the classical 
+MIQP optimizer, while the quantum solver is utilized only during 
+the rebalancing stage. The overweighting of ICICI Bank, ITC, 
+and Bharti Airtel reflects their superior expected return-to-risk 
+characteristics within the classical covariance structure. 
+Once the weights are assigned, we determine the total investment 
+amount used to purchase stocks across all the selected companies. 
+Based on this total investment, we calculate the optimal number 
+of shares to acquire for each company. By multiplying the optimal 
+number of shares by the closing price of each company’s stock, we 
+aggregate these values to determine the overall portfolio value. 
+Furthermore, the portfolio configured using our algorithm’s 
+assigned weights demonstrates significantly higher returns and 
+6of10 AdvancedQuantumTechnologies ,2025
+ 25119044, 0, Downloaded from https://advanced.onlinelibrary.wiley.com/doi/10.1002/qute.202500753, Wiley Online Library on [05/03/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+TABLE 2 Algorithm weights vs benchmark weights. 
+Name of the stock 
+Weights by 
+algorithm 
+Weights in 
+benchmark 
+Bharti Airtel 16.26 5.23 
+HDFC Bank 2.59 9.36 
+Hindustan Unilever 4.59 14.91 
+ICICI Bank 10.42 5.52 
+Infosys 6.90 8.41 
+ITC 10.56 2.53 
+L&T 17.73 15.88 
+Reliance Industries 12.42 14.49 
+State Bank of India 10.24 3.42 
+TCS 8.28 20.25 
+Returns 26.79 18.03 
+Risk 10.49 10.92 
+Sharpe Ratio 2.55 1.65 
+Diversification Ratio 1.78 1.72 
+a superior Sharpe ratio compared to the benchmark. Notably, 
+this portfolio also exhibits reduced risk relative to the bench- 
+mark, highlighting the effectiveness of our method in optimizing 
+investment outcomes. 
+Algorithm 4 summarizes the complete end-to-end workflow 
+implemented in this study. The pipeline begins with data inges- 
+tion and preprocessing, where daily prices are converted into 
+log-returns and used to estimate the expected-return vector and 
+covariance matrix for each rebalancing window. These estimates 
+feed into a discrete asset-selection module, formulated as a 
+QUBO and solved using a quantum-assisted (or simulated) 
+annealing routine. The selected assets are then passed to an 
+integer-constrained CQM allocator that computes feasible share 
+allocations under budget, sector, and cardinality constraints. 
+Finally, a quarterly rebalancing mechanism identifies underper- 
+forming holdings, replaces them through a repeat of the selection 
+stage, and updates the portfolio’s evaluation metrics. This unified 
+structure provides a transparent hybrid framework that inte- 
+grates quantum-assisted selection with classical optimization and 
+realistic trading constraints. 
+In Figure 3 , the red line represents the portfolio value of the 
+benchmark data for our analysis. Conversely, the blue line depicts 
+the portfolio value achieved by our algorithm. Over the 13-month 
+period, both the individual investor and the algorithm started 
+with the same portfolio value of 1.6 million Indian Rupees. 
+By the end of this period, the investor’s portfolio had grown 
+to approximately 1.95 million, reflecting an absolute gain of 
+0.35 million rupees, or about 21.9% growth. In comparison, the 
+algorithm’s portfolio reached 2.2 million rupees, marking a larger 
+increase of 0.6 million, or 37.5%. This means the algorithm not 
+only delivered a higher return overall but also outperformed the 
+investor by around 0.25 million rupees in absolute terms, which 
+translates to a performance gap of roughly 15.6 percentage points. 
+ALGORITHM 1 End-to-End Portfolio Optimization and Rebalanc- 
+ing via Quantum Annealing. 
+1: Input : Historical prices 𝑃𝑖,𝑡 for assets  ; rebalancing 
+interval Δ𝑡 = 𝑞 𝑢𝑎𝑡 𝑒𝑟𝑙 𝑦; constants 𝑞, 𝜆, 𝐾sell , 𝐵
+2: Output : Optimized quarterly portfolios { 𝑤( 𝑘) } with 
+risk–return metrics 
+3: Data Preparation 
+4: Retrieve adjusted close prices for  from NSE/BSE 
+between 𝑡start and 𝑡end 
+5: Compute log-returns, annualized mean 𝜇, and covariance 
+matrix Σ
+6: Apply HP filter ( 𝜆HP = 6 . 25 ) to smooth price trends 
+7: Optimization Stage 
+8: for each rebalancing window 𝑘do 
+9: Formulate mean–variance objective: 
+min 𝑥 𝑞 𝑥⊤Σ𝑥 − 𝜇⊤𝑥
+10: Encode budget & cardinality constraints: 
+𝐻 = 𝐻obj + 𝜆𝐻𝑐 
+11: Convert 𝐻to QUBO using QuadraticProgramToQubo 
+12: Solve using SimulatedAnnealingSampler ( num_reads 
+= 5000 ) 
+13: Decode lowest-energy bitstring and normalize to obtain 
+𝑤( 𝑘) 
+14: Rebalancing and Evaluation 
+15: for each quarter 𝑘 →𝑘+ 1 do 
+16: Rank current holdings by expected return 𝜇
+17: Sell the 𝐾sell = 4 lowest-return assets to free capital 
+18: Identify candidate replacements from the same sectors 
+19: Re-solve the QUBO on this subset to select 𝐾sell new 
+assets 
+20: Allocate integer shares 
+21: Update holdings and compute portfolio value, risk, 
+return, and Sharpe ratio 
+Following the computation and comparison of portfolio values, 
+we employ the rebalancing strategies described in Section 3.5 . 
+In this study, the portfolios were rebalanced quarterly, result- 
+ing in a total of four rebalancing actions over the 13-month 
+portfolio period. 
+Figure 4 illustrates the rebalancing outcomes, with the red line 
+representing the user’s portfolio and the blue line depicting 
+the algorithm’s portfolio. After conducting four rebalancing 
+sessions, the difference between the two portfolios becomes quite 
+marginal. However, when contrasting these rebalanced portfolios 
+with the original portfolios shown in Figure 3 , there is an 
+observable improvement in their values. Specifically, the user’s 
+rebalanced portfolio surpasses 2 million Indian Rupees, whereas 
+the original value was approximately 1.95 million Indian Rupees. 
+This highlights the effectiveness of rebalancing in enhancing 
+portfolio performance. 
+AdvancedQuantumTechnologies ,2025 7of10
+ 25119044, 0, Downloaded from https://advanced.onlinelibrary.wiley.com/doi/10.1002/qute.202500753, Wiley Online Library on [05/03/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+FIGURE 5 Comparison of a client portfolio before and after rebal- 
+ancing. 
+FIGURE 6 Comparison of a test portfolio before and after rebalanc- 
+ing with NIFTY 50 benchmark. 
+We did not restrain from testing the above methods with one 
+single portfolio. Below are more results on different portfolios 
+with various benchmarks used in the Indian market. In Figure 5 
+we apply the rebalancing technique to a portfolio by a real user 
+which consists of 70 assets, where the user bought 100 shares 
+of each asset. He started his portfolio on the 1st of September 
+2023 and stopped all his transactions on 25th September 2024. 
+The benchmark used in this portfolio is NIFTY 50 which contains 
+50 of the largest Indian companies listed on National Stock 
+Exchange(NSE). 
+We also created a test portfolio by ourselves which is not real 
+rather fabricated. This synthetic portfolio contains of 11 assets 
+from different sectors, Information technology, Health Care, 
+Banking to name a few. We also assumed that there are 100 shares 
+of each of these assets in this Test Portfolio for simplicity. We 
+used various benchmarks to see the efficiency of our rebalancing 
+technique. Figure 6, 7 , and 8 , shows the the impact of our 
+rebalancing methodology with NIFTY 50, 100, 500 benchmarks 
+respectively. Where as Figures 9 and 10 , showsthe  performance 
+with BSE 100, 500 benchmarks respectively. 
+5 Conclusion 
+This work presents an end-to-end framework for portfolio opti- 
+mization that integrates classical mean–variance modeling with 
+quantum annealing-based rebalancing. The experiments demon- 
+strate that, even under current hardware constraints, quantum 
+FIGURE 7 Comparison of a test portfolio before and after rebalanc- 
+ing with NIFTY 100 benchmark. 
+FIGURE 8 Comparison of a test portfolio before and after rebalanc- 
+ing with NIFTY 500 benchmark. 
+FIGURE 9 Comparison of a test portfolio before and after rebalanc- 
+ing with BSE 100 benchmark. 
+FIGURE 10 Comparison of a test portfolio before and after rebal- 
+ancing with BSE 500 benchmark. 
+8of10 AdvancedQuantumTechnologies ,2025
+ 25119044, 0, Downloaded from https://advanced.onlinelibrary.wiley.com/doi/10.1002/qute.202500753, Wiley Online Library on [05/03/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+annealers can successfully handle constrained portfolio formu- 
+lations and yield allocations comparable to classical baselines. 
+However, the scope of the present study remains limited to a 
+modest asset universe and should be interpreted as an initial feasi- 
+bility test rather than a demonstration of large-scale deployment. 
+The results are influenced by inherent limitations of current 
+annealing technology, including restricted problem size due to 
+embedding overhead, limited parameter precision, and the need 
+for hybrid solver orchestration that introduces classical latency. 
+Furthermore, the stochastic nature of the annealing process 
+may lead to solution variability, necessitating multiple runs and 
+statistical averaging. 
+These constraints imply that the current results reflect the near- 
+term capabilities of quantum annealers rather than their ultimate 
+performance potential. Given the strength of classical MIQP and 
+metaheuristics (GA/SA), our results should be interpreted as 
+evidence of feasibility rather than superiority. Future research 
+will aim to benchmark larger portfolios, explore advanced hybrid 
+workflows, and leverage improvements in annealing hardware 
+and problem embedding to approach industrial-scale portfo- 
+lio optimization. 
+Future Work 
+While this study demonstrates the feasibility of integrating quan- 
+tum annealing into a practical portfolio construction pipeline, 
+several important avenues remain open for future exploration. 
+The present experiments use a modest asset universe moti- 
+vated by the constraints of our industry collaboration and the 
+hybrid solver configurations available at the time of execution. 
+Extending the analysis to broader such as the global equity 
+indices, or multi-asset datasets will be essential for assessing 
+scalability and stress-testing the proposed pipeline under real- 
+istic institutional workloads. The current quarterly rebalancing 
+procedure can be extended by explicitly modeling transaction 
+costs, slippage, and liquidity constraints. Incorporating these 
+frictions will produce a more realistic assessment of turnover 
+and its impact on realized performance. Given evolving access 
+policies for commercial annealers, future work will explore 
+alternative quantum and quantum-inspired backends, including 
+simulated quantum annealers, Fujitsu DAU, Toshiba SBM, and 
+emerging open-access annealing platforms. This will allow the 
+pipeline to be tested under diverse hardware characteristics and 
+will facilitate reproducibility. Overall, this work provides an 
+initial proof-of-concept integration of quantum annealing into 
+a portfolio-optimization workflow. Future efforts will focus on 
+broadening empirical scope, strengthening baselines, improv- 
+ing reproducibility, and evaluating scalability across markets, 
+datasets, and hardware platforms. 
+Acknowledgements 
+Sai Nandan Morapakula and Sangram Deshpande contributed equally to 
+this work. The authors would like to thank D-Wave Systems for the access 
+to their quantum annealer. We would also like to thank Prof. Greg Byrd 
+for the meaningful discussions and comments. This work is supported by 
+the NSF, Office of Strategic Initiatives, under Grant No. OSI-2328774 (SM, 
+KI) 
+Conflicts of Interest 
+The authors declare no conflict of interest. 
+Data Availability Statement 
+The data that support the findings of this study are available from the 
+corresponding author upon reasonable request. 
+References 
+1 . H. Markowitz, “Portfolio Selection,”The Journal of Finance 7, no. 1 
+(1952): 77–91. [Online]. Available, http://www.jstor.org/stable/2975974 . 
+2 . G. Cornuéjols and R. Tutuncu, Optimization Methods in Finance 1 
+(2007). 
+3 . R. Jagannathan and T. Ma, “Risk Reduction in Large Portfolios: Why 
+Imposing the Wrong Constraints Helps,”The Journal of Finance 58, no. 
+4 (2003): 1651–1683. [Online]. Available, https://onlinelibrary.wiley.com/ 
+doi/abs/10.1111/1540-6261.00580 . 
+4 . V. DeMiguel, L. Garlappi, and R. Uppal, “Optimal Versus Naive 
+Diversification: How Inefficient Is the 1/n Portfolio Strategy?”The Review 
+of Financial Studies 22, no. 5 (2009): 1915–1953. [Online]. Available, http:// 
+www.jstor.org/stable/30226017 . 
+5 . O. Ledoit and M. Wolf, “A Well-Conditioned Estimator for Large- 
+Dimensional Covariance Matrices,”Journal of Multivariate Analysis 88, 
+no. 2 (2004): 365–411. [Online]. Available, https://www.sciencedirect. 
+com/science/article/pii/S0047259X03000964 . 
+6 . C. Chen, X. Li, C. Tolman, S. Wang, and Y. Ye, “Sparse Portfolio 
+Selection via Quasi-Norm Regularization,” (2013), https://arxiv.org/abs/ 
+1312.6350 . 
+7 . A. Lucas, “Ising Formulations of Many NP Problems,”Frontiers in 
+Physics 2 (2014), https://doi.org/10.3389/fphy.2014.00005 . 
+8 . F. Glover, G. Kochenberger, and Y. Du, “A Tutorial on Formulating and 
+Using QUBO Models,”(2019), https://arxiv.org/abs/1811.11538 . 
+9 . T. Kadowaki and H. Nishimori, “Quantum Annealing in the Transverse 
+Ising Model,”Physical Review E 58 (1998): 5355–5363. [Online]. Available, 
+https://link.aps.org/doi/10.1103/PhysRevE.58.5355 . 
+10 . P. Hauke, H. G. Katzgraber, W. Lechner, H. Nishimori, and W. D. 
+Oliver, “Perspectives of Quantum Annealing: Methods and Implementa- 
+tions,”Reports on Progress in Physics 83, no. 5 (2020): 054401. [Online]. 
+Available, https://doi.org/10.1088/1361-6633/ab85b8 . 
+11 . A. Abbas, A. Ambainis, B. Augustino, et al., “Challenges and Opportu- 
+nities in Quantum Optimization,”Nature Reviews Physics 6, no. 12 (2024): 
+718–735. [Online]. Available, https://doi.org/10.1038/s42254-024-00770-9 . 
+12 . S. Yarkoni, E. Raponi, T. Bäck, and S. Schmitt, “Quantum Annealing 
+for Industry Applications: Introduction and Review,”Reports on Progress 
+in Physics 85, no. 10 (2022): 104001. [Online]. Available, https://doi.org/10. 
+1088/1361-6633/ac8c54 . 
+13 . C. McGeoch and P. Farré, “Advantage Processor Overview,” (Dwave 
+Systems, 2650 E Bayshore Rd Palo Alto, CA, Tech. Rep., January 
+2022), https://www.dwavequantum.com/media/3xvdipcn/14-1058a- 
+a_advantage_processor_overview.pdf. 
+14 . G. Rosenberg, P. Haghnegahdar, P. Goddard, P. Carr, K. Wu, and M. 
+L. de Prado, “Solving the Optimal Trading Trajectory Problem Using a 
+Quantum Annealer,”IEEE Journal of Selected Topics in Signal Processing 
+10, no. 6 (2016): 1053–1060. [Online]. Available, https://doi.org/10.1109/ 
+JSTSP.2016.2574703 . 
+15 . C. Grange, M. Lavignac, V. Pozzoli, and E. Bourreau, “Quadratic Ver- 
+sus Polynomial Unconstrained Binary Models for Quantum Optimization 
+Illustrated on Railway Timetabling,” (2024), https://arxiv.org/abs/2411. 
+10062 . 
+AdvancedQuantumTechnologies ,2025 9of10
+ 25119044, 0, Downloaded from https://advanced.onlinelibrary.wiley.com/doi/10.1002/qute.202500753, Wiley Online Library on [05/03/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License
+
+16 . D. Venturelli and A. Kondratyev, “Reverse Quantum Annealing 
+Approach to Portfolio Optimization Problems,”Quantum Machine Intel- 
+ligence 1, no. 1–2 (2019) 17–30. [Online]. Available, https://doi.org/10.1007/ 
+s42484- 019- 00001- w. 
+17 . E. Farhi, J. Goldstone, and S. Gutmann, “A Quantum Approximate 
+Optimization Algorithm,”(2014), https://arxiv.org/abs/1411.4028 . 
+18 . M. Hodson, B. Ruck, H. Ong, D. Garvin, and S. Dulman, “Portfolio 
+Rebalancing Experiments Using the Quantum Alternating Operator 
+Ansatz,”(2019), https://arxiv.org/abs/1911.05296 . 
+19 . C. Huot, K. Kea, T.-K. Kim, and Y. Han, “Enhancing Knapsack- 
+Based Financial Portfolio Optimization Using Quantum Approximate 
+Optimization Algorithm,”(2024), https://arxiv.org/abs/2402.07123 . 
+20 . S. Brandhofer, D. Braun, V. Dehn, et al., “Benchmarking the Per- 
+formance of Portfolio Optimization With QAOA,”Quantum Information 
+Processing 22, no. 1 (2022), https://doi.org/10.1007/s11128- 022- 03766- 5 . 
+21 . A. R. Mazumder, A. Sen, and U. Sen, “Benchmarking Metaheuristic- 
+Integrated QAOA Against Quantum Annealing,” (2024), https://arxiv. 
+org/abs/2309.16796 . 
+22 . K. Zaman, A. Marchisio, M. Kashif, and M. Shafique, “Po-QA: A 
+Framework for Portfolio Optimization Using Quantum Algorithms,”
+(2024), https://arxiv.org/abs/2407.19857 . 
+23 . D. J. Egger, C. Gambella, J. Marecek, et al., “Quantum Computing for 
+Finance: State-of-the-Art and Future Prospects,”IEEE Transactions on 
+Quantum Engineering 1 (2020): 1–24. [Online]. Available, https://doi.org/ 
+10.1109/TQE.2020.3030314 . 
+24 . A. Acharya, R. Yalovetzky, P. Minssen, et al., “Decomposition Pipeline 
+for Large-Scale Portfolio Optimization With Applications to Near-Term 
+Quantum Computing,”(2024), https://arxiv.org/abs/2409.10301 . 
+25 . S. Wang, P. Wang, G. Li, et al., “Variational Quantum Eigensolver with 
+Linear Depth Problem-Inspired Ansatz for Solving Portfolio Optimization 
+in Finance,”(2024), https://arxiv.org/abs/2403.04296 . 
+26 . S. Woerner and D. J. Egger, “Quantum Risk Analysis,”npj Quantum 
+Information 5, no. 1 (2019), https://doi.org/10.1038/s41534- 019- 0130- 6 . 
+27 . N. Stamatopoulos, D. J. Egger, Y. Sun, et al., “Option Pricing Using 
+Quantum Computers,”Quantum 4 (2020): 291, https://doi.org/10.22331/ 
+q- 2020- 07- 06- 291 . 
+28 . R. Orús, S. Mugel, and E. Lizaso, “Quantum Computing for Finance: 
+Overview and Prospects,”Reviews in Physics 4 (2019): 100028. [Online]. 
+Available, https://doi.org/10.1016/j.revip.2019.100028 . 
+29 . P. Rebentrost, B. Gupt, and T. R. Bromley, “Quantum Computational 
+Finance: Monte Carlo Pricing of Financial Derivatives,”Physical Review 
+A 98, no. 2 (2018), https://doi.org/10.1103/PhysRevA.98.022321 . 
+30 . S. Mugel, C. Kuchkovsky, E. Sánchez, et al., “Dynamic Portfo- 
+lio Optimization with Real Datasets Using Quantum Processors and 
+Quantum-Inspired Tensor Networks,”Physical Review Research 4, no. 1 
+(2022), https://doi.org/10.1103/PhysRevResearch.4.013006 . 
+31 . “Hybrid Solver for Constrained Quadratic Models,”(Dwave Systems, 
+2650 E Bayshore Rd Palo Alto, CA, Tech. Rep., October 2021). [Online]. 
+Available, https://www.dwavequantum.com/media/rldh2ghw/14-1055a- 
+a_hybrid_solver_for_constrained_quadratic_models.pdf. 
+Supporting Information 
+Additional supporting information can be found online in the Supporting 
+Information section. 
+Supporting File: qute70142-sup-0001-Data.zip. 
+10of10 AdvancedQuantumTechnologies ,2025
+ 25119044, 0, Downloaded from https://advanced.onlinelibrary.wiley.com/doi/10.1002/qute.202500753, Wiley Online Library on [05/03/2026]. See the Terms and Conditions (https://onlinelibrary.wiley.com/terms-and-conditions) on Wiley Online Library for rules of use; OA articles are governed by the applicable Creative Commons License

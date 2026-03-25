@@ -1,0 +1,89 @@
+{
+    "dataset_candidates":  [
+                               "Dataset/prices_timeseries_complete.csv",
+                               "data/prices_timeseries.csv"
+                           ],
+    "universe_filter":  {
+                            "mode":  "full_universe",
+                            "nifty100_sectors_path":  "config/nifty100_sectors.json"
+                        },
+    "matrix_exports":  {
+                           "enabled":  true,
+                           "output_root":  "run_artifacts/matrix_exports",
+                           "include_full_covariance":  false,
+                           "include_full_qubo":  false,
+                           "include_selected_covariance":  true,
+                           "include_selected_qubo":  true
+                       },
+    "evaluation":  {
+                       "k_stocks":  10,
+                       "k_mode":  "auto_from_phase2_if_available",
+                       "k_min":  8,
+                       "k_max":  20,
+                       "seed":  42,
+                       "min_train_coverage":  0.8,
+                       "min_test_points":  20,
+                       "train_window_mode":  "rolling",
+                       "horizon_months":  [
+                                              12
+                                          ],
+                       "train_months_by_horizon":  {
+                                                       "12":  60
+                                                   }
+                   },
+    "dynamic_k":  {
+                      "enabled":  true,
+                      "mode":  "eq7_train_window",
+                      "k_min":  6,
+                      "k_max":  20,
+                      "risk_free_rate":  0.06
+                  },
+    "qubo":  {
+                 "downside_beta":  0.3,
+                 "lambda_penalty":  null,
+                 "lambda_base":  50.0,
+                 "lambda_scale":  10.0,
+                 "max_iter":  2000,
+                 "covariance_shrinkage_enabled":  true,
+                 "covariance_shrinkage_alpha":  "auto",
+                 "covariance_shrinkage_diag_eps":  1E-08,
+                 "ensemble_enabled":  true,
+                 "ensemble_num_seeds":  7,
+                 "ensemble_seed_step":  101
+             },
+    "weight_optimization":  {
+                                "min_weight":  0.0,
+                                "max_weight":  0.4,
+                                "budget":  1000000
+                            },
+    "crash_scenarios":  {
+                            "COVID Peak Crash":  {
+                                                     "train_start":  "2019-02-20",
+                                                     "train_end":  "2020-02-19",
+                                                     "test_start":  "2020-02-20",
+                                                     "test_end":  "2020-04-30",
+                                                     "description":  "12M train before COVID crash peak, test during crash peak"
+                                                 },
+                            "China Bubble Burst Peak":  {
+                                                            "train_start":  "2014-06-12",
+                                                            "train_end":  "2015-06-11",
+                                                            "test_start":  "2015-06-12",
+                                                            "test_end":  "2015-09-30",
+                                                            "description":  "12M train before China crash, test peak drawdown months"
+                                                        },
+                            "European Debt Stress":  {
+                                                         "train_start":  "2011-03-14",
+                                                         "train_end":  "2012-03-13",
+                                                         "test_start":  "2012-03-14",
+                                                         "test_end":  "2012-09-30",
+                                                         "description":  "12M train before Euro stress, test during stress window"
+                                                     },
+                            "2022 Global Bear Phase":  {
+                                                           "train_start":  "2021-01-01",
+                                                           "train_end":  "2021-12-31",
+                                                           "test_start":  "2022-01-01",
+                                                           "test_end":  "2022-06-30",
+                                                           "description":  "12M train before 2022 bear phase, test in first drawdown half"
+                                                       }
+                        }
+}

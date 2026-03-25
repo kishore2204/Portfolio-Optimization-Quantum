@@ -1,0 +1,38 @@
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated outputs
+results/*.png
+results/*.csv
+results/*.json
+results/*.md
+
+# Generated intermediate artifacts
+data/*.npy
+data/*.csv
+portfolios/*.npy
+portfolios/*.csv
+portfolios/*.json
+quantum/*.npy
+quantum/*.json
+
+# Keep documentation and configs tracked
+!docs/**
+!config/**
+!README.md

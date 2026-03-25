@@ -1,0 +1,17 @@
+group,metric,method,count
+horizon,best_total_return,Greedy,1
+horizon,best_total_return,Quantum,2
+horizon,best_total_return,Classical,1
+horizon,best_sharpe,Greedy,1
+horizon,best_sharpe,Quantum,2
+horizon,best_sharpe,Classical,1
+horizon,best_max_drawdown,Classical,4
+horizon,best_var_95,Classical,4
+crash,best_total_return,Classical,1
+crash,best_total_return,Quantum,3
+crash,best_sharpe,Classical,1
+crash,best_sharpe,Quantum,3
+crash,best_max_drawdown,Classical,1
+crash,best_max_drawdown,Quantum,3
+crash,best_var_95,Classical,3
+crash,best_var_95,Quantum,1
