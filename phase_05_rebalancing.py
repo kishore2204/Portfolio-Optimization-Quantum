@@ -117,7 +117,11 @@ class QuarterlyRebalancer:
         """
         # Build reverse sector map (stock -> sector)
         stock_to_sector = {}
-        for sector, stocks in self.sector_map.items():
+        sector_source = self.sector_map
+        if isinstance(sector_source, dict) and 'NIFTY_100_STOCKS' in sector_source:
+            sector_source = sector_source['NIFTY_100_STOCKS']
+
+        for sector, stocks in sector_source.items():
             for stock in stocks:
                 stock_to_sector[stock] = sector
         
@@ -134,7 +138,7 @@ class QuarterlyRebalancer:
         candidates = []
         for sector in underperformer_sectors:
             # Get all stocks in this sector
-            sector_stocks = self.sector_map.get(sector, [])
+            sector_stocks = sector_source.get(sector, [])
             
             # Filter to universe and exclude current holdings
             available = [s for s in sector_stocks 

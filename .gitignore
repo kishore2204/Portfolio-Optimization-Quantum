@@ -17,6 +17,9 @@ env/
 .DS_Store
 Thumbs.db
 
+# Local API credentials and provider secrets
+apis/*.json
+
 # Generated outputs
 results/*.png
 results/*.csv

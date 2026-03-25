@@ -71,7 +71,8 @@ def load_complete_data(data_path: str):
     return df
 
 def get_stock_universe(prices_df, train_start, train_end, test_start, test_end,
-                       min_coverage=0.8, min_test_points=20):
+                       min_coverage=0.8, min_test_points=20,
+                       min_train_points=0, min_return_points=0):
     """Get stocks with strong train coverage and minimum test availability."""
     train_mask = (prices_df['Date'] >= train_start) & (prices_df['Date'] <= train_end)
     test_mask = (prices_df['Date'] >= test_start) & (prices_df['Date'] <= test_end)
@@ -89,8 +90,26 @@ def get_stock_universe(prices_df, train_start, train_end, test_start, test_end,
 
         train_non_null = train_df[col].notna().sum()
         test_non_null = test_df[col].notna().sum()
-        if train_non_null >= min_required and test_non_null >= min_test_points:
-            eligible_stocks.append(col)
+        if train_non_null < min_required or test_non_null < min_test_points:
+            continue
+
+        if int(min_train_points) > 0 and train_non_null < int(min_train_points):
+            continue
+
+        series_train = train_df[col].ffill().bfill()
+        returns_train = series_train.pct_change().replace([np.inf, -np.inf], np.nan).dropna()
+
+        if int(min_return_points) > 0 and len(returns_train) < int(min_return_points):
+            continue
+
+        if returns_train.empty:
+            continue
+
+        variance = float(np.var(returns_train.values))
+        if not np.isfinite(variance) or variance <= 0:
+            continue
+
+        eligible_stocks.append(col)
 
     return eligible_stocks
 
@@ -146,6 +165,7 @@ def select_quantum_portfolio(
     K=10,
     seed=None,
     qubo_params=None,
+    current_holdings=None,
     return_details=False,
     include_matrices=False,
     verbose=True,
@@ -172,13 +192,29 @@ def select_quantum_portfolio(
     lambda_base = float(qubo_params.get('lambda_base', 50.0))
     lambda_scale = float(qubo_params.get('lambda_scale', 10.0))
     downside_beta = float(qubo_params.get('downside_beta', 0.3))
+    risk_aversion = float(qubo_params.get('risk_aversion', 1.0))
     max_iter = int(qubo_params.get('max_iter', 2000))
     cov_shrink_enabled = bool(qubo_params.get('covariance_shrinkage_enabled', False))
     cov_shrink_alpha_cfg = qubo_params.get('covariance_shrinkage_alpha', 'auto')
     cov_shrink_diag_eps = float(qubo_params.get('covariance_shrinkage_diag_eps', 1e-8))
+    uncertainty_aware_enabled = bool(qubo_params.get('uncertainty_aware_enabled', False))
+    instability_gamma = float(qubo_params.get('instability_gamma', 0.0))
+    mean_shrinkage = float(qubo_params.get('mean_shrinkage', 0.0))
     ensemble_enabled = bool(qubo_params.get('ensemble_enabled', False))
     ensemble_num_seeds = max(1, int(qubo_params.get('ensemble_num_seeds', 1)))
     ensemble_seed_step = int(qubo_params.get('ensemble_seed_step', 101))
+    ensemble_confidence_threshold = float(qubo_params.get('ensemble_confidence_threshold', 0.0))
+    turnover_aware_enabled = bool(qubo_params.get('turnover_aware_enabled', False))
+    turnover_penalty = float(qubo_params.get('turnover_penalty', 0.0))
+    warm_start_enabled = bool(qubo_params.get('warm_start_enabled', False))
+    path_relinking_enabled = bool(qubo_params.get('path_relinking_enabled', False))
+    path_relinking_passes = int(qubo_params.get('path_relinking_passes', 1))
+    regime_conditional_enabled = bool(qubo_params.get('regime_conditional_enabled', False))
+    solver_backend = str(qubo_params.get('solver_backend', 'simulated_annealing'))
+    solver_num_reads = int(qubo_params.get('solver_num_reads', 100))
+    solver_annealing_time = int(qubo_params.get('solver_annealing_time', 20))
+    solver_chain_strength = qubo_params.get('solver_chain_strength')
+    solver_strict = bool(qubo_params.get('solver_strict', False))
 
     if cov_shrink_enabled:
         cov_matrix, alpha_used = _shrink_covariance(
@@ -189,7 +225,49 @@ def select_quantum_portfolio(
         )
         if verbose:
             print(f"  Covariance shrinkage applied (alpha={alpha_used:.3f})")
-    
+
+    # Regime-conditioned QUBO coefficients based on train-window market behavior.
+    regime_label = "neutral"
+    if len(returns) > 5:
+        market = returns.mean(axis=1)
+        ann_ret = float(market.mean() * 252)
+        ann_vol = float(market.std() * np.sqrt(252))
+        if ann_ret >= float(qubo_params.get('trend_return_threshold', 0.12)) and ann_vol <= float(qubo_params.get('trend_vol_threshold', 0.24)):
+            regime_label = "trend"
+        elif ann_vol >= float(qubo_params.get('unstable_vol_threshold', 0.32)):
+            regime_label = "unstable"
+
+    if regime_conditional_enabled:
+        if regime_label == "trend":
+            risk_aversion *= float(qubo_params.get('trend_risk_aversion_mult', 0.9))
+            downside_beta *= float(qubo_params.get('trend_downside_beta_mult', 0.8))
+            lambda_scale *= float(qubo_params.get('trend_lambda_scale_mult', 0.9))
+        elif regime_label == "unstable":
+            risk_aversion *= float(qubo_params.get('unstable_risk_aversion_mult', 1.2))
+            downside_beta *= float(qubo_params.get('unstable_downside_beta_mult', 1.3))
+            lambda_scale *= float(qubo_params.get('unstable_lambda_scale_mult', 1.1))
+
+    # Robust-QUBO: shrink means and penalize unstable assets on diagonal.
+    uncertainty_penalty_vector = None
+    if uncertainty_aware_enabled and len(returns) > 5:
+        mu = returns.mean().values * 252
+        if 0.0 < mean_shrinkage < 1.0:
+            cross_mean = float(np.nanmean(mu))
+            mu = (1.0 - mean_shrinkage) * mu + mean_shrinkage * cross_mean
+        mean_returns = mu
+
+        vol = returns.std().values * np.sqrt(252)
+        downside_freq = (returns < 0).mean().values
+        instability = np.nan_to_num(vol, nan=0.0, posinf=0.0, neginf=0.0) * np.nan_to_num(downside_freq, nan=0.0)
+        if np.max(instability) > 0:
+            instability = instability / float(np.max(instability))
+        uncertainty_penalty_vector = instability_gamma * instability
+
+    hold_preference_vector = None
+    if turnover_aware_enabled and current_holdings:
+        cur = set(current_holdings)
+        hold_preference_vector = np.array([1.0 if s in cur else 0.0 for s in stocks], dtype=float)
+
     # Use REAL QUBO formulation (optionally as multi-seed consensus ensemble)
     if ensemble_enabled and ensemble_num_seeds > 1:
         if verbose:
@@ -211,6 +289,19 @@ def select_quantum_portfolio(
                 lambda_base=lambda_base,
                 lambda_scale=lambda_scale,
                 downside_beta=downside_beta,
+                risk_aversion=risk_aversion,
+                uncertainty_penalty_vector=uncertainty_penalty_vector,
+                turnover_penalty=turnover_penalty,
+                hold_preference_vector=hold_preference_vector,
+                use_warm_start=warm_start_enabled,
+                warm_start_symbols=current_holdings,
+                path_relinking_enabled=path_relinking_enabled,
+                path_relinking_passes=path_relinking_passes,
+                solver_backend=solver_backend,
+                solver_num_reads=solver_num_reads,
+                solver_annealing_time=solver_annealing_time,
+                solver_chain_strength=solver_chain_strength,
+                solver_strict=solver_strict,
                 return_details=True,
                 include_qubo_matrix=False,
                 verbose=verbose,
@@ -225,7 +316,13 @@ def select_quantum_portfolio(
             sharpes[stock] = mean_returns[i] / sigma if sigma > 0 else -1e9
 
         ranked = sorted(stocks, key=lambda s: (freq.get(s, 0), sharpes.get(s, -1e9)), reverse=True)
-        selected = ranked[:K]
+        selected = []
+        min_hits = int(np.ceil(ensemble_confidence_threshold * ensemble_num_seeds)) if ensemble_confidence_threshold > 0 else 0
+        if min_hits > 0:
+            selected = [s for s in ranked if freq.get(s, 0) >= min_hits][:K]
+        if len(selected) < K:
+            fill = [s for s in ranked if s not in set(selected)]
+            selected.extend(fill[: max(0, K - len(selected))])
 
         qubo_details = {
             "ensemble": {
@@ -233,6 +330,14 @@ def select_quantum_portfolio(
                 "num_seeds": ensemble_num_seeds,
                 "seed_step": ensemble_seed_step,
                 "frequency": freq,
+                "confidence_threshold": float(ensemble_confidence_threshold),
+                "min_hits": int(min_hits),
+            },
+            "regime": {
+                "label": regime_label,
+                "risk_aversion": float(risk_aversion),
+                "downside_beta": float(downside_beta),
+                "lambda_scale": float(lambda_scale),
             },
             "runs": details_list,
         }
@@ -250,6 +355,19 @@ def select_quantum_portfolio(
                 lambda_base=lambda_base,
                 lambda_scale=lambda_scale,
                 downside_beta=downside_beta,
+                risk_aversion=risk_aversion,
+                uncertainty_penalty_vector=uncertainty_penalty_vector,
+                turnover_penalty=turnover_penalty,
+                hold_preference_vector=hold_preference_vector,
+                use_warm_start=warm_start_enabled,
+                warm_start_symbols=current_holdings,
+                path_relinking_enabled=path_relinking_enabled,
+                path_relinking_passes=path_relinking_passes,
+                solver_backend=solver_backend,
+                solver_num_reads=solver_num_reads,
+                solver_annealing_time=solver_annealing_time,
+                solver_chain_strength=solver_chain_strength,
+                solver_strict=solver_strict,
                 return_details=True,
                 include_qubo_matrix=include_matrices,
                 verbose=verbose,
@@ -267,6 +385,19 @@ def select_quantum_portfolio(
                 lambda_base=lambda_base,
                 lambda_scale=lambda_scale,
                 downside_beta=downside_beta,
+                risk_aversion=risk_aversion,
+                uncertainty_penalty_vector=uncertainty_penalty_vector,
+                turnover_penalty=turnover_penalty,
+                hold_preference_vector=hold_preference_vector,
+                use_warm_start=warm_start_enabled,
+                warm_start_symbols=current_holdings,
+                path_relinking_enabled=path_relinking_enabled,
+                path_relinking_passes=path_relinking_passes,
+                solver_backend=solver_backend,
+                solver_num_reads=solver_num_reads,
+                solver_annealing_time=solver_annealing_time,
+                solver_chain_strength=solver_chain_strength,
+                solver_strict=solver_strict,
                 verbose=verbose,
             )
     
@@ -286,6 +417,13 @@ def select_quantum_portfolio(
             print(f"  ... and {len(selected)-5} more")
     
     if return_details:
+        if isinstance(qubo_details, dict):
+            qubo_details.setdefault("regime", {
+                "label": regime_label,
+                "risk_aversion": float(risk_aversion),
+                "downside_beta": float(downside_beta),
+                "lambda_scale": float(lambda_scale),
+            })
         details = {
             "train_start": str(train_df['Date'].min().date()),
             "train_end": str(train_df['Date'].max().date()),
@@ -538,24 +676,48 @@ def _rebalance_interval_months(rebalance_freq: str) -> int:
     return 3
 
 
-def _load_sector_map(sector_file: str = 'config/nifty100_sectors.json'):
-    """Load sector mapping as stock->sector from config json."""
-    path = Path(sector_file)
-    if not path.exists():
-        return {}
-    try:
-        with open(path, 'r', encoding='utf-8') as f:
-            raw = json.load(f)
-    except Exception:
-        return {}
+def _normalize_symbol(symbol: str) -> str:
+    return str(symbol).strip().upper()
 
-    groups = raw.get('NIFTY_100_STOCKS', raw if isinstance(raw, dict) else {})
+
+def _load_sector_map(
+    sector_file: str = 'config/nifty100_sectors.json',
+    sector_template_file: str = 'config/all_stocks_sector_template.csv',
+):
+    """Load sector mapping as normalized stock->sector from json and csv fallback."""
     stock_to_sector = {}
-    if isinstance(groups, dict):
-        for sector, stocks in groups.items():
-            if isinstance(stocks, list):
-                for s in stocks:
-                    stock_to_sector[s] = sector
+
+    path = Path(sector_file)
+    if path.exists():
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                raw = json.load(f)
+            groups = raw.get('NIFTY_100_STOCKS', raw if isinstance(raw, dict) else {})
+            if isinstance(groups, dict):
+                for sector, stocks in groups.items():
+                    if isinstance(stocks, list):
+                        for s in stocks:
+                            key = _normalize_symbol(s)
+                            if key:
+                                stock_to_sector[key] = str(sector)
+        except Exception:
+            pass
+
+    template_path = Path(sector_template_file)
+    if template_path.exists():
+        try:
+            df = pd.read_csv(template_path)
+            stock_col = 'stock' if 'stock' in df.columns else df.columns[0]
+            sector_col = 'sector' if 'sector' in df.columns else (df.columns[1] if len(df.columns) > 1 else None)
+            if sector_col is not None:
+                for _, row in df.iterrows():
+                    stock = _normalize_symbol(row.get(stock_col, ''))
+                    sector = str(row.get(sector_col, '')).strip()
+                    if stock and sector and sector.lower() != 'nan':
+                        stock_to_sector[stock] = sector
+        except Exception:
+            pass
+
     return stock_to_sector
 
 
@@ -585,12 +747,12 @@ def _select_replacement_candidates(universe, current_holdings, sold_names, stock
     if not sold_names:
         return []
 
-    sold_sectors = {stock_to_sector.get(s, 'Others') for s in sold_names}
+    sold_sectors = {stock_to_sector.get(_normalize_symbol(s), 'Others') for s in sold_names}
     current_set = set(current_holdings)
 
     sector_matched = [
         s for s in universe
-        if s not in current_set and stock_to_sector.get(s, 'Others') in sold_sectors
+        if s not in current_set and stock_to_sector.get(_normalize_symbol(s), 'Others') in sold_sectors
     ]
 
     # Fallback: if sector-matched set is too small, allow full-universe candidates.
@@ -627,7 +789,13 @@ def backtest_period_with_rebalance(
     min_weight=0.0,
     sell_count=None,
     sector_file='config/nifty100_sectors.json',
+    sector_template_file='config/all_stocks_sector_template.csv',
     qubo_params=None,
+    transaction_cost_pct=0.0,
+    underperformer_threshold_annualized=0.0,
+    max_turnover_per_rebalance=0.35,
+    replacement_min_annualized_return=0.0,
+    eligible_universe=None,
     verbose=True,
 ):
     """Backtest with paper-style periodic rebalancing: sell underperformers, sector-matched quantum replacement, re-optimize weights."""
@@ -643,7 +811,12 @@ def backtest_period_with_rebalance(
             f"{test_df['Date'].max().date()} ({len(test_df)} days), freq={rebalance_freq}"
         )
 
-    universe = [c for c in test_df.columns if c != 'Date']
+    universe_all = [c for c in test_df.columns if c != 'Date']
+    if eligible_universe is not None:
+        eligible_set = set(eligible_universe)
+        universe = [c for c in universe_all if c in eligible_set]
+    else:
+        universe = list(universe_all)
     stock_prices = test_df.set_index('Date')[universe].ffill().bfill()
     daily_returns = stock_prices.pct_change()
     daily_returns = daily_returns.replace([np.inf, -np.inf], np.nan)
@@ -665,7 +838,7 @@ def backtest_period_with_rebalance(
     else:
         current_weight_map = {s: w / w_sum for s, w in current_weight_map.items()}
 
-    stock_to_sector = _load_sector_map(sector_file)
+    stock_to_sector = _load_sector_map(sector_file, sector_template_file)
     k_sell_default = max(1, min(4, max(1, len(current_holdings) // 4)))
     k_sell = int(sell_count) if sell_count is not None else k_sell_default
 
@@ -673,8 +846,20 @@ def backtest_period_with_rebalance(
     qcfg.setdefault('ensemble_enabled', False)
     qcfg['max_iter'] = min(int(qcfg.get('max_iter', 800)), 800)
 
+    adaptive_turnover_cap_enabled = bool(qcfg.get('adaptive_turnover_cap_enabled', False))
+    turnover_cap_trend = float(qcfg.get('turnover_cap_trend', max_turnover_per_rebalance if max_turnover_per_rebalance is not None else 0.45))
+    turnover_cap_neutral = float(qcfg.get('turnover_cap_neutral', max_turnover_per_rebalance if max_turnover_per_rebalance is not None else 0.35))
+    turnover_cap_unstable = float(qcfg.get('turnover_cap_unstable', max_turnover_per_rebalance if max_turnover_per_rebalance is not None else 0.20))
+    turnover_regime_lookback = int(qcfg.get('turnover_regime_lookback_days', 63))
+    trend_return_threshold = float(qcfg.get('trend_return_threshold', 0.12))
+    trend_vol_threshold = float(qcfg.get('trend_vol_threshold', 0.24))
+    unstable_vol_threshold = float(qcfg.get('unstable_vol_threshold', 0.32))
+
     portfolio_returns = []
+    turnover_history = []
+    transaction_cost_history = []
     rebalance_count = 0
+    pending_rebalance_cost = 0.0
     step_months = _rebalance_interval_months(rebalance_freq)
     first_dt = pd.to_datetime(daily_returns.index[0])
     next_rebalance_dt = first_dt + pd.DateOffset(months=step_months)
@@ -686,12 +871,25 @@ def backtest_period_with_rebalance(
         if current_dt >= next_rebalance_dt:
             # 1) Rank holdings by recent quarter annualized expected returns and sell underperformers.
             mu_holdings = _quarterly_mean_returns_for_holdings(prices_df, current_holdings, pd.to_datetime(date))
-            sorted_holdings = sorted(current_holdings, key=lambda s: mu_holdings.get(s, -np.inf))
-            sold = sorted_holdings[:max(1, min(k_sell, max(1, len(current_holdings) - 1)))]
+            underperformers = [
+                s for s in current_holdings
+                if float(mu_holdings.get(s, -np.inf)) < float(underperformer_threshold_annualized)
+            ]
+            sorted_holdings = sorted(underperformers, key=lambda s: mu_holdings.get(s, -np.inf))
+            sell_n = max(0, min(k_sell, max(0, len(current_holdings) - 1)))
+            sold = sorted_holdings[:sell_n] if sell_n > 0 else []
             remaining = [s for s in current_holdings if s not in sold]
 
             # 2) Sector-matched candidates from current universe, then QUBO pick replacements.
             candidate_pool = _select_replacement_candidates(universe, remaining, sold, stock_to_sector)
+            if candidate_pool and replacement_min_annualized_return is not None:
+                mu_candidates = _quarterly_mean_returns_for_holdings(prices_df, candidate_pool, pd.to_datetime(date))
+                strong = [
+                    s for s in candidate_pool
+                    if float(mu_candidates.get(s, -np.inf)) >= float(replacement_min_annualized_return)
+                ]
+                if strong:
+                    candidate_pool = strong
             need = len(sold)
             replacements = []
             if need > 0 and candidate_pool:
@@ -705,6 +903,7 @@ def backtest_period_with_rebalance(
                         K=k_pick,
                         seed=None,
                         qubo_params=qcfg,
+                        current_holdings=remaining,
                         return_details=False,
                         verbose=False,
                     )
@@ -725,12 +924,57 @@ def backtest_period_with_rebalance(
                 min_weight=min_weight,
                 verbose=False,
             )
+
+            pre_rebalance_weights = dict(current_weight_map)
             ws = float(sum(new_w_map.values()))
             if ws <= 0:
                 n = len(current_holdings)
                 current_weight_map = {s: 1.0 / n for s in current_holdings}
             else:
                 current_weight_map = {s: float(new_w_map.get(s, 0.0)) / ws for s in current_holdings}
+
+            # Cap turnover to reduce churn from aggressive rebalance updates.
+            overlap = set(pre_rebalance_weights.keys()) | set(current_weight_map.keys())
+            old_weights = {k: float(pre_rebalance_weights.get(k, 0.0)) for k in overlap}
+            new_weights = {k: float(current_weight_map.get(k, 0.0)) for k in overlap}
+            turnover = float(sum(abs(new_weights[k] - old_weights[k]) for k in overlap))
+
+            cap = None if max_turnover_per_rebalance is None else float(max_turnover_per_rebalance)
+            if adaptive_turnover_cap_enabled:
+                hist = prices_df[prices_df['Date'] <= current_dt]
+                cols = [c for c in current_holdings if c in hist.columns]
+                if cols:
+                    recent = hist[cols].tail(max(10, turnover_regime_lookback)).ffill().bfill()
+                    rets = recent.pct_change().dropna()
+                    if not rets.empty:
+                        market = rets.mean(axis=1)
+                        ann_ret = float(market.mean() * 252)
+                        ann_vol = float(market.std() * np.sqrt(252))
+                        if ann_ret >= trend_return_threshold and ann_vol <= trend_vol_threshold:
+                            cap = turnover_cap_trend
+                        elif ann_vol >= unstable_vol_threshold:
+                            cap = turnover_cap_unstable
+                        else:
+                            cap = turnover_cap_neutral
+
+            if cap is not None and cap > 0 and turnover > cap:
+                alpha = cap / turnover
+                blended = {k: old_weights[k] + alpha * (new_weights[k] - old_weights[k]) for k in overlap}
+                denom = float(sum(blended.values()))
+                if denom > 0:
+                    current_weight_map = {k: float(v) / denom for k, v in blended.items() if float(v) > 0}
+                else:
+                    current_weight_map = dict(pre_rebalance_weights)
+                turnover = cap
+
+            turnover_history.append(float(turnover))
+
+            # Apply turnover-based transaction cost on rebalance date.
+            if float(transaction_cost_pct) > 0:
+                pending_rebalance_cost = turnover * float(transaction_cost_pct)
+                transaction_cost_history.append(float(pending_rebalance_cost))
+            else:
+                transaction_cost_history.append(0.0)
 
             rebalance_count += 1
             while current_dt >= next_rebalance_dt:
@@ -741,6 +985,9 @@ def backtest_period_with_rebalance(
             r = row.get(s, 0.0)
             r = 0.0 if pd.isna(r) else float(r)
             daily_ret += float(w) * r
+        if pending_rebalance_cost > 0:
+            daily_ret -= pending_rebalance_cost
+            pending_rebalance_cost = 0.0
         portfolio_returns.append(daily_ret)
 
         # Drift weights between rebalances.
@@ -770,6 +1017,8 @@ def backtest_period_with_rebalance(
         'sharpe': sharpe,
         'rebalance_frequency': rebalance_freq,
         'rebalances_applied': int(rebalance_count),
+        'avg_turnover_per_rebalance': float(np.mean(turnover_history)) if turnover_history else 0.0,
+        'total_transaction_cost': float(np.sum(transaction_cost_history)) if transaction_cost_history else 0.0,
         'cumulative_returns': cumulative_returns,
         'dates': daily_returns.index.tolist(),
     }

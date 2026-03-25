@@ -13,10 +13,15 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
 import phase_08_crash_and_regime_evaluation as crash_mod
 import unified_train_test_compare as utc
@@ -274,10 +279,17 @@ def _build_runtime_context(base: Path) -> dict:
     universe_cfg = config.get("universe_filter", {})
     universe_mode = universe_cfg.get("mode", "full_universe")
     nifty100_sectors_path = universe_cfg.get("nifty100_sectors_path", "config/nifty100_sectors.json")
+    custom_symbols_path = universe_cfg.get("custom_symbols_path", "config/nifty200_symbols.csv")
+    custom_top_n = int(universe_cfg.get("custom_universe_top_n", 200))
 
     allowed_symbols = None
     if universe_mode == "nifty100_only":
         allowed_symbols = utc.load_nifty100_symbols(base, nifty100_sectors_path)
+    elif universe_mode == "custom_symbols":
+        if custom_symbols_path:
+            allowed_symbols = utc.load_symbols_from_file(base, custom_symbols_path)
+        if not allowed_symbols:
+            allowed_symbols = utc.build_data_coverage_universe(prices_df_raw, custom_top_n)
 
     prices_df, _ = utc.apply_universe_filter(prices_df_raw, universe_mode, allowed_symbols)
 
@@ -319,8 +331,17 @@ def _monthly_return_for_scenario(
 
     k_stocks = utc.resolve_k_stocks(base, eval_cfg, cli_k=None)
     seed = int(eval_cfg.get("seed", 42))
-    min_train_coverage = float(eval_cfg.get("min_train_coverage", 0.8))
-    min_test_points = int(eval_cfg.get("min_test_points", 20))
+    is_horizon = str(scenario_name).startswith("Horizon_")
+    if is_horizon:
+        min_train_coverage = float(eval_cfg.get("min_train_coverage_horizon", eval_cfg.get("min_train_coverage", 0.8)))
+        min_test_points = int(eval_cfg.get("min_test_points_horizon", eval_cfg.get("min_test_points", 20)))
+        min_train_points = int(eval_cfg.get("min_train_points_horizon", eval_cfg.get("min_train_points", 0)))
+        min_return_points = int(eval_cfg.get("min_return_points_horizon", eval_cfg.get("min_return_points", 0)))
+    else:
+        min_train_coverage = float(eval_cfg.get("min_train_coverage_crash", eval_cfg.get("min_train_coverage", 0.8)))
+        min_test_points = int(eval_cfg.get("min_test_points_crash", eval_cfg.get("min_test_points", 20)))
+        min_train_points = int(eval_cfg.get("min_train_points_crash", eval_cfg.get("min_train_points", 0)))
+        min_return_points = int(eval_cfg.get("min_return_points_crash", eval_cfg.get("min_return_points", 0)))
 
     cfg = scenario_cfg
     crash_mod.validate_no_data_leakage(cfg["train_start"], cfg["train_end"], cfg["test_start"], cfg["test_end"])
@@ -333,7 +354,12 @@ def _monthly_return_for_scenario(
         cfg["test_end"],
         min_coverage=min_train_coverage,
         min_test_points=min_test_points,
+        min_train_points=min_train_points,
+        min_return_points=min_return_points,
     )
+
+    if not eligible:
+        raise RuntimeError(f"No eligible stocks for scenario: {scenario_name}")
 
     scenario_k = utc.derive_scenario_k_from_train_window(
         base,
@@ -464,7 +490,7 @@ def _monthly_return_for_scenario(
 
 
 def main() -> int:
-    base = Path(__file__).resolve().parent
+    base = BASE_DIR
     report_path = base / "results" / "unified_train_test_compare.json"
     out_dir = base / "results"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -515,10 +541,11 @@ def main() -> int:
         dataset_start_ts=dataset["start"],
     )
 
-    required_horizons = ["Horizon_6M_Train_60M", "Horizon_12M_Train_60M", "Horizon_24M_Train_60M"]
-    for scenario_name in required_horizons:
-        if scenario_name not in horizon_scenarios:
-            continue
+    def _h_key(name: str) -> int:
+        m = re.search(r"Horizon_(\d+)M", name)
+        return int(m.group(1)) if m else 999
+
+    for scenario_name in sorted(horizon_scenarios.keys(), key=_h_key):
         slug = scenario_name.lower().replace("_train_60m", "").replace("horizon_", "horizon_")
         png_out, csv_out = _monthly_return_for_scenario(
             base,

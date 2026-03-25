@@ -204,59 +204,17 @@
     "KOTAKBANK": "Financial_Services"
   },
   "sector_stats": {
-    "Telecom": {
-      "count": 2,
-      "avg_return": 0.24656436173905952,
-      "volatility": 0.22316955202015584,
-      "sharpe": 0.8359758759663134
-    },
-    "IT": {
-      "count": 9,
-      "avg_return": 0.22646340981168944,
-      "volatility": 0.22832960609013822,
-      "sharpe": 0.7290487320596274
-    },
-    "Pharma": {
-      "count": 9,
-      "avg_return": 0.14568221429478656,
-      "volatility": 0.16235541231548095,
-      "sharpe": 0.527744736518504
-    },
-    "Real_Estate": {
-      "count": 4,
-      "avg_return": 0.38960436612532834,
-      "volatility": 0.30156183565474226,
-      "sharpe": 1.092990979477562
-    },
-    "Paints": {
-      "count": 2,
-      "avg_return": 0.1717166811510296,
-      "volatility": 0.19939225123954674,
-      "sharpe": 0.5602859712778653
-    },
     "Capital_Goods": {
       "count": 6,
       "avg_return": 0.36284340728513775,
       "volatility": 0.19557891722611276,
       "sharpe": 1.5484460778306404
     },
-    "Others": {
-      "count": 8,
-      "avg_return": 0.18084762228835594,
-      "volatility": 0.21713818700218446,
-      "sharpe": 0.5565470724278461
-    },
-    "Healthcare": {
-      "count": 3,
-      "avg_return": 0.3819359889607618,
-      "volatility": 0.2335455773529214,
-      "sharpe": 1.3784717852921258
-    },
-    "Automobile": {
-      "count": 8,
-      "avg_return": 0.25361409693431225,
-      "volatility": 0.1829831129512178,
-      "sharpe": 1.0580981698891996
+    "Telecom": {
+      "count": 2,
+      "avg_return": 0.24656436173905952,
+      "volatility": 0.22316955202015584,
+      "sharpe": 0.8359758759663134
     },
     "Consumer_Durables": {
       "count": 6,
@@ -264,35 +222,11 @@
       "volatility": 0.1714001714467409,
       "sharpe": -0.04358317972947737
     },
-    "Cement": {
-      "count": 6,
-      "avg_return": 0.14469209835430677,
-      "volatility": 0.21656384173084534,
-      "sharpe": 0.39107220151536504
-    },
-    "Metals": {
-      "count": 8,
-      "avg_return": 0.3146318114858454,
-      "volatility": 0.31172766169736016,
-      "sharpe": 0.8168406040688616
-    },
-    "Retail": {
-      "count": 4,
-      "avg_return": 0.2219088849438545,
-      "volatility": 0.20952728663886275,
-      "sharpe": 0.7727341270968567
-    },
-    "Financial_Services": {
-      "count": 12,
-      "avg_return": 0.1405599502071995,
-      "volatility": 0.17079259087888168,
-      "sharpe": 0.47168293303969455
-    },
-    "Power": {
-      "count": 4,
-      "avg_return": 0.5043524576516502,
-      "volatility": 0.26451816236159226,
-      "sharpe": 1.6798561342046041
+    "Pharma": {
+      "count": 9,
+      "avg_return": 0.14568221429478656,
+      "volatility": 0.16235541231548095,
+      "sharpe": 0.527744736518504
     },
     "Oil_Gas": {
       "count": 6,
@@ -300,17 +234,83 @@
       "volatility": 0.20771788543761346,
       "sharpe": 0.8938782712490995
     },
-    "Logistics": {
+    "Healthcare": {
+      "count": 3,
+      "avg_return": 0.3819359889607618,
+      "volatility": 0.2335455773529214,
+      "sharpe": 1.3784717852921258
+    },
+    "Paints": {
       "count": 2,
-      "avg_return": 0.19945963329818425,
-      "volatility": 0.2912055568230281,
-      "sharpe": 0.4789044371942973
+      "avg_return": 0.1717166811510296,
+      "volatility": 0.19939225123954674,
+      "sharpe": 0.5602859712778653
     },
     "FMCG": {
       "count": 9,
       "avg_return": 0.1774881014709286,
       "volatility": 0.13872004711648936,
       "sharpe": 0.8469439270898507
+    },
+    "Retail": {
+      "count": 4,
+      "avg_return": 0.2219088849438545,
+      "volatility": 0.20952728663886275,
+      "sharpe": 0.7727341270968567
+    },
+    "Cement": {
+      "count": 6,
+      "avg_return": 0.14469209835430677,
+      "volatility": 0.21656384173084534,
+      "sharpe": 0.39107220151536504
+    },
+    "Power": {
+      "count": 4,
+      "avg_return": 0.5043524576516502,
+      "volatility": 0.26451816236159226,
+      "sharpe": 1.6798561342046041
+    },
+    "Automobile": {
+      "count": 8,
+      "avg_return": 0.25361409693431225,
+      "volatility": 0.1829831129512178,
+      "sharpe": 1.0580981698891996
+    },
+    "Financial_Services": {
+      "count": 12,
+      "avg_return": 0.1405599502071995,
+      "volatility": 0.17079259087888168,
+      "sharpe": 0.47168293303969455
+    },
+    "IT": {
+      "count": 9,
+      "avg_return": 0.22646340981168944,
+      "volatility": 0.22832960609013822,
+      "sharpe": 0.7290487320596274
+    },
+    "Real_Estate": {
+      "count": 4,
+      "avg_return": 0.38960436612532834,
+      "volatility": 0.30156183565474226,
+      "sharpe": 1.092990979477562
+    },
+    "Others": {
+      "count": 8,
+      "avg_return": 0.18084762228835594,
+      "volatility": 0.21713818700218446,
+      "sharpe": 0.5565470724278461
+    },
+    "Logistics": {
+      "count": 2,
+      "avg_return": 0.19945963329818425,
+      "volatility": 0.2912055568230281,
+      "sharpe": 0.4789044371942973
+    },
+    "Metals": {
+      "count": 8,
+      "avg_return": 0.3146318114858454,
+      "volatility": 0.31172766169736016,
+      "sharpe": 0.8168406040688616
     }
   },
   "statistics": {

@@ -11,8 +11,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
+from pathlib import Path
 import warnings
 warnings.filterwarnings('ignore')
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 def create_comparison_graphs(report_data, prices_df):
     """
@@ -166,7 +169,7 @@ def create_comparison_graphs(report_data, prices_df):
         
         # Save with clean filename
         safe_name = scenario_name.lower().replace(' ', '_').replace('-', '_')
-        filename = f"results/graph_rebalance_comparison_{safe_name}.png"
+        filename = BASE_DIR / "results" / f"graph_rebalance_comparison_{safe_name}.png"
         plt.savefig(filename, dpi=150, bbox_inches='tight')
         print(f"  ✓ Saved: {filename}")
         print(f"    Returns: Quantum={quantum_return:.2f}%, Quantum+Rebal={quantum_rebal_return:.2f}%, Markowitz={markowitz_return:.2f}%")
@@ -177,12 +180,12 @@ def main():
     print("[GRAPH GENERATION] Starting rebalance comparison visualization...\n")
     
     # Load report
-    with open('results/unified_train_test_compare.json', 'r') as f:
+    with open(BASE_DIR / 'results' / 'unified_train_test_compare.json', 'r') as f:
         report_data = json.load(f)
     
     # Load prices
     print("[DATA] Loading price data...")
-    prices_df = pd.read_csv('Dataset/prices_timeseries_complete.csv',
+    prices_df = pd.read_csv(BASE_DIR / 'Dataset' / 'prices_timeseries_complete.csv',
                             index_col=0, parse_dates=True)
     prices_df.index = pd.to_datetime(prices_df.index)
     print(f"  Loaded {len(prices_df)} rows, {len(prices_df.columns)} assets\n")

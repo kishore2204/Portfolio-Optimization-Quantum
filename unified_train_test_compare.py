@@ -40,6 +40,48 @@ def load_nifty100_symbols(base_dir: Path, sectors_rel_path: str) -> Set[str]:
     return symbols
 
 
+def load_symbols_from_file(base_dir: Path, symbols_rel_path: str) -> Set[str]:
+    symbols_path = (base_dir / symbols_rel_path).resolve()
+    if not symbols_path.exists():
+        raise FileNotFoundError(f"Custom symbols file not found: {symbols_path}")
+
+    if symbols_path.suffix.lower() == ".json":
+        data = load_json(symbols_path)
+        if isinstance(data, dict):
+            symbols = set()
+            for value in data.values():
+                if isinstance(value, list):
+                    symbols.update(str(v).strip() for v in value if str(v).strip())
+            return symbols
+        if isinstance(data, list):
+            return {str(v).strip() for v in data if str(v).strip()}
+        raise ValueError(f"Unsupported JSON schema in symbols file: {symbols_path}")
+
+    df = pd.read_csv(symbols_path)
+    col_lookup = {str(c).strip().lower(): c for c in df.columns}
+    if "stock" in col_lookup:
+        col = col_lookup["stock"]
+    elif "symbol" in col_lookup:
+        col = col_lookup["symbol"]
+    elif "ticker" in col_lookup:
+        col = col_lookup["ticker"]
+    else:
+        col = df.columns[0]
+
+    return {str(v).strip() for v in df[col].dropna().tolist() if str(v).strip()}
+
+
+def build_data_coverage_universe(prices_df: pd.DataFrame, top_n: int) -> Set[str]:
+    asset_cols = [c for c in prices_df.columns if c != "Date"]
+    scored = []
+    for c in asset_cols:
+        non_null = int(prices_df[c].notna().sum())
+        scored.append((c, non_null))
+
+    scored.sort(key=lambda x: x[1], reverse=True)
+    return {name for name, _ in scored[: max(1, int(top_n))]}
+
+
 def apply_universe_filter(prices_df: pd.DataFrame, mode: str, allowed_symbols: Set[str] | None = None):
     asset_cols = [c for c in prices_df.columns if c != "Date"]
     raw_assets = len(asset_cols)
@@ -51,11 +93,11 @@ def apply_universe_filter(prices_df: pd.DataFrame, mode: str, allowed_symbols: S
             "dropped_assets": 0,
         }
 
-    if mode != "nifty100_only":
+    if mode not in ("nifty100_only", "custom_symbols"):
         raise ValueError(f"Unknown universe mode: {mode}")
 
     if not allowed_symbols:
-        raise ValueError("nifty100_only mode requested, but no NIFTY100 symbols were provided")
+        raise ValueError(f"{mode} mode requested, but no symbols were provided")
 
     kept_assets = [c for c in asset_cols if c in allowed_symbols]
     if not kept_assets:
@@ -89,6 +131,57 @@ def resolve_k_stocks(base_dir: Path, eval_cfg: dict, cli_k: int | None) -> int:
                 return max(k_min, min(k_max, fallback))
 
     return max(k_min, min(k_max, fallback))
+
+
+def _load_sector_lookup(base_dir: Path, universe_cfg: dict) -> Dict[str, str]:
+    lookup: Dict[str, str] = {}
+
+    nifty100_path = universe_cfg.get("nifty100_sectors_path", "config/nifty100_sectors.json")
+    sectors_path = (base_dir / nifty100_path).resolve()
+    if sectors_path.exists():
+        try:
+            data = load_json(sectors_path)
+            groups = data.get("NIFTY_100_STOCKS", {}) if isinstance(data, dict) else {}
+            for sector, stocks in groups.items():
+                if isinstance(stocks, list):
+                    for s in stocks:
+                        lookup[str(s)] = str(sector)
+        except Exception:
+            pass
+
+    template_path = universe_cfg.get("sector_template_path", "config/all_stocks_sector_template.csv")
+    csv_path = (base_dir / template_path).resolve()
+    if csv_path.exists():
+        try:
+            df = pd.read_csv(csv_path)
+            stock_col = "stock" if "stock" in df.columns else df.columns[0]
+            sector_col = "sector" if "sector" in df.columns else (df.columns[1] if len(df.columns) > 1 else None)
+            if sector_col is not None:
+                for _, row in df.iterrows():
+                    stock = str(row.get(stock_col, "")).strip()
+                    sector = str(row.get(sector_col, "")).strip()
+                    if stock and sector and sector.lower() != "nan":
+                        lookup[stock] = sector
+        except Exception:
+            pass
+
+    # Ensure complete sector labels for custom universe by falling back to "Others".
+    try:
+        if str(universe_cfg.get("mode", "")) == "custom_symbols" or str(universe_cfg.get("mode_horizon", "")) == "custom_symbols" or str(universe_cfg.get("mode_crash", "")) == "custom_symbols":
+            custom_path = universe_cfg.get("custom_symbols_path")
+            if custom_path:
+                custom_symbols = load_symbols_from_file(base_dir, str(custom_path))
+                for s in custom_symbols:
+                    if s not in lookup:
+                        lookup[s] = "Others"
+    except Exception:
+        pass
+
+    return lookup
+
+
+def _sector_rows(stocks: List[str], sector_lookup: Dict[str, str]) -> List[dict]:
+    return [{"stock": s, "sector": sector_lookup.get(s, "Unknown")} for s in stocks]
 
 
 def _load_eq7_cardinality_module(base_dir: Path):
@@ -363,6 +456,9 @@ def evaluate_one(
     rebalance_compare_enabled: bool = False,
     rebalance_frequency: str = "quarterly",
     baseline_method: str = "markowitz",
+    real_quantum_compare: bool = False,
+    real_quantum_strict: bool = False,
+    sector_lookup: Dict[str, str] | None = None,
 ):
     crash_mod.validate_no_data_leakage(cfg["train_start"], cfg["train_end"], cfg["test_start"], cfg["test_end"])
 
@@ -372,6 +468,8 @@ def evaluate_one(
         cfg["test_start"], cfg["test_end"],
         min_coverage=min_train_coverage,
         min_test_points=min_test_points,
+        min_train_points=int(eval_cfg.get("min_train_points", 0)),
+        min_return_points=int(eval_cfg.get("min_return_points", 0)),
     )
 
     scenario_k = derive_scenario_k_from_train_window(
@@ -386,11 +484,14 @@ def evaluate_one(
         k_stocks,
     )
 
-    if len(eligible) < scenario_k:
+    scenario_k = min(int(scenario_k), len(eligible)) if eligible else 0
+
+    minimum_eligible_assets = int(eval_cfg.get("minimum_eligible_assets", 1))
+    if len(eligible) < max(minimum_eligible_assets, 1) or scenario_k < 1:
         return {
             "status": "skipped",
             "eligible_stocks": len(eligible),
-            "reason": f"eligible<{scenario_k}",
+            "reason": f"eligible<{max(minimum_eligible_assets, 1)}",
             "scenario": cfg,
         }
 
@@ -428,6 +529,14 @@ def evaluate_one(
         verbose=False,
     )
 
+    rq_w = None
+    rq_bt = None
+    rq_rebal_bt = None
+    rq_backend_used = None
+    rq_fallback_used = None
+    rq_fallback_reason = None
+    rq_error = None
+
     if rebalance_compare_enabled:
         q_rebal_bt = crash_mod.backtest_period_with_rebalance(
             prices_df,
@@ -439,6 +548,15 @@ def evaluate_one(
             rebalance_freq=rebalance_frequency,
             max_weight=float(weight_cfg.get("max_weight", 0.4)),
             min_weight=float(weight_cfg.get("min_weight", 0.0)),
+            sell_count=weight_cfg.get("rebalance_sell_count"),
+            transaction_cost_pct=float(weight_cfg.get("transaction_cost_pct", 0.002)),
+            underperformer_threshold_annualized=float(
+                weight_cfg.get("rebalance_underperformer_threshold_annualized", 0.0)
+            ),
+            max_turnover_per_rebalance=float(weight_cfg.get("rebalance_max_turnover", 0.35)),
+            replacement_min_annualized_return=float(weight_cfg.get("replacement_min_annualized_return", 0.0)),
+            sector_template_file=str(weight_cfg.get("sector_template_file", "config/all_stocks_sector_template.csv")),
+            eligible_universe=eligible,
             verbose=False,
         )
 
@@ -462,7 +580,7 @@ def evaluate_one(
                 K=scenario_k,
                 verbose=False,
             )
-            baseline_name = "Markowitz"
+            baseline_name = "MIQP" if baseline_method_norm == "miqp" else "Markowitz"
 
         b_w, _ = crash_mod.optimize_weights(
             b_stocks,
@@ -481,6 +599,84 @@ def evaluate_one(
             cfg["test_end"],
             verbose=False,
         )
+
+        if real_quantum_compare:
+            real_qubo_cfg = {
+                **qubo_cfg,
+                "solver_backend": "dwave_qpu",
+                "solver_strict": bool(real_quantum_strict),
+            }
+            try:
+                rq_selected = crash_mod.select_quantum_portfolio(
+                    prices_df,
+                    eligible,
+                    cfg["train_start"],
+                    cfg["train_end"],
+                    K=scenario_k,
+                    seed=seed,
+                    qubo_params=real_qubo_cfg,
+                    return_details=True,
+                    include_matrices=False,
+                    verbose=False,
+                )
+                if isinstance(rq_selected, tuple):
+                    rq_stocks, rq_details = rq_selected
+                else:
+                    rq_stocks = rq_selected
+                    rq_details = {}
+
+                rq_solver = rq_details.get("qubo", {}).get("solver", {})
+                rq_backend_used = rq_solver.get("backend_used")
+                rq_fallback_used = rq_solver.get("fallback_used")
+                rq_fallback_reason = rq_solver.get("fallback_reason")
+                if rq_backend_used is None:
+                    runs = rq_details.get("qubo", {}).get("runs", [])
+                    if isinstance(runs, list) and runs and isinstance(runs[0], dict):
+                        run_solver = runs[0].get("solver", {})
+                        rq_backend_used = run_solver.get("backend_used")
+                        rq_fallback_used = run_solver.get("fallback_used")
+                        rq_fallback_reason = run_solver.get("fallback_reason")
+
+                rq_w, _ = crash_mod.optimize_weights(
+                    rq_stocks,
+                    prices_df,
+                    cfg["train_start"],
+                    cfg["train_end"],
+                    max_weight=float(weight_cfg.get("max_weight", 0.4)),
+                    min_weight=float(weight_cfg.get("min_weight", 0.0)),
+                    verbose=False,
+                )
+                rq_bt = crash_mod.backtest_period(
+                    prices_df,
+                    rq_stocks,
+                    rq_w,
+                    cfg["test_start"],
+                    cfg["test_end"],
+                    verbose=False,
+                )
+                rq_rebal_bt = crash_mod.backtest_period_with_rebalance(
+                    prices_df,
+                    rq_stocks,
+                    rq_w,
+                    cfg["train_start"],
+                    cfg["test_start"],
+                    cfg["test_end"],
+                    rebalance_freq=rebalance_frequency,
+                    max_weight=float(weight_cfg.get("max_weight", 0.4)),
+                    min_weight=float(weight_cfg.get("min_weight", 0.0)),
+                    sell_count=weight_cfg.get("rebalance_sell_count"),
+                    transaction_cost_pct=float(weight_cfg.get("transaction_cost_pct", 0.002)),
+                    underperformer_threshold_annualized=float(
+                        weight_cfg.get("rebalance_underperformer_threshold_annualized", 0.0)
+                    ),
+                    max_turnover_per_rebalance=float(weight_cfg.get("rebalance_max_turnover", 0.35)),
+                    replacement_min_annualized_return=float(weight_cfg.get("replacement_min_annualized_return", 0.0)),
+                    sector_template_file=str(weight_cfg.get("sector_template_file", "config/all_stocks_sector_template.csv")),
+                    eligible_universe=eligible,
+                    verbose=False,
+                )
+            except Exception as exc:
+                rq_error = str(exc)
     else:
         g_stocks = crash_mod.select_greedy_portfolio(
             prices_df,
@@ -536,12 +732,20 @@ def evaluate_one(
 
     print(f"  Eligible stocks: {len(eligible)} | Scenario K: {scenario_k}")
     if rebalance_compare_enabled:
-        print(
+        msg = (
             "  Total return (%): "
             f"Quantum(NoRebal)={q_bt['total_return']:.2f}, "
             f"Quantum(Rebal-{rebalance_frequency})={q_rebal_bt['total_return']:.2f}, "
             f"{baseline_name}={b_bt['total_return']:.2f}"
         )
+        if rq_bt is not None and rq_rebal_bt is not None:
+            msg += (
+                f", RealQ(NoRebal)={rq_bt['total_return']:.2f}, "
+                f"RealQ(Rebal-{rebalance_frequency})={rq_rebal_bt['total_return']:.2f}"
+            )
+        elif real_quantum_compare and rq_error:
+            msg += f", RealQ=SKIPPED ({rq_error})"
+        print(msg)
     else:
         print(
             "  Total return (%): "
@@ -551,6 +755,7 @@ def evaluate_one(
         )
 
     methods = {}
+    sector_lookup = sector_lookup or {}
     budget = float(weight_cfg.get("budget", 0.0))
     if rebalance_compare_enabled:
         method_payload = {
@@ -558,17 +763,29 @@ def evaluate_one(
             "Quantum_Rebalanced": q_rebal_bt,
             baseline_name: b_bt,
         }
+        if rq_bt is not None and rq_rebal_bt is not None:
+            method_payload["Real_Quantum_NoRebalance"] = rq_bt
+            method_payload["Real_Quantum_Rebalanced"] = rq_rebal_bt
     else:
         method_payload = {"Quantum": q_bt, "Greedy": g_bt, "Classical": c_bt}
 
     for method_name, metrics in method_payload.items():
         if metrics is None:
             continue
-        if method_name in ("Quantum", "Quantum_NoRebalance", "Quantum_Rebalanced"):
-            w_map = q_w
+        if method_name in (
+            "Quantum",
+            "Quantum_NoRebalance",
+            "Quantum_Rebalanced",
+            "Real_Quantum_NoRebalance",
+            "Real_Quantum_Rebalanced",
+        ):
+            if method_name.startswith("Real_Quantum") and rq_w is not None:
+                w_map = rq_w
+            else:
+                w_map = q_w
         elif method_name == "Greedy":
             w_map = g_w
-        elif method_name == "Markowitz":
+        elif method_name in ("Markowitz", "MIQP"):
             w_map = b_w
         else:
             w_map = c_w
@@ -580,11 +797,30 @@ def evaluate_one(
             "var_95": float(metrics["var_95"]),
             "sharpe": float(metrics["sharpe"]),
             "budget_partition": budget_partition_summary(w_map, budget),
+            "selected_stocks": list(w_map.keys()),
+            "selected_stock_sectors": _sector_rows(list(w_map.keys()), sector_lookup),
         }
 
         if method_name == "Quantum_Rebalanced" and isinstance(metrics, dict):
             methods[method_name]["rebalance_frequency"] = metrics.get("rebalance_frequency")
             methods[method_name]["rebalances_applied"] = int(metrics.get("rebalances_applied", 0))
+            methods[method_name]["avg_turnover_per_rebalance"] = float(metrics.get("avg_turnover_per_rebalance", 0.0))
+            methods[method_name]["total_transaction_cost"] = float(metrics.get("total_transaction_cost", 0.0))
+        if method_name == "Real_Quantum_Rebalanced" and isinstance(metrics, dict):
+            methods[method_name]["rebalance_frequency"] = metrics.get("rebalance_frequency")
+            methods[method_name]["rebalances_applied"] = int(metrics.get("rebalances_applied", 0))
+            methods[method_name]["avg_turnover_per_rebalance"] = float(metrics.get("avg_turnover_per_rebalance", 0.0))
+            methods[method_name]["total_transaction_cost"] = float(metrics.get("total_transaction_cost", 0.0))
+
+    if real_quantum_compare:
+        methods["real_quantum_execution"] = {
+            "requested": True,
+            "backend_requested": "dwave_qpu",
+            "backend_used": rq_backend_used,
+            "fallback_used": rq_fallback_used,
+            "fallback_reason": rq_fallback_reason,
+            "error": rq_error,
+        }
 
     matrix_export_file = None
     if bool((matrix_cfg or {}).get("enabled", False)) and q_details:
@@ -637,10 +873,12 @@ def parse_args():
     parser.add_argument("--only", choices=["horizon", "crash", "all"], default="all")
     parser.add_argument("--k", type=int, default=None)
     parser.add_argument("--seed", type=int, default=None)
-    parser.add_argument("--universe-mode", choices=["full_universe", "nifty100_only"], default=None)
+    parser.add_argument("--universe-mode", choices=["full_universe", "nifty100_only", "custom_symbols"], default=None)
     parser.add_argument("--enable-rebalance-compare", action="store_true")
     parser.add_argument("--rebalance-frequency", choices=["monthly", "quarterly", "6M"], default="quarterly")
-    parser.add_argument("--baseline-method", choices=["markowitz", "greedy"], default="markowitz")
+    parser.add_argument("--baseline-method", choices=["markowitz", "greedy", "miqp"], default="markowitz")
+    parser.add_argument("--real-quantum-compare", action="store_true")
+    parser.add_argument("--real-quantum-strict", action="store_true")
     return parser.parse_args()
 
 
@@ -654,14 +892,22 @@ def write_rebalance_compare_artifacts(report: dict, out_dir: Path):
             m = scenario.get("methods", {})
             q0 = m.get("Quantum_NoRebalance", {})
             qr = m.get("Quantum_Rebalanced", {})
-            baseline_name = "Markowitz" if "Markowitz" in m else "Greedy"
+            if "MIQP" in m:
+                baseline_name = "MIQP"
+            elif "Markowitz" in m:
+                baseline_name = "Markowitz"
+            else:
+                baseline_name = "Greedy"
             b = m.get(baseline_name, {})
             rows.append({
                 "group": group_name,
                 "scenario": scenario_name,
                 "quantum_no_rebalance_total_return": q0.get("total_return"),
                 "quantum_rebalanced_total_return": qr.get("total_return"),
-                f"{baseline_name.lower()}_total_return": b.get("total_return"),
+                "real_quantum_no_rebalance_total_return": m.get("Real_Quantum_NoRebalance", {}).get("total_return"),
+                "real_quantum_rebalanced_total_return": m.get("Real_Quantum_Rebalanced", {}).get("total_return"),
+                "baseline_method": baseline_name,
+                "baseline_total_return": b.get("total_return"),
                 "winner_total_return": scenario.get("winners", {}).get("best_total_return"),
                 "winner_sharpe": scenario.get("winners", {}).get("best_sharpe"),
                 "rebalances_applied": qr.get("rebalances_applied", 0),
@@ -676,17 +922,23 @@ def write_rebalance_compare_artifacts(report: dict, out_dir: Path):
         "Methods compared per scenario:",
         "1. Quantum_NoRebalance",
         "2. Quantum_Rebalanced",
-        "3. Markowitz (or Greedy if selected)",
+        "3. Real_Quantum_NoRebalance (if enabled and available)",
+        "4. Real_Quantum_Rebalanced (if enabled and available)",
+        "5. Markowitz (or Greedy if selected)",
         "",
-        "| Group | Scenario | Quantum NoRebal | Quantum Rebal | Baseline | Winner Return | Winner Sharpe | Rebalances |",
-        "|---|---|---:|---:|---:|---|---|---:|",
+        "| Group | Scenario | Quantum NoRebal | Quantum Rebal | RealQ NoRebal | RealQ Rebal | Baseline | Winner Return | Winner Sharpe | Rebalances |",
+        "|---|---|---:|---:|---:|---:|---:|---|---|---:|",
     ]
 
     for r in rows:
-        baseline_value = r.get("markowitz_total_return", r.get("greedy_total_return"))
+        baseline_value = r.get("baseline_total_return")
+        rq0 = r.get("real_quantum_no_rebalance_total_return")
+        rqr = r.get("real_quantum_rebalanced_total_return")
+        rq0_s = f"{rq0:.2f}" if isinstance(rq0, (int, float)) else "NA"
+        rqr_s = f"{rqr:.2f}" if isinstance(rqr, (int, float)) else "NA"
         md_lines.append(
             f"| {r['group']} | {r['scenario']} | {r['quantum_no_rebalance_total_return']:.2f} "
-            f"| {r['quantum_rebalanced_total_return']:.2f} | {baseline_value:.2f} "
+            f"| {r['quantum_rebalanced_total_return']:.2f} | {rq0_s} | {rqr_s} | {baseline_value:.2f} ({r['baseline_method']}) "
             f"| {r['winner_total_return']} | {r['winner_sharpe']} | {r['rebalances_applied']} |"
         )
 
@@ -715,20 +967,36 @@ def main():
         universe_mode_horizon = universe_cfg.get("mode_horizon", default_universe_mode)
         universe_mode_crash = universe_cfg.get("mode_crash", default_universe_mode)
     nifty100_sectors_path = universe_cfg.get("nifty100_sectors_path", "config/nifty100_sectors.json")
+    sector_lookup = _load_sector_lookup(base_dir, universe_cfg)
 
-    allowed_symbols = None
-    if universe_mode_horizon == "nifty100_only" or universe_mode_crash == "nifty100_only":
-        allowed_symbols = load_nifty100_symbols(base_dir, nifty100_sectors_path)
+    allowed_symbols_horizon: Set[str] | None = None
+    allowed_symbols_crash: Set[str] | None = None
+
+    custom_symbols_rel_path = universe_cfg.get("custom_symbols_path", "config/nifty200_symbols.csv")
+    use_data_coverage = bool(universe_cfg.get("custom_symbols_from_data_coverage", False))
+    custom_top_n = int(universe_cfg.get("custom_symbols_top_n", 200))
+
+    def _resolve_symbols_for_mode(mode: str) -> Set[str] | None:
+        if mode == "nifty100_only":
+            return load_nifty100_symbols(base_dir, nifty100_sectors_path)
+        if mode == "custom_symbols":
+            if use_data_coverage:
+                return build_data_coverage_universe(prices_df_raw, custom_top_n)
+            return load_symbols_from_file(base_dir, custom_symbols_rel_path)
+        return None
+
+    allowed_symbols_horizon = _resolve_symbols_for_mode(universe_mode_horizon)
+    allowed_symbols_crash = _resolve_symbols_for_mode(universe_mode_crash)
 
     prices_df_horizon, universe_stats_horizon = apply_universe_filter(
         prices_df_raw,
         universe_mode_horizon,
-        allowed_symbols,
+        allowed_symbols_horizon,
     )
     prices_df_crash, universe_stats_crash = apply_universe_filter(
         prices_df_raw,
         universe_mode_crash,
-        allowed_symbols,
+        allowed_symbols_crash,
     )
 
     print("\n[UNIVERSE FILTER]")
@@ -744,12 +1012,38 @@ def main():
         f"{universe_stats_crash['filtered_assets']} "
         f"(dropped {universe_stats_crash['dropped_assets']} from {universe_stats_crash['raw_assets']})"
     )
+    if universe_mode_horizon == "custom_symbols" or universe_mode_crash == "custom_symbols":
+        print(
+            "Custom symbol source: "
+            f"{'data_coverage_top_n=' + str(custom_top_n) if use_data_coverage else custom_symbols_rel_path}"
+        )
 
     eval_cfg = config["evaluation"]
     k_stocks = resolve_k_stocks(base_dir, eval_cfg, args.k)
     seed = int(args.seed if args.seed is not None else eval_cfg["seed"])
     min_train_coverage = float(eval_cfg["min_train_coverage"])
     min_test_points = int(eval_cfg["min_test_points"])
+    min_train_coverage_horizon = float(eval_cfg.get("min_train_coverage_horizon", min_train_coverage))
+    min_train_coverage_crash = float(eval_cfg.get("min_train_coverage_crash", min_train_coverage))
+    min_test_points_horizon = int(eval_cfg.get("min_test_points_horizon", min_test_points))
+    min_test_points_crash = int(eval_cfg.get("min_test_points_crash", min_test_points))
+
+    eval_cfg_horizon = {
+        **eval_cfg,
+        "min_train_points": int(eval_cfg.get("min_train_points_horizon", eval_cfg.get("min_train_points", 0))),
+        "min_return_points": int(eval_cfg.get("min_return_points_horizon", eval_cfg.get("min_return_points", 0))),
+        "minimum_eligible_assets": int(
+            eval_cfg.get("minimum_eligible_assets_horizon", eval_cfg.get("minimum_eligible_assets", 1))
+        ),
+    }
+    eval_cfg_crash = {
+        **eval_cfg,
+        "min_train_points": int(eval_cfg.get("min_train_points_crash", eval_cfg.get("min_train_points", 0))),
+        "min_return_points": int(eval_cfg.get("min_return_points_crash", eval_cfg.get("min_return_points", 0))),
+        "minimum_eligible_assets": int(
+            eval_cfg.get("minimum_eligible_assets_crash", eval_cfg.get("minimum_eligible_assets", 1))
+        ),
+    }
     qubo_cfg = config.get("qubo", {})
     weight_cfg = config.get("weight_optimization", {})
     dynamic_k_cfg = config.get("dynamic_k", {"enabled": False})
@@ -757,6 +1051,11 @@ def main():
     rebalance_compare_enabled = bool(args.enable_rebalance_compare)
     rebalance_frequency = str(args.rebalance_frequency)
     baseline_method = str(args.baseline_method)
+    real_quantum_compare = bool(args.real_quantum_compare)
+    real_quantum_strict = bool(args.real_quantum_strict)
+
+    if real_quantum_compare and not rebalance_compare_enabled:
+        print("[WARN] --real-quantum-compare is intended for --enable-rebalance-compare runs.")
 
     matrix_run_dir = None
     if bool(matrix_cfg.get("enabled", False)):
@@ -791,9 +1090,14 @@ def main():
             "seed": seed,
             "min_train_coverage": min_train_coverage,
             "min_test_points": min_test_points,
+            "min_train_coverage_horizon": min_train_coverage_horizon,
+            "min_train_coverage_crash": min_train_coverage_crash,
+            "min_test_points_horizon": min_test_points_horizon,
+            "min_test_points_crash": min_test_points_crash,
             "universe_mode_horizon": universe_mode_horizon,
             "universe_mode_crash": universe_mode_crash,
             "nifty100_sectors_path": nifty100_sectors_path,
+            "custom_symbols_path": custom_symbols_rel_path,
             "qubo": qubo_cfg,
             "weight_optimization": weight_cfg,
         },
@@ -804,6 +1108,8 @@ def main():
             "enabled": rebalance_compare_enabled,
             "frequency": rebalance_frequency if rebalance_compare_enabled else None,
             "baseline_method": baseline_method if rebalance_compare_enabled else None,
+            "real_quantum_compare": real_quantum_compare if rebalance_compare_enabled else None,
+            "real_quantum_strict": real_quantum_strict if rebalance_compare_enabled else None,
         },
         "matrix_exports": {
             "enabled": bool(matrix_cfg.get("enabled", False)),
@@ -829,9 +1135,9 @@ def main():
                 prices_df_horizon,
                 k_stocks,
                 seed,
-                min_train_coverage,
-                min_test_points,
-                eval_cfg,
+                min_train_coverage_horizon,
+                min_test_points_horizon,
+                eval_cfg_horizon,
                 dynamic_k_cfg,
                 qubo_cfg,
                 weight_cfg,
@@ -841,6 +1147,9 @@ def main():
                 rebalance_compare_enabled,
                 rebalance_frequency,
                 baseline_method,
+                real_quantum_compare,
+                real_quantum_strict,
+                sector_lookup,
             )
         report["winner_counts"]["horizon"] = aggregate_winners(report["horizon_results"])
 
@@ -854,9 +1163,9 @@ def main():
                 prices_df_crash,
                 k_stocks,
                 seed,
-                min_train_coverage,
-                min_test_points,
-                eval_cfg,
+                min_train_coverage_crash,
+                min_test_points_crash,
+                eval_cfg_crash,
                 dynamic_k_cfg,
                 qubo_cfg,
                 weight_cfg,
@@ -866,6 +1175,9 @@ def main():
                 rebalance_compare_enabled,
                 rebalance_frequency,
                 baseline_method,
+                real_quantum_compare,
+                real_quantum_strict,
+                sector_lookup,
             )
         report["winner_counts"]["crash"] = aggregate_winners(report["crash_results"])
 

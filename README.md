@@ -32,12 +32,47 @@ python run_crash_analysis_wrapper.py
 python unified_train_test_compare.py --only all
 ```
 
+- Run unified comparison with rebalance and real-quantum attempt (D-Wave QPU with safe fallback):
+
+```powershell
+python unified_train_test_compare.py --only all --enable-rebalance-compare --baseline-method markowitz --real-quantum-compare
+```
+
 - Run unified comparison with explicit universe mode:
 
 ```powershell
 python unified_train_test_compare.py --only all --universe-mode full_universe
 python unified_train_test_compare.py --only all --universe-mode nifty100_only
 ```
+
+## Optional provider smoke test
+
+Use this only if you want to test an external quantum provider API without changing the main pipeline.
+
+Set environment variables in PowerShell:
+
+```powershell
+$env:OPENQUANTUM_BASE_URL = "https://your-provider-base-url"
+$env:OPENQUANTUM_API_KEY = "your-api-key"
+# Optional overrides:
+# $env:OPENQUANTUM_SUBMIT_PATH = "/v1/jobs"
+# $env:OPENQUANTUM_API_KEY_HEADER = "Authorization"
+# $env:OPENQUANTUM_API_KEY_PREFIX = "Bearer "
+```
+
+Run tiny-circuit smoke test:
+
+```powershell
+python scripts/open_quantum_smoke_test.py --shots 32
+```
+
+Dry-run payload generation (no submission):
+
+```powershell
+python scripts/open_quantum_smoke_test.py --dry-run
+```
+
+Artifacts are written under `results/` as `open_quantum_smoke_test_*.json`.
 
 ## Defaults
 
