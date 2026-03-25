@@ -1,0 +1,1066 @@
+{
+  "dataset": {
+    "path": "E:\\Projects_TP\\summi\\summi\\New Data\\prices_timeseries_complete.csv",
+    "rows": 3719,
+    "assets": 2248,
+    "assets_after_universe_filter": 109,
+    "start_date": "2011-03-14",
+    "end_date": "2026-03-11"
+  },
+  "methodology_phases": [
+    "phase_01_data_preparation",
+    "phase_02_cardinality_determination",
+    "phase_03_qubo_formulation",
+    "phase_04_quantum_selection",
+    "phase_05_rebalancing",
+    "phase_06_weight_optimization",
+    "phase_07_strategy_comparison",
+    "phase_08_crash_and_regime_evaluation"
+  ],
+  "parameters": {
+    "k_stocks": 8,
+    "k_mode": "auto_from_phase2_if_available",
+    "seed": 42,
+    "min_train_coverage": 0.8,
+    "min_test_points": 20,
+    "universe_mode": "nifty100_only",
+    "nifty100_sectors_path": "config/nifty100_sectors.json",
+    "qubo": {
+      "downside_beta": 0.3,
+      "lambda_penalty": null,
+      "lambda_base": 50.0,
+      "lambda_scale": 10.0,
+      "max_iter": 2000,
+      "covariance_shrinkage_enabled": true,
+      "covariance_shrinkage_alpha": "auto",
+      "covariance_shrinkage_diag_eps": 1e-08,
+      "ensemble_enabled": true,
+      "ensemble_num_seeds": 7,
+      "ensemble_seed_step": 101
+    },
+    "weight_optimization": {
+      "min_weight": 0.0,
+      "max_weight": 0.4,
+      "budget": 1000000
+    }
+  },
+  "horizon_results": {
+    "Horizon_6M_Train_6M": {
+      "status": "ok",
+      "scenario": {
+        "train_start": "2025-03-12",
+        "train_end": "2025-09-11",
+        "test_start": "2025-09-12",
+        "test_end": "2026-03-11",
+        "description": "Test=6M, Train=6M ending at latest date"
+      },
+      "scenario_k": 8,
+      "eligible_stocks": 109,
+      "methods": {
+        "Quantum": {
+          "total_return": -8.659391883382828,
+          "volatility": 15.363425443368522,
+          "max_drawdown": -12.213774087864614,
+          "var_95": -1.4910241177139183,
+          "sharpe": -1.5309374287563182,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "FORTIS",
+                "amount": 194637.21924352716
+              },
+              {
+                "stock": "BOSCHLTD",
+                "amount": 176144.7236759404
+              },
+              {
+                "stock": "TVSMOTOR",
+                "amount": 168736.35380857214
+              },
+              {
+                "stock": "BRITANNIA",
+                "amount": 155780.1690190478
+              },
+              {
+                "stock": "SBILIFE",
+                "amount": 125545.74349705334
+              }
+            ]
+          }
+        },
+        "Greedy": {
+          "total_return": -7.522500874012794,
+          "volatility": 16.553665662296638,
+          "max_drawdown": -10.385332388191564,
+          "var_95": -1.6636621916697583,
+          "sharpe": -1.2551131924126715,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "BOSCHLTD",
+                "amount": 222600.3179301359
+              },
+              {
+                "stock": "FORTIS",
+                "amount": 219420.36272708178
+              },
+              {
+                "stock": "TVSMOTOR",
+                "amount": 185684.14618597715
+              },
+              {
+                "stock": "BRITANNIA",
+                "amount": 160320.8211529083
+              },
+              {
+                "stock": "HDFCAMC",
+                "amount": 119093.06064941516
+              }
+            ]
+          }
+        },
+        "Classical": {
+          "total_return": -5.2086963364953665,
+          "volatility": 15.228582979887642,
+          "max_drawdown": -8.393410602856049,
+          "var_95": -1.4617401487258117,
+          "sharpe": -1.0431920130860597,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0000000001,
+            "cash": -1.1641532182693481e-10,
+            "top_allocations": [
+              {
+                "stock": "BOSCHLTD",
+                "amount": 210990.2700302931
+              },
+              {
+                "stock": "FORTIS",
+                "amount": 186723.63619976322
+              },
+              {
+                "stock": "TVSMOTOR",
+                "amount": 167534.71062828487
+              },
+              {
+                "stock": "SBILIFE",
+                "amount": 158097.73079942007
+              },
+              {
+                "stock": "BRITANNIA",
+                "amount": 151748.7622774832
+              }
+            ]
+          }
+        }
+      },
+      "winners": {
+        "best_total_return": "Classical",
+        "best_sharpe": "Classical",
+        "best_max_drawdown": "Classical",
+        "best_var_95": "Classical"
+      }
+    },
+    "Horizon_12M_Train_12M": {
+      "status": "ok",
+      "scenario": {
+        "train_start": "2024-03-12",
+        "train_end": "2025-03-11",
+        "test_start": "2025-03-12",
+        "test_end": "2026-03-11",
+        "description": "Test=12M, Train=12M ending at latest date"
+      },
+      "scenario_k": 8,
+      "eligible_stocks": 109,
+      "methods": {
+        "Quantum": {
+          "total_return": 20.379559345624187,
+          "volatility": 15.007310524786169,
+          "max_drawdown": -7.437268780166104,
+          "var_95": -1.4867723324735038,
+          "sharpe": 0.9367870682348691,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "DIVISLAB",
+                "amount": 265496.11545981944
+              },
+              {
+                "stock": "BHARTIARTL",
+                "amount": 220208.25263746842
+              },
+              {
+                "stock": "FORTIS",
+                "amount": 148214.78714100158
+              },
+              {
+                "stock": "VEDL",
+                "amount": 143662.76006396508
+              },
+              {
+                "stock": "INDIGO",
+                "amount": 108690.65576349004
+              }
+            ]
+          }
+        },
+        "Greedy": {
+          "total_return": 19.530136455998925,
+          "volatility": 15.427469850373834,
+          "max_drawdown": -7.908572091025527,
+          "var_95": -1.4698914559323648,
+          "sharpe": 0.8685659012681856,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 999999.9999999999,
+            "cash": 1.1641532182693481e-10,
+            "top_allocations": [
+              {
+                "stock": "DIVISLAB",
+                "amount": 280991.0290675689
+              },
+              {
+                "stock": "BHARTIARTL",
+                "amount": 232124.66064845165
+              },
+              {
+                "stock": "FORTIS",
+                "amount": 149322.82237636897
+              },
+              {
+                "stock": "VEDL",
+                "amount": 148472.72879052444
+              },
+              {
+                "stock": "INDIGO",
+                "amount": 116338.70973299973
+              }
+            ]
+          }
+        },
+        "Classical": {
+          "total_return": 21.878050304283757,
+          "volatility": 15.685423799194387,
+          "max_drawdown": -8.28065990300781,
+          "var_95": -1.5487090245119963,
+          "sharpe": 0.9834381630905232,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "DIVISLAB",
+                "amount": 295595.99733033596
+              },
+              {
+                "stock": "BHARTIARTL",
+                "amount": 228420.66071708652
+              },
+              {
+                "stock": "FORTIS",
+                "amount": 151786.44055574597
+              },
+              {
+                "stock": "VEDL",
+                "amount": 151223.65257401057
+              },
+              {
+                "stock": "INDIGO",
+                "amount": 122554.72597046487
+              }
+            ]
+          }
+        }
+      },
+      "winners": {
+        "best_total_return": "Classical",
+        "best_sharpe": "Classical",
+        "best_max_drawdown": "Quantum",
+        "best_var_95": "Greedy"
+      }
+    },
+    "Horizon_24M_Train_24M": {
+      "status": "ok",
+      "scenario": {
+        "train_start": "2022-03-12",
+        "train_end": "2024-03-11",
+        "test_start": "2024-03-12",
+        "test_end": "2026-03-11",
+        "description": "Test=24M, Train=24M ending at latest date"
+      },
+      "scenario_k": 8,
+      "eligible_stocks": 109,
+      "methods": {
+        "Quantum": {
+          "total_return": 28.748173681857914,
+          "volatility": 18.6989082420327,
+          "max_drawdown": -27.27996494183818,
+          "var_95": -1.9939764382437941,
+          "sharpe": 0.45966322128404935,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "TVSMOTOR",
+                "amount": 272921.0507901488
+              },
+              {
+                "stock": "NTPC",
+                "amount": 139940.52518263354
+              },
+              {
+                "stock": "SUNPHARMA",
+                "amount": 139431.16500018744
+              },
+              {
+                "stock": "BAJAJ-AUTO",
+                "amount": 109577.45978899155
+              },
+              {
+                "stock": "TRENT",
+                "amount": 106524.79685110427
+              }
+            ]
+          }
+        },
+        "Greedy": {
+          "total_return": 32.70806833120139,
+          "volatility": 20.749057133472558,
+          "max_drawdown": -30.155617101692005,
+          "var_95": -2.1504143258783843,
+          "sharpe": 0.508067776465902,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "TVSMOTOR",
+                "amount": 310925.97234290413
+              },
+              {
+                "stock": "NTPC",
+                "amount": 186908.01042946617
+              },
+              {
+                "stock": "BAJAJ-AUTO",
+                "amount": 155908.23989739595
+              },
+              {
+                "stock": "TRENT",
+                "amount": 122402.79220104883
+              },
+              {
+                "stock": "CUMMINSIND",
+                "amount": 107140.39932079065
+              }
+            ]
+          }
+        },
+        "Classical": {
+          "total_return": 34.051054020499635,
+          "volatility": 17.857777553271344,
+          "max_drawdown": -26.104094421382808,
+          "var_95": -1.8112576812297554,
+          "sharpe": 0.587598822627203,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0000000001,
+            "cash": -1.1641532182693481e-10,
+            "top_allocations": [
+              {
+                "stock": "TVSMOTOR",
+                "amount": 287852.7261561513
+              },
+              {
+                "stock": "NTPC",
+                "amount": 215211.75627057254
+              },
+              {
+                "stock": "SUNPHARMA",
+                "amount": 155138.13594743647
+              },
+              {
+                "stock": "BAJAJ-AUTO",
+                "amount": 141562.59246468183
+              },
+              {
+                "stock": "CUMMINSIND",
+                "amount": 132854.169345193
+              }
+            ]
+          }
+        }
+      },
+      "winners": {
+        "best_total_return": "Classical",
+        "best_sharpe": "Classical",
+        "best_max_drawdown": "Classical",
+        "best_var_95": "Classical"
+      }
+    },
+    "Horizon_36M_Train_36M": {
+      "status": "ok",
+      "scenario": {
+        "train_start": "2020-03-12",
+        "train_end": "2023-03-11",
+        "test_start": "2023-03-12",
+        "test_end": "2026-03-11",
+        "description": "Test=36M, Train=36M ending at latest date"
+      },
+      "scenario_k": 8,
+      "eligible_stocks": 76,
+      "methods": {
+        "Quantum": {
+          "total_return": 76.7971651055134,
+          "volatility": 18.266169348404343,
+          "max_drawdown": -33.460456786571804,
+          "var_95": -1.6352354057080891,
+          "sharpe": 0.7928873390071709,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "CUMMINSIND",
+                "amount": 247941.87886013553
+              },
+              {
+                "stock": "CIPLA",
+                "amount": 174836.0627633949
+              },
+              {
+                "stock": "ADANIGREEN",
+                "amount": 174254.3633918448
+              },
+              {
+                "stock": "ITC",
+                "amount": 149693.0839280459
+              },
+              {
+                "stock": "OIL",
+                "amount": 141718.76151331316
+              }
+            ]
+          }
+        },
+        "Greedy": {
+          "total_return": 83.80792812201807,
+          "volatility": 20.656091949552092,
+          "max_drawdown": -32.493964310141074,
+          "var_95": -1.8517917729686175,
+          "sharpe": 0.788000937589388,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "CUMMINSIND",
+                "amount": 229808.68553217564
+              },
+              {
+                "stock": "ADANIENT",
+                "amount": 184810.20399149644
+              },
+              {
+                "stock": "SUNPHARMA",
+                "amount": 172292.13373326807
+              },
+              {
+                "stock": "ITC",
+                "amount": 133511.86632980686
+              },
+              {
+                "stock": "OIL",
+                "amount": 129716.6501735695
+              }
+            ]
+          }
+        },
+        "Classical": {
+          "total_return": 63.14309856209241,
+          "volatility": 15.834062241834637,
+          "max_drawdown": -27.514965734814627,
+          "var_95": -1.4942020306594517,
+          "sharpe": 0.7165119277392644,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0000000001,
+            "cash": -1.1641532182693481e-10,
+            "top_allocations": [
+              {
+                "stock": "CUMMINSIND",
+                "amount": 289586.0693697559
+              },
+              {
+                "stock": "ITC",
+                "amount": 171203.48766022956
+              },
+              {
+                "stock": "SUNPHARMA",
+                "amount": 164821.26918817358
+              },
+              {
+                "stock": "CIPLA",
+                "amount": 123219.51696716336
+              },
+              {
+                "stock": "SIEMENS",
+                "amount": 120151.70284038635
+              }
+            ]
+          }
+        }
+      },
+      "winners": {
+        "best_total_return": "Greedy",
+        "best_sharpe": "Quantum",
+        "best_max_drawdown": "Classical",
+        "best_var_95": "Classical"
+      }
+    }
+  },
+  "crash_results": {
+    "COVID Peak Crash": {
+      "status": "ok",
+      "scenario": {
+        "train_start": "2019-02-20",
+        "train_end": "2020-02-19",
+        "test_start": "2020-02-20",
+        "test_end": "2020-04-30",
+        "description": "12M train before COVID crash peak, test during crash peak"
+      },
+      "scenario_k": 8,
+      "eligible_stocks": 75,
+      "methods": {
+        "Quantum": {
+          "total_return": -1.4845138538929326,
+          "volatility": 49.787866367506986,
+          "max_drawdown": -27.200571565402093,
+          "var_95": -4.114865254951913,
+          "sharpe": -0.04133439691797394,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "ALKEM",
+                "amount": 210969.6327617663
+              },
+              {
+                "stock": "ADANIGREEN",
+                "amount": 170434.45468333992
+              },
+              {
+                "stock": "TATACONSUM",
+                "amount": 154176.6864198467
+              },
+              {
+                "stock": "TCS",
+                "amount": 116330.02262836412
+              },
+              {
+                "stock": "PIIND",
+                "amount": 107193.25205288439
+              }
+            ]
+          }
+        },
+        "Greedy": {
+          "total_return": -2.2606442709369734,
+          "volatility": 60.52175792638691,
+          "max_drawdown": -33.984442188660324,
+          "var_95": -5.308245780204584,
+          "sharpe": -0.009740667570444051,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "TATACONSUM",
+                "amount": 237953.97301400415
+              },
+              {
+                "stock": "ADANIGREEN",
+                "amount": 234695.85938464853
+              },
+              {
+                "stock": "IGL",
+                "amount": 151875.61919657717
+              },
+              {
+                "stock": "PIIND",
+                "amount": 141708.68016134034
+              },
+              {
+                "stock": "HDFCLIFE",
+                "amount": 120278.3159182125
+              }
+            ]
+          }
+        },
+        "Classical": {
+          "total_return": -5.199593055379525,
+          "volatility": 56.16318173320391,
+          "max_drawdown": -29.269234566216586,
+          "var_95": -4.762745115198035,
+          "sharpe": -0.36579509800705245,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0000000001,
+            "cash": -1.1641532182693481e-10,
+            "top_allocations": [
+              {
+                "stock": "ALKEM",
+                "amount": 230944.81166926623
+              },
+              {
+                "stock": "TATACONSUM",
+                "amount": 190248.1921260922
+              },
+              {
+                "stock": "PIIND",
+                "amount": 180888.35723820215
+              },
+              {
+                "stock": "HDFCLIFE",
+                "amount": 166555.89061894213
+              },
+              {
+                "stock": "BATAINDIA",
+                "amount": 80629.69462121405
+              }
+            ]
+          }
+        }
+      },
+      "winners": {
+        "best_total_return": "Quantum",
+        "best_sharpe": "Greedy",
+        "best_max_drawdown": "Quantum",
+        "best_var_95": "Quantum"
+      }
+    },
+    "China Bubble Burst Peak": {
+      "status": "ok",
+      "scenario": {
+        "train_start": "2014-06-12",
+        "train_end": "2015-06-11",
+        "test_start": "2015-06-12",
+        "test_end": "2015-09-30",
+        "description": "12M train before China crash, test peak drawdown months"
+      },
+      "scenario_k": 8,
+      "eligible_stocks": 91,
+      "methods": {
+        "Quantum": {
+          "total_return": 7.004178878548051,
+          "volatility": 20.652605374454136,
+          "max_drawdown": -10.615559971401021,
+          "var_95": -1.5382580349130652,
+          "sharpe": 0.9019607960328107,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "BRITANNIA",
+                "amount": 216232.7845782845
+              },
+              {
+                "stock": "PAGEIND",
+                "amount": 177627.86323280848
+              },
+              {
+                "stock": "EICHERMOT",
+                "amount": 136428.10762835667
+              },
+              {
+                "stock": "TORNTPHARM",
+                "amount": 109926.69313639493
+              },
+              {
+                "stock": "WHIRLPOOL",
+                "amount": 100726.73705190857
+              }
+            ]
+          }
+        },
+        "Greedy": {
+          "total_return": 8.336318441796319,
+          "volatility": 21.145696588297426,
+          "max_drawdown": -9.52627293638991,
+          "var_95": -1.7226924693364818,
+          "sharpe": 1.0797743518504195,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "BRITANNIA",
+                "amount": 217140.15507060636
+              },
+              {
+                "stock": "PAGEIND",
+                "amount": 184959.888076869
+              },
+              {
+                "stock": "EICHERMOT",
+                "amount": 128144.43212641716
+              },
+              {
+                "stock": "TORNTPHARM",
+                "amount": 125256.90944086581
+              },
+              {
+                "stock": "PIDILITIND",
+                "amount": 122394.08496787882
+              }
+            ]
+          }
+        },
+        "Classical": {
+          "total_return": 9.940341200046676,
+          "volatility": 21.55663372379027,
+          "max_drawdown": -9.076067172040984,
+          "var_95": -1.6903683339880853,
+          "sharpe": 1.2897314544062997,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0000000001,
+            "cash": -1.1641532182693481e-10,
+            "top_allocations": [
+              {
+                "stock": "BRITANNIA",
+                "amount": 235948.01680129077
+              },
+              {
+                "stock": "PAGEIND",
+                "amount": 178897.22397628851
+              },
+              {
+                "stock": "TORNTPHARM",
+                "amount": 141879.95402027987
+              },
+              {
+                "stock": "LUPIN",
+                "amount": 139072.1016040437
+              },
+              {
+                "stock": "EICHERMOT",
+                "amount": 125646.36079880825
+              }
+            ]
+          }
+        }
+      },
+      "winners": {
+        "best_total_return": "Classical",
+        "best_sharpe": "Classical",
+        "best_max_drawdown": "Classical",
+        "best_var_95": "Quantum"
+      }
+    },
+    "European Debt Stress": {
+      "status": "ok",
+      "scenario": {
+        "train_start": "2011-03-14",
+        "train_end": "2012-03-13",
+        "test_start": "2012-03-14",
+        "test_end": "2012-09-30",
+        "description": "12M train before Euro stress, test during stress window"
+      },
+      "scenario_k": 8,
+      "eligible_stocks": 90,
+      "methods": {
+        "Quantum": {
+          "total_return": 17.00346284467804,
+          "volatility": 11.689302223901144,
+          "max_drawdown": -7.72191126682965,
+          "var_95": -1.22410667778643,
+          "sharpe": 1.9996214503746519,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "BRITANNIA",
+                "amount": 265750.53246943746
+              },
+              {
+                "stock": "SHREECEM",
+                "amount": 183449.7228407817
+              },
+              {
+                "stock": "EICHERMOT",
+                "amount": 118266.27937872706
+              },
+              {
+                "stock": "PAGEIND",
+                "amount": 100155.5861179166
+              },
+              {
+                "stock": "BATAINDIA",
+                "amount": 92944.51588111189
+              }
+            ]
+          }
+        },
+        "Greedy": {
+          "total_return": 13.873623035915106,
+          "volatility": 13.766798059544733,
+          "max_drawdown": -8.911998639345967,
+          "var_95": -1.3231013288119498,
+          "sharpe": 1.357006212486316,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "BRITANNIA",
+                "amount": 327527.0930381071
+              },
+              {
+                "stock": "SHREECEM",
+                "amount": 187776.2922315469
+              },
+              {
+                "stock": "EICHERMOT",
+                "amount": 146843.40437621146
+              },
+              {
+                "stock": "PAGEIND",
+                "amount": 107517.68655727858
+              },
+              {
+                "stock": "BATAINDIA",
+                "amount": 101030.61674178694
+              }
+            ]
+          }
+        },
+        "Classical": {
+          "total_return": 15.106176415192074,
+          "volatility": 11.712303364327346,
+          "max_drawdown": -8.909776353390054,
+          "var_95": -1.077991827634155,
+          "sharpe": 1.7405627467454643,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "BRITANNIA",
+                "amount": 283615.5868798869
+              },
+              {
+                "stock": "SHREECEM",
+                "amount": 187110.61178879358
+              },
+              {
+                "stock": "EICHERMOT",
+                "amount": 143114.3347793793
+              },
+              {
+                "stock": "HINDUNILVR",
+                "amount": 104511.05468192925
+              },
+              {
+                "stock": "SUNPHARMA",
+                "amount": 99815.23627091844
+              }
+            ]
+          }
+        }
+      },
+      "winners": {
+        "best_total_return": "Quantum",
+        "best_sharpe": "Quantum",
+        "best_max_drawdown": "Quantum",
+        "best_var_95": "Classical"
+      }
+    },
+    "2022 Global Bear Phase": {
+      "status": "ok",
+      "scenario": {
+        "train_start": "2021-01-01",
+        "train_end": "2021-12-31",
+        "test_start": "2022-01-01",
+        "test_end": "2022-06-30",
+        "description": "12M train before 2022 bear phase, test in first drawdown half"
+      },
+      "scenario_k": 8,
+      "eligible_stocks": 109,
+      "methods": {
+        "Quantum": {
+          "total_return": -13.482874504010722,
+          "volatility": 25.901245755243686,
+          "max_drawdown": -16.942296566054615,
+          "var_95": -2.760249355455841,
+          "sharpe": -1.2752643296073556,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0000000001,
+            "cash": -1.1641532182693481e-10,
+            "top_allocations": [
+              {
+                "stock": "PERSISTENT",
+                "amount": 237691.68269063986
+              },
+              {
+                "stock": "ADANIENT",
+                "amount": 166854.13957712112
+              },
+              {
+                "stock": "MAXHEALTH",
+                "amount": 141597.31833186225
+              },
+              {
+                "stock": "ABB",
+                "amount": 138924.9291143305
+              },
+              {
+                "stock": "ASIANPAINT",
+                "amount": 114348.79092846936
+              }
+            ]
+          }
+        },
+        "Greedy": {
+          "total_return": -19.502986116659937,
+          "volatility": 30.986322064864186,
+          "max_drawdown": -23.055595402371345,
+          "var_95": -3.5563851749294377,
+          "sharpe": -1.4990451446261948,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "PERSISTENT",
+                "amount": 323329.90589534974
+              },
+              {
+                "stock": "ADANIENT",
+                "amount": 229046.5972922204
+              },
+              {
+                "stock": "MAXHEALTH",
+                "amount": 188696.02922358023
+              },
+              {
+                "stock": "LTTS",
+                "amount": 86354.33167759673
+              },
+              {
+                "stock": "MPHASIS",
+                "amount": 49406.043715628424
+              }
+            ]
+          }
+        },
+        "Classical": {
+          "total_return": -30.730009452587915,
+          "volatility": 29.58809984240101,
+          "max_drawdown": -34.5555388818945,
+          "var_95": -3.33348806039621,
+          "sharpe": -2.6304311210702194,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0,
+            "cash": 0.0,
+            "top_allocations": [
+              {
+                "stock": "PERSISTENT",
+                "amount": 374398.7474781033
+              },
+              {
+                "stock": "TECHM",
+                "amount": 208144.86500208557
+              },
+              {
+                "stock": "PIDILITIND",
+                "amount": 154592.89764210404
+              },
+              {
+                "stock": "ASIANPAINT",
+                "amount": 91202.61078096187
+              },
+              {
+                "stock": "WIPRO",
+                "amount": 80195.54365736152
+              }
+            ]
+          }
+        }
+      },
+      "winners": {
+        "best_total_return": "Quantum",
+        "best_sharpe": "Quantum",
+        "best_max_drawdown": "Quantum",
+        "best_var_95": "Quantum"
+      }
+    }
+  },
+  "winner_counts": {
+    "horizon": {
+      "best_total_return": {
+        "Classical": 3,
+        "Greedy": 1
+      },
+      "best_sharpe": {
+        "Classical": 3,
+        "Quantum": 1
+      },
+      "best_max_drawdown": {
+        "Classical": 3,
+        "Quantum": 1
+      },
+      "best_var_95": {
+        "Classical": 3,
+        "Greedy": 1
+      }
+    },
+    "crash": {
+      "best_total_return": {
+        "Quantum": 3,
+        "Classical": 1
+      },
+      "best_sharpe": {
+        "Greedy": 1,
+        "Classical": 1,
+        "Quantum": 2
+      },
+      "best_max_drawdown": {
+        "Quantum": 3,
+        "Classical": 1
+      },
+      "best_var_95": {
+        "Quantum": 3,
+        "Classical": 1
+      }
+    }
+  }
+}

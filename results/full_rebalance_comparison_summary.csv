@@ -1,0 +1,9 @@
+Type,Scenario,Quantum,Quantum+Rebal,Baseline,Sharpe Q,Sharpe Q+R,Sharpe Base,Winner
+Horizon,Horizon_6M_Train_60M,-15.00%,-11.94%,11.61%,-1.95,-1.55,1.18,Baseline
+Horizon,Horizon_12M_Train_60M,16.95%,12.99%,2.91%,0.58,0.40,-0.07,Quantum
+Horizon,Horizon_24M_Train_60M,7.77%,-42.69%,27.69%,0.01,-1.41,0.41,Baseline
+Horizon,Horizon_36M_Train_60M,72.80%,87.78%,39.71%,0.71,0.76,0.34,Quantum+Rebal
+Crash,COVID Peak Crash,-21.42%,-22.39%,-14.81%,-2.99,-3.07,-1.79,Baseline
+Crash,China Bubble Burst Peak,24.06%,55.89%,-13.46%,2.26,4.59,-1.17,Quantum+Rebal
+Crash,European Debt Stress,19.23%,11.90%,20.34%,1.92,1.21,1.95,Baseline
+Crash,2022 Global Bear Phase,-22.98%,-18.99%,-15.98%,-2.59,-1.94,-1.95,Baseline

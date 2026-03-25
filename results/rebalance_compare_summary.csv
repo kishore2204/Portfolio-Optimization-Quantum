@@ -1,0 +1,9 @@
+group,scenario,quantum_no_rebalance_total_return,quantum_rebalanced_total_return,markowitz_total_return,winner_total_return,winner_sharpe,rebalances_applied
+horizon,Horizon_6M_Train_60M,-2.825294882839968,-2.8210980747520598,3.3374538376030216,Markowitz,Markowitz,1
+horizon,Horizon_12M_Train_60M,35.06895730708084,36.935298300369745,26.141531407423592,Quantum_Rebalanced,Quantum_Rebalanced,3
+horizon,Horizon_24M_Train_60M,-1.8610112665506051,5.194491997919526,-8.1557817952985,Quantum_Rebalanced,Quantum_Rebalanced,7
+horizon,Horizon_36M_Train_60M,25.780305875462982,79.98201280747573,28.397232621435254,Quantum_Rebalanced,Quantum_Rebalanced,11
+crash,COVID Peak Crash,-18.9466997045588,-18.9466997045588,-18.619598196154886,Markowitz,Quantum_NoRebalance,0
+crash,China Bubble Burst Peak,52.98882426485678,40.970415347926846,3.9839865352029324,Quantum_NoRebalance,Quantum_NoRebalance,1
+crash,European Debt Stress,21.174840806456107,14.093827075319055,10.10129482845452,Quantum_NoRebalance,Quantum_NoRebalance,2
+crash,2022 Global Bear Phase,-13.17620109313119,-17.04654402441179,-13.572477202056488,Quantum_NoRebalance,Quantum_NoRebalance,1

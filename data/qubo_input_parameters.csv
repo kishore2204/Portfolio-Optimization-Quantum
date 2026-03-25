@@ -1,0 +1,2 @@
+N_variables,target_K,q_risk_aversion,beta_downside,lambda_penalty,sector_penalty,min_sectors,max_sector_weight
+29,8,0.5,0.3,50.0,5.0,5,0.35
