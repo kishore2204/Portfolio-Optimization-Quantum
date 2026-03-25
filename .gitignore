@@ -18,19 +18,19 @@ env/
 Thumbs.db
 
 # Generated outputs
-results/*.png
-results/*.csv
-results/*.json
-results/*.md
+#results/*.png
+#results/*.csv
+#results/*.json
+#results/*.md
 
 # Generated intermediate artifacts
-data/*.npy
-data/*.csv
-portfolios/*.npy
-portfolios/*.csv
-portfolios/*.json
-quantum/*.npy
-quantum/*.json
+#data/*.npy
+#data/*.csv
+#portfolios/*.npy
+#portfolios/*.csv
+#portfolios/*.json
+#quantum/*.npy
+#quantum/*.json
 
 # Keep documentation and configs tracked
 !docs/**
