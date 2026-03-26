@@ -14,6 +14,11 @@ from hybrid_optimizer import HybridConfig, run_quantum_hybrid_selection, portfol
 from rebalancing import RebalanceConfig, run_quarterly_rebalance
 from evaluation import value_from_returns, metrics_table, compute_metrics
 from visualization import plot_comparisons
+from matrix_exporter import export_matrices_and_metrics
+from enhanced_visualizations import create_5_comparison_graphs
+from multi_dataset_visualizations import create_5_graphs_per_dataset
+from full_period_visualizations import create_normal_15y_graphs
+from qubo import build_qubo
 
 
 @dataclass
@@ -146,6 +151,92 @@ def main():
 
     plot_comparisons(portfolio_values, bench_norm, out_dir)
 
+    # ==================== EXPORT MATRICES AND METRICS ====================
+    print("\n[Step 1] Exporting matrices to data/ folder...")
+    data_dir = root / "data"
+    
+    # Compute downside risk for export
+    _, _, downside_train = annualize_stats(train_r)
+    
+    # Build QUBO for quantum portfolio
+    mu_top = mu_train.loc[q_assets]
+    cov_top = cov_train.loc[q_assets, q_assets]
+    sector_map_top = {a: bundle.sector_map.get(a, "UNKNOWN") for a in q_assets}
+    
+    qubo_model = build_qubo(
+        mu=mu_top,
+        cov=cov_top,
+        downside=downside_train.loc[q_assets],
+        sector_map=sector_map_top,
+        K=K,
+        q_risk=1.0,
+        beta_downside=0.5,
+        lambda_card=4.0,
+        gamma_sector=0.3,
+    )
+    
+    config_dict = {
+        "train_years": cfg.train_years,
+        "test_years": cfg.test_years,
+        "k_ratio": cfg.k_ratio,
+        "selected_k": int(K),
+        "universe_size": int(n_assets),
+        "risk_aversion": cfg.risk_aversion,
+        "max_weight": cfg.max_weight,
+        "rf_rate": cfg.rf,
+    }
+    
+    export_matrices_and_metrics(
+        data_dir=data_dir,
+        train_returns=train_r,
+        test_returns=test_r,
+        mu_train=mu_train,
+        cov_train=cov_train,
+        downside_train=downside_train,
+        qubo_model=qubo_model,
+        classical_weights=w_classical,
+        quantum_weights=q_weights,
+        portfolio_values=portfolio_values,
+        benchmark_values=bench_norm,
+        train_prices=split.train_prices,
+        test_prices=split.test_prices,
+        split_dates=split.split_dates,
+        config_dict=config_dict,
+    )
+    print(f"✓ Matrices exported to: {data_dir}")
+
+    # ==================== CREATE 5 COMPARISON GRAPHS ====================
+    print("\n[Step 2] Creating 5 enhanced comparison graphs...")
+    enhanced_graphs = create_5_comparison_graphs(
+        portfolio_values=portfolio_values,
+        benchmark_values=bench_norm,
+        output_dir=out_dir,
+        config_dict=config_dict,
+    )
+    print(f"✓ 5 graphs created in: {out_dir}")
+
+    # ==================== CREATE 5 GRAPHS PER DATASET ====================
+    print("\n[Step 3] Creating 5 graphs per dataset (25 total graphs)...")
+    multi_dataset_results = create_5_graphs_per_dataset(
+        portfolio_values=portfolio_values,
+        benchmark_values=bench_norm,
+        output_dir=out_dir,
+    )
+    print(f"✓ Multi-dataset graphs created in: {out_dir}")
+
+    # ==================== CREATE 15-YEAR NORMAL DATASET GRAPHS ====================
+    print("\n[Step 4] Creating 15-year normal dataset graphs...")
+    normal_15y_graphs = create_normal_15y_graphs(
+        prices=prices,
+        sector_map=bundle.sector_map,
+        output_dir=out_dir,
+        rf=cfg.rf,
+        k_ratio=cfg.k_ratio,
+        max_weight=cfg.max_weight,
+        risk_aversion=cfg.risk_aversion,
+    )
+    print(f"✓ 15-year graphs created in: {out_dir}")
+
     summary = {
         "discovered_files": bundle.discovered_files,
         "split_dates": {
@@ -158,20 +249,44 @@ def main():
     }
     pd.Series(summary, dtype=object).to_json(out_dir / "run_summary.json", indent=2)
 
-    print("Run completed.")
-    print(f"Output directory: {out_dir}")
-    print("\nPortfolio metrics:")
+    print("\n" + "="*80)
+    print("RUN COMPLETED SUCCESSFULLY")
+    print("="*80)
+    print(f"\nOutput directory:        {out_dir}")
+    print(f"Data (matrices) folder:  {data_dir}")
+    
+    print("\n[Portfolio Metrics]")
     print(metric_df)
-    print("\nFull comparison metrics (portfolios + benchmarks):")
+    print("\n[Full Comparison Metrics (Portfolios + Benchmarks)]")
     print(full_metrics_df)
-    print("\nGenerated comparison images:")
+    
+    print("\n[Generated Outputs]")
+    print("\nOriginal Comparison Images (4):")
     for name in [
         "1_classical_vs_quantum_vs_rebalanced.png",
         "2_quantum_vs_rebalanced.png",
         "3_quantum_rebalanced_vs_benchmarks.png",
         "4_rebalanced_vs_nonrebalanced.png",
     ]:
-        print(str(out_dir / name))
+        print(f"  • {str(out_dir / name)}")
+    
+    print("\nEnhanced Quantum vs Rebalanced Graphs (5):")
+    for graph_path in enhanced_graphs:
+        print(f"  • {graph_path}")
+    
+    print("\nMulti-Dataset Comparison Graphs (5 graphs × 5 datasets = 25 total):")
+    for dataset_name, graph_paths in multi_dataset_results.items():
+        print(f"  {dataset_name}:")
+        for i, graph_path in enumerate(graph_paths, 1):
+            print(f"    {i}. {graph_path}")
+
+    print("\n15-Year Normal Dataset Graphs (2):")
+    for graph_path in normal_15y_graphs:
+        print(f"  • {graph_path}")
+    
+    print("\nMatrix & Metrics Files in data/ folder:")
+    for i in range(1, 13):
+        print(f"  • {i:02d}_*.csv or .txt (see data/ folder)")
 
 
 if __name__ == "__main__":

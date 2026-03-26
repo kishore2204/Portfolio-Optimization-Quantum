@@ -1,0 +1,134 @@
+================================================================================
+QUANTUM-INSPIRED PORTFOLIO OPTIMIZATION - COMPREHENSIVE METRICS REPORT
+================================================================================
+
+
+[1] DATASET OVERVIEW
+--------------------------------------------------------------------------------
+  Total Assets in Universe:          680
+  Training Period:                   None to 2021-03-15 00:00:00
+  Test Period:                       None to 2026-03-15 00:00:00
+  Training Days:                     2478
+  Test Days:                         1240
+
+
+[2] ANNUALIZED RISK STATISTICS (Training Period)
+--------------------------------------------------------------------------------
+  Universe Mean Return:              0.071099
+  Universe Min Return:               -0.423751
+  Universe Max Return:               0.490161
+  Universe Mean Volatility:          0.030299
+  Covariance Matrix Eigenvalues:
+    - Largest:                       27.608747
+    - Smallest:                      0.012361
+    - Condition Number:              2233.57
+  Downside Risk (Semi-Deviation):    0.317509 avg
+
+
+[3] CLASSICAL PORTFOLIO (MVO + Sharpe)
+--------------------------------------------------------------------------------
+  Selected Assets:                   40
+  Portfolio Concentration (HHI):     0.0648
+  Max Weight:                        0.1085
+  Top 5 Assets by Weight:
+    - AJANTPHARM: 0.1085
+    - RELAXO: 0.1059
+    - ALKYLAMINE: 0.0821
+    - AARTIIND: 0.0743
+    - VINATIORGA: 0.0582
+
+
+[4] QUANTUM PORTFOLIO (QUBO + Annealing + Sharpe)
+--------------------------------------------------------------------------------
+  Selected Assets:                   40
+  Portfolio Concentration (HHI):     0.0745
+  Max Weight:                        0.1186
+  Top 5 Assets by Weight:
+    - SOLARINDS: 0.1186
+    - SUPREMEIND: 0.1040
+    - PIIND: 0.1031
+    - HINDUNILVR: 0.0860
+    - EICHERMOT: 0.0723
+
+
+[5] QUBO CONFIGURATION
+--------------------------------------------------------------------------------
+  QUBO Matrix Size:                  (40, 40)
+  QUBO Diagonal Mean:                -316.013556
+  QUBO Off-Diagonal Mean:            3.934841
+  QUBO Sparsity:                     0.0000
+
+
+[6] TEST PERIOD PERFORMANCE METRICS
+--------------------------------------------------------------------------------
+
+  Portfolio: Classical
+    Total Return:                   0.1170 (11.70%)
+    Annualized Return:             0.0225 (2.25%)
+    Annualized Volatility:         0.1492 (14.92%)
+    Sharpe Ratio (rf=5%):          -0.1842
+    Maximum Drawdown:              -0.3058 (-30.58%)
+
+  Portfolio: Quantum
+    Total Return:                   1.0510 (105.10%)
+    Annualized Return:             0.1461 (14.61%)
+    Annualized Volatility:         0.1378 (13.78%)
+    Sharpe Ratio (rf=5%):          0.6973
+    Maximum Drawdown:              -0.2246 (-22.46%)
+
+  Portfolio: Quantum_Rebalanced
+    Total Return:                   3.4985 (349.85%)
+    Annualized Return:             0.3058 (30.58%)
+    Annualized Volatility:         0.1930 (19.30%)
+    Sharpe Ratio (rf=5%):          1.3259
+    Maximum Drawdown:              -0.3233 (-32.33%)
+
+  Benchmarks:
+    BSE_500:
+      Total Return:               0.7338 (73.38%)
+      Annualized Return:          0.1119 (11.19%)
+      Annualized Volatility:      0.1414 (14.14%)
+      Sharpe Ratio (rf=5%):       0.4379
+    HDFCNIF100:
+      Total Return:               -0.8577 (-85.77%)
+      Annualized Return:          -0.3966 (-39.66%)
+      Annualized Volatility:      1.0504 (105.04%)
+      Sharpe Ratio (rf=5%):       -0.4252
+    Nifty_100:
+      Total Return:               0.6339 (63.39%)
+      Annualized Return:          0.0999 (9.99%)
+      Annualized Volatility:      0.1385 (13.85%)
+      Sharpe Ratio (rf=5%):       0.3599
+    Nifty_200:
+      Total Return:               0.7226 (72.26%)
+      Annualized Return:          0.1106 (11.06%)
+      Annualized Volatility:      0.1412 (14.12%)
+      Sharpe Ratio (rf=5%):       0.4293
+    Nifty_50:
+      Total Return:               0.5986 (59.86%)
+      Annualized Return:          0.0954 (9.54%)
+      Annualized Volatility:      0.1360 (13.60%)
+      Sharpe Ratio (rf=5%):       0.3341
+
+
+[7] PORTFOLIO COMPARISON SUMMARY
+--------------------------------------------------------------------------------
+  Classical vs Quantum:
+    Quantum Outperformance:        0.9340 (93.40%)
+
+
+[8] CONFIGURATION PARAMETERS
+--------------------------------------------------------------------------------
+  k_ratio: 0.06
+  max_weight: 0.12
+  rf_rate: 0.05
+  risk_aversion: 4.0
+  selected_k: 40
+  test_years: 5
+  train_years: 10
+  universe_size: 680
+
+
+================================================================================
+END OF REPORT
+================================================================================
