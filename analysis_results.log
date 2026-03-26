@@ -1,0 +1,209 @@
+Traceback (most recent call last):
+  File "C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\run_portfolio_optimization_quantum.py", line 101, in run_step
+    result = runner_func()
+  File "C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\run_portfolio_optimization_quantum.py", line 160, in step2_qubo_formulation
+    formulator.run_formulation()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\phase_03_qubo_formulation.py", line 408, in run_formulation
+    self.compute_qubo_matrix()
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\phase_03_qubo_formulation.py", line 361, in compute_qubo_matrix
+    return self.compute_qubo_matrix_paper_method()
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\phase_03_qubo_formulation.py", line 267, in compute_qubo_matrix_paper_method
+    print(f"[2/4] Return term: -\u03bc'x")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u03bc' in position 20: character maps to <undefined>
+
+====================================================================================================
+               PAPER'S METHODOLOGY: HYBRID QUANTUM-CLASSICAL PORTFOLIO OPTIMIZATION
+====================================================================================================
+
+Reference: Morapakula et al. (2025)
+           'End-to-End Portfolio Optimization with Hybrid Quantum Annealing'
+           Advanced Quantum Technologies
+
+Configuration:
+  Universe: NIFTY 100
+  Portfolio Size: K will be derived from convex Sharpe optimization
+  Training Period: 2011-2022
+  Testing Period: 2024-2026
+  Rebalancing: Quarterly with underperformer removal (K_sell=2)
+  QUBO Formulation: Paper's MVO (min q*x'Cx - mu'x + lambda(1'x-K)^2)
+  Weight Optimization: SLSQP solver
+
+Timestamp: 2026-03-26 18:18:26
+====================================================================================================
+
+
+================================================================================
+STEP 1: Data Preparation (NIFTY 100, Train/Test Split)
+================================================================================
+
+Executing standard data preparation...
+
+================================================================================
+                     ENHANCED DATA PREPARATION - NIFTY 100                      
+================================================================================
+
+[1/8] Loading complete NSE dataset...
+   OK Loaded 3,719 rows
+   OK Date range: 2011-03-14 00:00:00 to 2026-03-11 00:00:00
+   OK Total stocks: 2248
+
+[2/8] Filtering to NIFTY 100 stocks...
+   OKô Found 110 NIFTY 100 stocks in dataset
+   OKô Sectors: 18
+
+[3/8] Cleaning and validating data...
+   [SKIP] GAIL: cannot convert the series to <class 'int'>
+   [SKIP] GAIL: cannot convert the series to <class 'int'>
+   OK Cleaned dataset: 2861 trading days
+   OK Valid stocks: 108
+   OK Data completeness: 88.73%
+
+[4/8] Splitting data for training and testing...
+   OKô Historical data: NaT to NaT
+   OKô Historical days: 0
+   OKô Test period: 2011-03-14 00:00:00 to 2026-03-11 00:00:00
+   OKô Test days: 2861
+
+   OKô Saved test data: data/test_data.csv
+
+[5/8] Computing returns and statistics...
+   OKô Mean annual return: 16.93%
+   OKô Mean volatility: 29.27%
+   OKô Mean Sharpe ratio: 0.348
+
+   Sector Performance:
+     Healthcare          : Sharpe= 1.205, Return= 33.11%, Stocks=3
+     Power               : Sharpe= 1.113, Return= 34.95%, Stocks=4
+     Capital_Goods       : Sharpe= 1.030, Return= 28.69%, Stocks=6
+     Automobile          : Sharpe= 1.014, Return= 24.72%, Stocks=8
+     Metals              : Sharpe= 0.795, Return= 29.31%, Stocks=8
+     Oil_Gas             : Sharpe= 0.739, Return= 22.89%, Stocks=6
+     Pharma              : Sharpe= 0.629, Return= 16.26%, Stocks=9
+     Real_Estate         : Sharpe= 0.562, Return= 23.05%, Stocks=4
+     Financial_Services  : Sharpe= 0.440, Return= 13.22%, Stocks=12
+     Telecom             : Sharpe= 0.423, Return= 15.38%, Stocks=2
+
+[6/8] Selecting investment universe...
+   OKô Selected 100 stocks for optimization
+   OKô Sectors represented: 18
+   OKô Top 10 stocks by Sharpe ratio:
+       1. TVSMOTOR        - Sharpe: 1.255, Return: 40.84%
+       2. CUMMINSIND      - Sharpe: 1.095, Return: 37.98%
+       3. ADANIPOWER      - Sharpe: 1.004, Return: 58.52%
+       4. BHARTIARTL      - Sharpe: 0.997, Return: 27.99%
+       5. FORTIS          - Sharpe: 0.986, Return: 37.31%
+       6. PERSISTENT      - Sharpe: 0.979, Return: 40.08%
+       7. TORNTPHARM      - Sharpe: 0.975, Return: 28.82%
+       8. MAXHEALTH       - Sharpe: 0.930, Return: 39.02%
+       9. OIL             - Sharpe: 0.912, Return: 42.77%
+      10. ABB             - Sharpe: 0.890, Return: 34.70%
+
+[7/8] Saving prepared data...
+   OK Saved arrays: mean_returns.npy, covariance_matrix.npy, sharpe_ratios.npy, returns_matrix.npy
+   OKô Saved time series: prices_timeseries.csv, returns_timeseries.csv
+   OKô Saved metadata: universe_metadata.json
+
+[8/8] Data preparation complete!
+
+================================================================================
+
+OKô Ready for QUBO formulation and quantum selection
+OKô Run: python phase_03_qubo_formulation.py
+
+Step 1 completed in 1.08s
+
+================================================================================
+STEP 1b: Two-Step Cardinality Determination (Convex Sharpe)
+================================================================================
+
+Determining optimal cardinality K from convex optimization...
+
+================================================================================
+STEP 1: CONVEX SHARPE RATIO OPTIMIZATION
+================================================================================
+Objective: Derive optimal cardinality K from continuous optimization
+  [WARNING] Primary solver failed: The solver CVXOPT is not installed.
+  [INFO] Attempting fallback solvers...
+
+  OK Optimization successful: optimal
+  Portfolio variance: 0.251324
+  Sum of optimal weights: 3.20
+  Non-zero weights: 14
+  Derived optimal K: 8
+
+  Top 5 weights:
+    1. Asset 0: 17.23%
+    2. Asset 6: 15.13%
+    3. Asset 3: 12.06%
+    4. Asset 4: 9.18%
+    5. Asset 8: 8.68%
+
+  OK Saved cardinality analysis to portfolios/cardinality_analysis.json
+
+Optimal K = 8 (saved to config)
+
+Step 1b completed in 0.04s
+
+================================================================================
+STEP 2: QUBO Formulation (Paper's MVO - Equation 8)
+================================================================================
+
+Formulating QUBO with paper's MVO formulation...
+
+================================================================================
+QUBO FORMULATION WITH SECTOR DIVERSIFICATION
+================================================================================
+
+Loaded 100 stocks for QUBO formulation
+Target portfolio size: K = 8
+
+Sector distribution in universe:
+  Financial_Services  :  12 stocks
+  Pharma              :   9 stocks
+  Automobile          :   8 stocks
+  IT                  :   8 stocks
+  Metals              :   8 stocks
+  FMCG                :   8 stocks
+  Others              :   7 stocks
+  Capital_Goods       :   6 stocks
+  Oil_Gas             :   6 stocks
+  Power               :   4 stocks
+  Retail              :   4 stocks
+  Real_Estate         :   4 stocks
+  Cement              :   4 stocks
+  Healthcare          :   3 stocks
+  Consumer_Durables   :   3 stocks
+  Telecom             :   2 stocks
+  Logistics           :   2 stocks
+  Paints              :   2 stocks
+
+============================================================
+QUBO FORMULATION (Paper + Robustness Extensions)
+============================================================
+[1/4] Risk term: q * x'Cx
+      Risk aversion q = 0.5
+      Covariance contribution: [-0.0061, 0.3310]
+
+Step 2 failed
+Error: 'charmap' codec can't encode character '\u03bc' in position 20: character maps to <undefined>
+
+====================================================================================================
+PIPELINE FAILED
+====================================================================================================
+
+Error: 'charmap' codec can't encode character '\u03bc' in position 20: character maps to <undefined>
+
+====================================================================================================
+                         PORTFOLIO OPTIMIZATION - COMPLETE ANALYSIS
+====================================================================================================
+
+
+[1/5] Core Pipeline Execution
+----------------------------------------------------------------------------------------------------

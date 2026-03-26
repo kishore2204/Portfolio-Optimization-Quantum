@@ -1,0 +1,57 @@
+{
+  "comparison_date": "2026-03-26T18:12:26.578819",
+  "comparison_type": "Quantum Strategies vs NIFTY 50 Benchmark",
+  "metrics": [
+    {
+      "strategy": "Quantum Buy-Hold",
+      "total_return": 414.4104807356089,
+      "annual_return": 39.531795048093834,
+      "volatility": 23.817472547488038,
+      "sharpe_ratio": 1.407865380394039,
+      "sortino_ratio": 2.0753473004660252,
+      "max_drawdown": -31.041013179433435,
+      "calmar_ratio": 1.2735343018470175,
+      "win_rate": 55.2865213882163,
+      "var_95": -2.200375285554403,
+      "num_periods": 1239,
+      "num_positive_days": 685,
+      "num_negative_days": 554,
+      "avg_daily_return": 0.14355052259558118,
+      "daily_volatility": 1.5003597433038423
+    },
+    {
+      "strategy": "Quantum + Quarterly Rebalancing",
+      "total_return": 505.8103602274068,
+      "annual_return": 44.25116458053986,
+      "volatility": 21.653850916384513,
+      "sharpe_ratio": 1.7664832333170304,
+      "sortino_ratio": 2.601491268208697,
+      "max_drawdown": -26.715029632492758,
+      "calmar_ratio": 1.6564145797060386,
+      "win_rate": 56.49717514124294,
+      "var_95": -2.027866818985099,
+      "num_periods": 1239,
+      "num_positive_days": 700,
+      "num_negative_days": 539,
+      "avg_daily_return": 0.1548139223255755,
+      "daily_volatility": 1.3640643917052742
+    },
+    {
+      "strategy": "NIFTY 50 Benchmark",
+      "total_return": 72.10020429351287,
+      "annual_return": 11.908375091277023,
+      "volatility": 13.553561779516595,
+      "sharpe_ratio": 0.4359278533120578,
+      "sortino_ratio": 0.5965476128801435,
+      "max_drawdown": -17.22975258496357,
+      "calmar_ratio": 0.691151833582885,
+      "win_rate": 53.45394736842105,
+      "var_95": -1.337989828998809,
+      "num_periods": 1216,
+      "num_positive_days": 650,
+      "num_negative_days": 565,
+      "avg_daily_return": 0.04831024114801612,
+      "daily_volatility": 0.8537941392321656
+    }
+  ]
+}

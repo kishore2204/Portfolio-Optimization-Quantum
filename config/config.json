@@ -1,83 +1,47 @@
 {
-  "project_info": {
-    "name": "Enhanced Quantum Portfolio Optimization",
-    "version": "2.0",
-    "description": "N IFTY 100 portfolio with half-yearly rebalancing and sector diversification",
-    "created": "2026-03-12"
-  },
   "data": {
     "source_path": "Dataset/prices_timeseries_complete.csv",
-    "start_date": "2011-03-14",
-    "train_start_date": "2024-01-01",
+    "train_start_date": "2000-01-01",
+    "train_end_date": "2022-12-31",
+    "test_start_date": "2023-01-01",
     "test_end_date": "2026-03-11",
-    "universe_size": 100,
     "min_history_days": 1000,
     "min_price": 10.0,
     "risk_free_rate": 0.06,
-    "trading_days_per_year": 252
+    "trading_days_per_year": 252,
+    "universe_size": 100
   },
   "portfolio": {
     "K": 8,
-    "K_sell": 4,
     "q": 0.5,
-    "universe_size": 100,
-    "use_adaptive_cardinality": true
-  },
-  "portfolio_optimization": {
-    "K": 15,
-    "q_risk_aversion": 0.5,
-    "lambda_penalty_adaptive": true,
-    "lambda_initial": 2.0,
-    "downside_risk_beta": 0.3,
-    "use_slsqp_weights": true,
-    "allow_short": false,
-    "min_weight": 0.0,
-    "max_weight": 0.4,
-    "budget": 1000000,
-    "solver": "cvxopt"
+    "universe": "NIFTY_100"
   },
   "sector_constraints": {
     "min_sectors": 5,
     "max_sector_weight": 0.35
   },
   "sector_diversification": {
-    "enabled": true,
     "min_sectors": 5,
-    "max_sector_concentration": 0.35,
-    "sector_file": "config/nifty100_sectors.json"
+    "max_stocks_per_sector": 20
   },
   "rebalancing": {
     "frequency": "quarterly",
-    "enabled": true,
-    "method": "underperformer_removal",
-    "K_sell": 4,
-    "transaction_cost_pct": 0.002,
-    "minimize_trades": true,
-    "max_trades_per_rebalance": 5,
-    "hp_filter_lambda": 6.25
+    "K_sell": 2,
+    "transaction_cost_pct": 0.001
+  },
+  "optimization": {
+    "risk_free_rate": 0.06,
+    "solver": "SLSQP"
+  },
+  "portfolio_optimization": {
+    "downside_risk_beta": 0.3,
+    "lambda_penalty_adaptive": true,
+    "lambda_initial": 100.0,
+    "lambda_sector_constraint": 50.0
   },
   "quantum": {
+    "solver": "SimulatedAnnealing",
     "num_reads": 1000,
     "num_sweeps": 10000
-  },
-  "quantum_solver": {
-    "use_dwave": false,
-    "num_reads": 5000,
-    "solver": "SimulatedAnnealingSampler",
-    "annealing_time": 20
-  },
-  "strategies": {
-    "compare": [
-      "buy_hold",
-      "quantum_once",
-      "quantum_rebalanced"
-    ],
-    "evaluate_metrics": [
-      "sharpe",
-      "sortino",
-      "calmar",
-      "max_drawdown",
-      "total_return"
-    ]
   }
 }

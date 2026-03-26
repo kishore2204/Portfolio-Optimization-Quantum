@@ -1,0 +1,116 @@
+{
+  "10-Year": {
+    "period": "10-Year",
+    "start_date": "2016-03-10T12:00:00",
+    "end_date": "2026-03-11T00:00:00",
+    "trading_days": 1239,
+    "metrics": {
+      "classical": {
+        "total_return": 404.42107628320923,
+        "annual_return": 38.976379884531134,
+        "volatility": 16.955018470161367,
+        "sharpe_ratio": 1.9449332917310165,
+        "sortino_ratio": 2.830548961239013,
+        "max_drawdown": -19.60923969281007,
+        "calmar_ratio": 1.987653804793983,
+        "win_rate": 56.49717514124294
+      },
+      "quantum": {
+        "total_return": 365.3931243605126,
+        "annual_return": 36.7186587082073,
+        "volatility": 19.57881200483091,
+        "sharpe_ratio": 1.5689745986951464,
+        "sortino_ratio": 2.397092932972149,
+        "max_drawdown": -19.387797125210003,
+        "calmar_ratio": 1.8939056598886073,
+        "win_rate": 56.25504439063761
+      },
+      "quantum_rebalanced": {
+        "total_return": 402.70526909306017,
+        "annual_return": 38.88010019225763,
+        "volatility": 17.408038748670307,
+        "sharpe_ratio": 1.8887883159594379,
+        "sortino_ratio": 2.8710170428584854,
+        "max_drawdown": -17.36064839329739,
+        "calmar_ratio": 2.2395534608758325,
+        "win_rate": 55.85149313962873
+      }
+    }
+  },
+  "5-Year": {
+    "period": "5-Year",
+    "start_date": "2021-03-10T18:00:00",
+    "end_date": "2026-03-11T00:00:00",
+    "trading_days": 1239,
+    "metrics": {
+      "classical": {
+        "total_return": 404.42107628320923,
+        "annual_return": 38.976379884531134,
+        "volatility": 16.955018470161367,
+        "sharpe_ratio": 1.9449332917310165,
+        "sortino_ratio": 2.830548961239013,
+        "max_drawdown": -19.60923969281007,
+        "calmar_ratio": 1.987653804793983,
+        "win_rate": 56.49717514124294
+      },
+      "quantum": {
+        "total_return": 365.3931243605126,
+        "annual_return": 36.7186587082073,
+        "volatility": 19.57881200483091,
+        "sharpe_ratio": 1.5689745986951464,
+        "sortino_ratio": 2.397092932972149,
+        "max_drawdown": -19.387797125210003,
+        "calmar_ratio": 1.8939056598886073,
+        "win_rate": 56.25504439063761
+      },
+      "quantum_rebalanced": {
+        "total_return": 402.70526909306017,
+        "annual_return": 38.88010019225763,
+        "volatility": 17.408038748670307,
+        "sharpe_ratio": 1.8887883159594379,
+        "sortino_ratio": 2.8710170428584854,
+        "max_drawdown": -17.36064839329739,
+        "calmar_ratio": 2.2395534608758325,
+        "win_rate": 55.85149313962873
+      }
+    }
+  },
+  "1-Year": {
+    "period": "1-Year",
+    "start_date": "2025-03-10T18:00:00",
+    "end_date": "2026-03-11T00:00:00",
+    "trading_days": 248,
+    "metrics": {
+      "classical": {
+        "total_return": 30.61845447077829,
+        "annual_return": 31.182402892041505,
+        "volatility": 15.29090534551443,
+        "sharpe_ratio": 1.6468876317666001,
+        "sortino_ratio": 2.8223610489267585,
+        "max_drawdown": -6.569547104331877,
+        "calmar_ratio": 4.746507239666524,
+        "win_rate": 54.43548387096774
+      },
+      "quantum": {
+        "total_return": 27.27155581712697,
+        "annual_return": 27.767550417318798,
+        "volatility": 17.425440960157097,
+        "sharpe_ratio": 1.2491821852365081,
+        "sortino_ratio": 1.9854113479481172,
+        "max_drawdown": -11.559104412615529,
+        "calmar_ratio": 2.402223340677975,
+        "win_rate": 55.24193548387096
+      },
+      "quantum_rebalanced": {
+        "total_return": 27.489518938194067,
+        "annual_return": 27.989895274177414,
+        "volatility": 14.890649286020702,
+        "sharpe_ratio": 1.476758659195705,
+        "sortino_ratio": 2.277180959039819,
+        "max_drawdown": -10.071786623684638,
+        "calmar_ratio": 2.7790397394199022,
+        "win_rate": 55.24193548387096
+      }
+    }
+  }
+}

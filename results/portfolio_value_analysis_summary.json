@@ -1,0 +1,158 @@
+{
+  "analysis_info": {
+    "start_date": "2021-03-15",
+    "end_date": "2026-03-11",
+    "total_trading_days": 1239
+  },
+  "train_test_splits": {
+    "10Y": {
+      "horizon": "10Y",
+      "train_period": "2021-03-15 to 2023-03-31",
+      "test_period": "2023-04-03 to 2026-03-11",
+      "train_days": 509,
+      "test_days": 730,
+      "train_metrics": {
+        "classical": {
+          "total_return": 81.05,
+          "annual_return": 40.13
+        },
+        "quantum": {
+          "total_return": 82.1,
+          "annual_return": 40.65
+        },
+        "quantum_rebalanced": {
+          "total_return": 94.23,
+          "annual_return": 46.65
+        }
+      },
+      "test_metrics": {
+        "classical": {
+          "total_return": 183.21,
+          "annual_return": 63.25
+        },
+        "quantum": {
+          "total_return": 157.97,
+          "annual_return": 54.53
+        },
+        "quantum_rebalanced": {
+          "total_return": 162.3,
+          "annual_return": 56.03
+        }
+      }
+    },
+    "5Y": {
+      "horizon": "5Y",
+      "train_period": "2021-03-15 to 2024-09-20",
+      "test_period": "2024-09-23 to 2026-03-11",
+      "train_days": 874,
+      "test_days": 365,
+      "train_metrics": {
+        "classical": {
+          "total_return": 353.76,
+          "annual_return": 102.0
+        },
+        "quantum": {
+          "total_return": 324.55,
+          "annual_return": 93.58
+        },
+        "quantum_rebalanced": {
+          "total_return": 348.17,
+          "annual_return": 100.39
+        }
+      },
+      "test_metrics": {
+        "classical": {
+          "total_return": 10.28,
+          "annual_return": 7.1
+        },
+        "quantum": {
+          "total_return": 7.34,
+          "annual_return": 5.07
+        },
+        "quantum_rebalanced": {
+          "total_return": 10.19,
+          "annual_return": 7.04
+        }
+      }
+    },
+    "1Y": {
+      "horizon": "1Y",
+      "train_period": "2021-03-15 to 2025-12-09",
+      "test_period": "2025-12-10 to 2026-03-11",
+      "train_days": 1176,
+      "test_days": 63,
+      "train_metrics": {
+        "classical": {
+          "total_return": 407.87,
+          "annual_return": 87.4
+        },
+        "quantum": {
+          "total_return": 375.08,
+          "annual_return": 80.37
+        },
+        "quantum_rebalanced": {
+          "total_return": 413.1,
+          "annual_return": 88.52
+        }
+      },
+      "test_metrics": {
+        "classical": {
+          "total_return": 0.59,
+          "annual_return": 2.34
+        },
+        "quantum": {
+          "total_return": -1.36,
+          "annual_return": -5.46
+        },
+        "quantum_rebalanced": {
+          "total_return": -1.08,
+          "annual_return": -4.3
+        }
+      }
+    }
+  },
+  "horizon_comparison": {
+    "10Y": {
+      "classical": {
+        "total_return": 404.42,
+        "annual_return": 38.98
+      },
+      "quantum": {
+        "total_return": 365.39,
+        "annual_return": 36.72
+      },
+      "quantum_rebalanced": {
+        "total_return": 402.71,
+        "annual_return": 38.88
+      }
+    },
+    "5Y": {
+      "classical": {
+        "total_return": 404.42,
+        "annual_return": 38.98
+      },
+      "quantum": {
+        "total_return": 365.39,
+        "annual_return": 36.72
+      },
+      "quantum_rebalanced": {
+        "total_return": 402.71,
+        "annual_return": 38.88
+      }
+    },
+    "1Y": {
+      "classical": {
+        "total_return": 30.62,
+        "annual_return": 31.18
+      },
+      "quantum": {
+        "total_return": 27.27,
+        "annual_return": 27.77
+      },
+      "quantum_rebalanced": {
+        "total_return": 27.49,
+        "annual_return": 27.99
+      }
+    }
+  }
+}

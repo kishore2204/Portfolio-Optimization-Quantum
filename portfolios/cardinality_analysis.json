@@ -3,13 +3,13 @@
   "method": "convex_sharpe_maximization",
   "reference": "Morapakula et al. (2025) - Equation 7",
   "portfolio_metrics": {
-    "annual_return": 0.4795878059758021,
-    "annual_risk": 0.15286543455958151,
-    "sharpe_ratio": 2.744818062923582
+    "annual_return": 0.37233661160854126,
+    "annual_risk": 0.15658124242052918,
+    "sharpe_ratio": 1.994725592799302
   },
   "optimization_details": {
-    "sum_of_weights": 2.383291377294389,
-    "max_weight": 0.3132893759079721,
+    "sum_of_weights": 3.201673972353018,
+    "max_weight": 0.5516611444818849,
     "non_zero_threshold": 0.01
   }
 }

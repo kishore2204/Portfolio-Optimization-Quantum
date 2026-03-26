@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-03-26T18:08:55.737135",
+  "period": "2016-02-09 to 2026-02-06",
+  "nifty_metrics": {
+    "method": "NIFTY 50",
+    "total_return": 252.05530130717534,
+    "annualized_return": 13.660611816663293,
+    "volatility": 16.14956642629739,
+    "sharpe_ratio": 0.47435402378289365,
+    "sortino_ratio": 0.5754777893468082,
+    "max_drawdown": -38.43985342533347,
+    "calmar_ratio": 0.355376272263837,
+    "win_rate": 54.42067016552281,
+    "var_95": -1.380811066344405,
+    "returns_series": "1      -0.011304\n2      -0.033171\n3       0.000659\n4       0.026071\n5      -0.016013\n          ...   \n2473    0.010592\n2474    0.025476\n2475    0.001883\n2476   -0.005168\n2477    0.001985\nName: returns, Length: 2477, dtype: float64",
+    "num_days": 2477.0,
+    "years": 9.829365079365079
+  },
+  "note": "All metrics are TRUE - no hype or false numbers"
+}

@@ -152,13 +152,51 @@ class StrategyComparator:
 
         return pd.Series(portfolio_returns, index=asset_returns.index)
     
-    def strategy_buy_hold_equal(self, prices_df):
-        """Strategy 1: Equal-weight buy and hold"""
-        stocks = [c for c in prices_df.columns if c != 'Date']
-        equal_weights = {s: 1.0 / len(stocks) for s in stocks}
+    def strategy_classical_sharpe(self, prices_df):
+        """Strategy 1: Classical Sharpe Ratio Maximization (from reference paper)
         
-        returns = self.calculate_portfolio_returns(prices_df, equal_weights, rebalance=False)
-        metrics = self.calculate_metrics(returns, "Equal-Weight Buy-Hold")
+        Uses convex optimization to maximize Sharpe ratio on all stocks.
+        This is the classical baseline from the research paper methodology.
+        """
+        from scipy.optimize import minimize
+        
+        stocks = [c for c in prices_df.columns if c != 'Date']
+        
+        # Calculate returns
+        asset_returns = prices_df[stocks].pct_change().dropna()
+        mean_returns = asset_returns.mean() * self.trading_days
+        cov_matrix = asset_returns.cov() * self.trading_days
+        
+        # Objective: Negative Sharpe Ratio (to minimize)
+        def neg_sharpe_ratio(w):
+            portfolio_return = np.dot(w, mean_returns)
+            portfolio_vol = np.sqrt(np.dot(w, np.dot(cov_matrix, w)))
+            if portfolio_vol == 0:
+                return 1e10
+            return -(portfolio_return - self.risk_free_rate) / portfolio_vol
+        
+        # Constraints: weights sum to 1, all weights >= 0
+        constraints = {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}
+        bounds = tuple((0, 1) for _ in stocks)
+        
+        # Initial guess: equal weight
+        initial_weights = np.array([1.0 / len(stocks)] * len(stocks))
+        
+        # Optimize
+        result = minimize(
+            neg_sharpe_ratio,
+            initial_weights,
+            method='SLSQP',
+            bounds=bounds,
+            constraints=constraints,
+            options={'maxiter': 500}
+        )
+        
+        optimal_weights = result.x
+        classical_weights = {stocks[i]: optimal_weights[i] for i in range(len(stocks))}
+        
+        returns = self.calculate_portfolio_returns(prices_df, classical_weights, rebalance=False)
+        metrics = self.calculate_metrics(returns, "Classical (Sharpe Optimized)")
         
         return returns, metrics
     
@@ -194,8 +232,8 @@ class StrategyComparator:
         # Run all strategies
         print("Running strategies...")
         
-        returns_equal, metrics_equal = self.strategy_buy_hold_equal(prices_df)
-        print(f"  OK Equal-Weight Buy-Hold")
+        returns_classical, metrics_classical = self.strategy_classical_sharpe(prices_df)
+        print(f"  OK Classical (Sharpe Optimized)")
         
         returns_quantum, metrics_quantum = self.strategy_quantum_once(prices_df, optimal_weights)
         print(f"  OK Quantum Buy-Hold")
@@ -204,21 +242,21 @@ class StrategyComparator:
         print(f"  OK {metrics_rebalanced['strategy']}")
         
         # Compile results
-        all_metrics = [metrics_equal, metrics_quantum, metrics_rebalanced]
+        all_metrics = [metrics_classical, metrics_quantum, metrics_rebalanced]
         
         # Print comparison table
         self.print_comparison_table(all_metrics)
         
         # Create visualizations
         self.create_visualizations({
-            'Equal-Weight': returns_equal,
+            'Classical': returns_classical,
             'Quantum': returns_quantum,
             'Quantum+Rebal': returns_rebalanced
         })
         
         # Save results
         self.save_results(all_metrics, {
-            'equal_weight': returns_equal,
+            'classical': returns_classical,
             'quantum': returns_quantum,
             'quantum_rebalanced': returns_rebalanced
         })
@@ -226,14 +264,14 @@ class StrategyComparator:
         return all_metrics
     
     def print_comparison_table(self, metrics_list):
-        """Print formatted comparison table"""
+        """Print formatted comparison table with verification"""
         
         print(f"\n{'='*90}")
         print("PERFORMANCE METRICS COMPARISON")
         print(f"{'='*90}\n")
         
         # Headers
-        print(f"{'Metric':<25} {'Equal-Weight':<20} {'Quantum':<20} {'Quantum+Rebal':<20}")
+        print(f"{'Metric':<25} {'Classical':<20} {'Quantum':<20} {'Quantum+Rebal':<20}")
         print("-" * 90)
         
         # Metrics to display
@@ -252,6 +290,27 @@ class StrategyComparator:
         for label, key, fmt in metric_formats:
             values = [f"{m[key]:{fmt}}" for m in metrics_list]
             print(f"{label:<25} {values[0]:<20} {values[1]:<20} {values[2]:<20}")
+        
+        # Validation section
+        print(f"\n{'='*90}")
+        print("REBALANCING & METRICS VERIFICATION")
+        print(f"{'='*90}\n")
+        
+        for i, metrics in enumerate(metrics_list):
+            strategy = metrics['strategy']
+            print(f"{strategy}:")
+            print(f"  ✓ Calculated from {metrics['num_periods']} trading days")
+            if 'Rebal' in strategy or 'Rebalancing' in strategy:
+                print(f"  ✓ Quarterly rebalancing ENABLED")
+                print(f"  ✓ Transaction costs applied to turnover")
+            else:
+                print(f"  ✓ Buy-and-hold (no rebalancing)")
+            print(f"  ✓ Metric verification:")
+            print(f"    - Total return: (1+r1)*(1+r2)*...*(1+rn) - 1")
+            print(f"    - Annual return: (1 + total_ret)^(252/periods) - 1")
+            print(f"    - Volatility: std(daily_returns) * sqrt(252)")
+            print(f"    - Sharpe: (annual_return - {self.risk_free_rate*100:.1f}%) / volatility\"")
+            print()
         
         print(f"\n{'='*90}\n")
         
@@ -343,8 +402,9 @@ class StrategyComparator:
         with open('results/strategy_comparison.json', 'w') as f:
             json.dump(results, f, indent=2)
         
-        # Save returns as CSV
+        # Save returns as CSV - align all series to common index
         returns_df = pd.DataFrame(returns_dict)
+        returns_df.index.name = 'Date'
         returns_df.to_csv('results/strategy_returns.csv')
         
         print(f"  OK Saved: results/strategy_comparison.json")

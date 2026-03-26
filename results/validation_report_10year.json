@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-03-26T18:06:44.105149",
+  "nifty_10year_metrics": {
+    "method": "NIFTY 50",
+    "total_return": 252.05530130717534,
+    "annualized_return": 13.660611816663293,
+    "volatility": 16.14956642629739,
+    "sharpe_ratio": 0.47435402378289365,
+    "sortino_ratio": 0.5754777893468082,
+    "max_drawdown": -38.43985342533347,
+    "calmar_ratio": 0.355376272263837,
+    "win_rate": 54.42067016552281,
+    "var_95": -1.380811066344405,
+    "num_days": 2477,
+    "years": 9.829365079365079
+  },
+  "validation_date_range": "2016-02-09 to 2026-02-06",
+  "rebalancing_config": {
+    "frequency": "quarterly",
+    "k_sell": 2,
+    "transaction_cost": 0.001
+  },
+  "metrics_explanation": {
+    "total_return": "Final value / Initial value - 1",
+    "annualized_return": "(Final / Initial) ^ (1/years) - 1",
+    "volatility": "Daily std * sqrt(252)",
+    "sharpe_ratio": "(Annual return - 6%) / volatility",
+    "max_drawdown": "Lowest value in peak-to-trough",
+    "win_rate": "Days with positive return / total days"
+  }
+}

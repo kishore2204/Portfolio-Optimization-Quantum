@@ -1,0 +1,49 @@
+{
+  "analysis_date": "2026-03-26T18:22:07.768036",
+  "analysis_type": "Time Horizon Comparison (1Y, 5Y, 10Y)",
+  "data_period": {
+    "start": "2021-03-15T00:00:00",
+    "end": "2026-03-11T00:00:00",
+    "total_trading_days": 1239
+  },
+  "horizons": {
+    "1-Year": {
+      "classical": {
+        "name": "Classical (Sharpe Optimized)",
+        "total_return": 31.683540269417843,
+        "annual_return": 31.683540269417843,
+        "volatility": 15.549261911572525,
+        "sharpe": 1.651753016669099,
+        "sortino": 2.874831218960608,
+        "max_drawdown": -6.56954710433191,
+        "calmar": 4.8227891156341585,
+        "win_rate": 53.96825396825397,
+        "var_95": -1.438969903523387
+      },
+      "quantum": {
+        "name": "Quantum Buy-Hold",
+        "total_return": 29.09813792310183,
+        "annual_return": 29.09813792310183,
+        "volatility": 17.524945088280106,
+        "sharpe": 1.31801485292806,
+        "sortino": 2.125502640716139,
+        "max_drawdown": -11.559104412615499,
+        "calmar": 2.5173349841311574,
+        "win_rate": 55.158730158730165,
+        "var_95": -1.5668310462170039
+      },
+      "quantum_rebalanced": {
+        "name": "Quantum + Quarterly Rebal",
+        "total_return": 29.313984060550524,
+        "annual_return": 29.313984060550524,
+        "volatility": 15.000797809560536,
+        "sharpe": 1.5541829412360788,
+        "sortino": 2.435107611929078,
+        "max_drawdown": -10.07178662368458,
+        "calmar": 2.910504874241124,
+        "win_rate": 55.158730158730165,
+        "var_95": -1.382935575034268
+      }
+    }
+  }
+}

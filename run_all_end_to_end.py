@@ -5,7 +5,6 @@ Master runner for Portfolio Optimization Quantum.
 Runs in order:
 1) core phase pipeline
 2) unified horizon comparison
-3) unified crash comparison
 
 Writes a run summary markdown to results/final_run_summary.md.
 """
@@ -62,7 +61,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--python", default=sys.executable, help="Python executable")
     parser.add_argument("--skip-core", action="store_true", help="Skip core phase pipeline")
     parser.add_argument("--skip-horizon", action="store_true", help="Skip horizon comparison")
-    parser.add_argument("--skip-crash", action="store_true", help="Skip crash comparison")
     return parser.parse_args()
 
 
@@ -89,15 +87,6 @@ def main() -> int:
             root,
         )
         rows.append({"step": "unified_horizon", "status": "SUCCESS" if ok else "FAILED", "code": code})
-        overall_ok = overall_ok and ok
-
-    if not args.skip_crash:
-        ok, code = run_step(
-            "Unified Crash Comparison",
-            [args.python, "unified_train_test_compare.py", "--only", "crash"],
-            root,
-        )
-        rows.append({"step": "unified_crash", "status": "SUCCESS" if ok else "FAILED", "code": code})
         overall_ok = overall_ok and ok
 
     generated_files = [

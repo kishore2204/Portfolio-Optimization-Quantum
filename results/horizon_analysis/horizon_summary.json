@@ -1,0 +1,98 @@
+{
+  "10Y": {
+    "classical": {
+      "Total Return (%)": 404.42,
+      "Annual Return (%)": 38.98,
+      "Volatility (%)": 16.96,
+      "Sharpe Ratio": 1.944,
+      "Sortino Ratio": 2.828,
+      "Max Drawdown (%)": -19.61,
+      "Calmar Ratio": 1.988,
+      "Win Rate (%)": 56.5
+    },
+    "quantum": {
+      "Total Return (%)": 365.39,
+      "Annual Return (%)": 36.72,
+      "Volatility (%)": 19.59,
+      "Sharpe Ratio": 1.568,
+      "Sortino Ratio": 2.395,
+      "Max Drawdown (%)": -19.39,
+      "Calmar Ratio": 1.894,
+      "Win Rate (%)": 56.26
+    },
+    "quantum_rebalanced": {
+      "Total Return (%)": 402.71,
+      "Annual Return (%)": 38.88,
+      "Volatility (%)": 17.42,
+      "Sharpe Ratio": 1.888,
+      "Sortino Ratio": 2.868,
+      "Max Drawdown (%)": -17.36,
+      "Calmar Ratio": 2.24,
+      "Win Rate (%)": 55.85
+    }
+  },
+  "5Y": {
+    "classical": {
+      "Total Return (%)": 404.42,
+      "Annual Return (%)": 38.98,
+      "Volatility (%)": 16.96,
+      "Sharpe Ratio": 1.944,
+      "Sortino Ratio": 2.828,
+      "Max Drawdown (%)": -19.61,
+      "Calmar Ratio": 1.988,
+      "Win Rate (%)": 56.5
+    },
+    "quantum": {
+      "Total Return (%)": 365.39,
+      "Annual Return (%)": 36.72,
+      "Volatility (%)": 19.59,
+      "Sharpe Ratio": 1.568,
+      "Sortino Ratio": 2.395,
+      "Max Drawdown (%)": -19.39,
+      "Calmar Ratio": 1.894,
+      "Win Rate (%)": 56.26
+    },
+    "quantum_rebalanced": {
+      "Total Return (%)": 402.71,
+      "Annual Return (%)": 38.88,
+      "Volatility (%)": 17.42,
+      "Sharpe Ratio": 1.888,
+      "Sortino Ratio": 2.868,
+      "Max Drawdown (%)": -17.36,
+      "Calmar Ratio": 2.24,
+      "Win Rate (%)": 55.85
+    }
+  },
+  "1Y": {
+    "classical": {
+      "Total Return (%)": 30.62,
+      "Annual Return (%)": 31.18,
+      "Volatility (%)": 15.32,
+      "Sharpe Ratio": 1.644,
+      "Sortino Ratio": 2.81,
+      "Max Drawdown (%)": -6.57,
+      "Calmar Ratio": 4.747,
+      "Win Rate (%)": 54.44
+    },
+    "quantum": {
+      "Total Return (%)": 27.27,
+      "Annual Return (%)": 27.77,
+      "Volatility (%)": 17.46,
+      "Sharpe Ratio": 1.247,
+      "Sortino Ratio": 1.976,
+      "Max Drawdown (%)": -11.56,
+      "Calmar Ratio": 2.402,
+      "Win Rate (%)": 55.24
+    },
+    "quantum_rebalanced": {
+      "Total Return (%)": 27.49,
+      "Annual Return (%)": 27.99,
+      "Volatility (%)": 14.92,
+      "Sharpe Ratio": 1.474,
+      "Sortino Ratio": 2.267,
+      "Max Drawdown (%)": -10.07,
+      "Calmar Ratio": 2.779,
+      "Win Rate (%)": 55.24
+    }
+  }
+}

@@ -1,31 +1,31 @@
 {
   "stocks": [
-    "TVSMOTOR",
-    "PERSISTENT",
-    "TRENT",
+    "CUMMINSIND",
     "ADANIPOWER",
-    "ABB",
+    "BHARTIARTL",
+    "MAXHEALTH",
+    "SUNPHARMA",
+    "TITAN",
     "CHOLAFIN",
-    "INDIGO",
-    "SHREECEM"
+    "RAMCOCEM"
   ],
   "weights": [
-    0.26057472005907767,
-    0.2402470593825856,
-    0.18529645002901723,
-    0.12009583607286348,
-    0.19378593445645603,
-    6.268808084165831e-17,
-    0.0,
-    0.0
+    0.22557263358993873,
+    0.11804616612958761,
+    0.2233159958645858,
+    0.16126606596648618,
+    0.18561906069734438,
+    0.06891224824458869,
+    0.017267829507468167,
+    4.84158045848054e-16
   ],
   "optimization_info": {
-    "sharpe_ratio": 2.418098440421155,
-    "portfolio_return": 0.554926319488665,
-    "portfolio_volatility": 0.20467583586153124,
+    "sharpe_ratio": 1.674566830337657,
+    "portfolio_return": 0.34641301326466345,
+    "portfolio_volatility": 0.17103707542499905,
     "risk_free_rate": 0.06,
     "method": "SLSQP_Sharpe_Maximization",
-    "max_weight": 0.26057472005907767,
-    "min_weight": 0.0
+    "max_weight": 0.22557263358993873,
+    "min_weight": 4.84158045848054e-16
   }
 }

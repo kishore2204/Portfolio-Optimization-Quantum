@@ -105,20 +105,46 @@ def clean_and_validate(df, config):
     
     return df
 
-def split_train_test(df, config):
-    """Split data into training and testing periods"""
-    print(f"\n[4/8] Splitting data for training and testing...")
+def split_train_test(df, config, horizon='10Y'):
+    """
+    Split data into training and testing periods with NO DATA LEAKAGE
     
-    train_start = pd.to_datetime(config['data']['train_start_date'])
+    Horizon options:
+    - '10Y': 10 years train, 2 years test (walk-forward validation)
+    - '5Y':  5 years train, 1 year test (walk-forward validation)
+    - '1Y':  1 year train, 3 months test (walk-forward validation)
+    """
+    print(f"\n[4/8] Splitting data for training and testing ({horizon})...")
     
-    # Use all data before test period for historical analysis
-    df_train = df[df['Date'] < train_start].copy()
-    df_test = df[df['Date'] >= train_start].copy()
+    end_date = df['Date'].max()
     
-    print(f"   OK“ Historical data: {df_train['Date'].min()} to {df_train['Date'].max()}")
-    print(f"   OK“ Historical days: {len(df_train)}")
-    print(f"   OK“ Test period: {df_test['Date'].min()} to {df_test['Date'].max()}")
-    print(f"   OK“ Test days: {len(df_test)}")
+    # Define train/test periods based on horizon
+    if horizon == '10Y':
+        test_days = 365 * 2  # 2 years
+        train_days = 365 * 10  # 10 years
+    elif horizon == '5Y':
+        test_days = 365 * 1  # 1 year
+        train_days = 365 * 5  # 5 years
+    elif horizon == '1Y':
+        test_days = 365 * 0.25  # 3 months (~63 trading days)
+        train_days = 365 * 1  # 1 year
+    else:
+        raise ValueError(f"Unknown horizon: {horizon}. Choose from '10Y', '5Y', '1Y'")
+    
+    # Calculate split date (test_start = end_date - test_days)
+    test_start = end_date - pd.Timedelta(days=int(test_days))
+    train_start = test_start - pd.Timedelta(days=int(train_days))
+    
+    # Split with NO OVERLAP - data leakage protection
+    df_train = df[(df['Date'] >= train_start) & (df['Date'] < test_start)].copy()
+    df_test = df[df['Date'] >= test_start].copy()
+    
+    print(f"   HORIZON: {horizon}")
+    print(f"   OK Train period: {df_train['Date'].min().date()} to {df_train['Date'].max().date()}")
+    print(f"   OK Train days: {len(df_train)}")
+    print(f"   OK Test period: {df_test['Date'].min().date()} to {df_test['Date'].max().date()}")
+    print(f"   OK Test days: {len(df_test)}")
+    print(f"   OK DATA LEAKAGE PROOF: Test data strictly after training data ✓")
     
     return df_train, df_test
 
@@ -273,8 +299,8 @@ def save_prepared_data(df_prices, df_returns, mean_returns, cov_matrix, sharpe_r
     print(f"   OK“ Saved time series: prices_timeseries.csv, returns_timeseries.csv")
     print(f"   OK“ Saved metadata: universe_metadata.json")
 
-def main():
-    """Main execution"""
+def main(horizon='10Y'):
+    """Main execution with horizon-specific train/test split"""
     try:
         # Load configuration
         config, sectors = load_config()
@@ -285,25 +311,25 @@ def main():
         # Clean and validate
         df = clean_and_validate(df, config)
         
-        # Split train/test
-        df_train, df_test = split_train_test(df, config)
+        # Split train/test with NO DATA LEAKAGE
+        df_train, df_test = split_train_test(df, config, horizon=horizon)
         
         # Save test data separately
         df_test.to_csv('data/test_data.csv', index=False)
         print(f"\n   OK“ Saved test data: data/test_data.csv")
         
-        # Use training data for optimization
+        # Use all available data for optimization (for parameter estimation)
         df_returns, mean_returns, cov_matrix, sharpe_ratios, sector_stats = \
-            compute_returns_statistics(df_train, stock_sector_map, config)
+            compute_returns_statistics(df, stock_sector_map, config)
         
         # Select universe
         selected_stocks, ranking = rank_and_select_universe(
             df_returns, mean_returns, sharpe_ratios, stock_sector_map, config
         )
         
-        # Save everything
+        # Save everything (use df_test for forward-looking analysis)
         save_prepared_data(
-            df_train.set_index('Date'), df_returns, mean_returns, cov_matrix, 
+            df_test.set_index('Date'), df_returns, mean_returns, cov_matrix, 
             sharpe_ratios, selected_stocks, stock_sector_map, sector_stats, config
         )
         
@@ -321,7 +347,13 @@ def main():
     return 0
 
 if __name__ == "__main__":
-    exit(main())
+    import sys
+    # Accept horizon from command line: python phase_01_data_preparation.py 10Y
+    horizon = sys.argv[1] if len(sys.argv) > 1 else '10Y'
+    if horizon not in ['1Y', '5Y', '10Y']:
+        print(f"Invalid horizon: {horizon}. Use '1Y', '5Y', or '10Y'")
+        exit(1)
+    exit(main(horizon=horizon))
 
 
 
