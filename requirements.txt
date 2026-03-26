@@ -1,11 +1,7 @@
-# Portfolio Optimization Quantum - Unified Dependencies
-numpy>=1.21.0
-pandas>=1.3.0
-scipy>=1.7.0
-cvxpy>=1.2.0
-dwave-ocean-sdk>=5.0.0
-dimod>=0.12.0
-dwave-neal>=0.6.0
-matplotlib>=3.4.0
-seaborn>=0.11.0
-tqdm>=4.62.0
+numpy
+pandas
+matplotlib
+scipy
+cvxpy
+dwave-neal
+scikit-learn

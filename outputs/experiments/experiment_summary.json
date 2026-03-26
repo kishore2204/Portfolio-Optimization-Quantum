@@ -1,0 +1,45 @@
+{
+  "sweep_config":{
+    "train_years":10,
+    "test_years":5,
+    "rf":0.05,
+    "k_ratio":0.06,
+    "max_weight":0.12,
+    "risk_aversion":4.0,
+    "q_risk_values":[
+      0.8,
+      1.0,
+      1.2
+    ],
+    "beta_values":[
+      0.3,
+      0.5,
+      0.7
+    ],
+    "lambda_values":[
+      3.0,
+      5.0
+    ],
+    "gamma_values":[
+      0.2,
+      0.5
+    ],
+    "rebalance_days_values":[
+      42,
+      63
+    ],
+    "transaction_cost_values":[
+      0.0005,
+      0.001
+    ],
+    "out_dir":"outputs\/experiments"
+  },
+  "num_regimes":2,
+  "best_regime":"R001",
+  "dataset_root":"D:\\Matrix\\SDP\\NewBeginning\\datasets",
+  "split_dates":{
+    "start":"2011-03-15 00:00:00",
+    "train_end":"2021-03-15 00:00:00",
+    "test_end":"2026-03-15 00:00:00"
+  }
+}
