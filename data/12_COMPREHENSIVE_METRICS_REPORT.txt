@@ -41,21 +41,21 @@ QUANTUM-INSPIRED PORTFOLIO OPTIMIZATION - COMPREHENSIVE METRICS REPORT
 [4] QUANTUM PORTFOLIO (QUBO + Annealing + Sharpe)
 --------------------------------------------------------------------------------
   Selected Assets:                   40
-  Portfolio Concentration (HHI):     0.0745
-  Max Weight:                        0.1186
+  Portfolio Concentration (HHI):     0.0769
+  Max Weight:                        0.1200
   Top 5 Assets by Weight:
-    - SOLARINDS: 0.1186
-    - SUPREMEIND: 0.1040
-    - PIIND: 0.1031
-    - HINDUNILVR: 0.0860
-    - EICHERMOT: 0.0723
+    - SOLARINDS: 0.1200
+    - SUPREMEIND: 0.1072
+    - PIIND: 0.1048
+    - HINDUNILVR: 0.0864
+    - EICHERMOT: 0.0747
 
 
 [5] QUBO CONFIGURATION
 --------------------------------------------------------------------------------
   QUBO Matrix Size:                  (40, 40)
-  QUBO Diagonal Mean:                -316.013556
-  QUBO Off-Diagonal Mean:            3.934841
+  QUBO Diagonal Mean:                -316.013234
+  QUBO Off-Diagonal Mean:            3.934897
   QUBO Sparsity:                     0.0000
 
 
@@ -70,14 +70,14 @@ QUANTUM-INSPIRED PORTFOLIO OPTIMIZATION - COMPREHENSIVE METRICS REPORT
     Maximum Drawdown:              -0.3058 (-30.58%)
 
   Portfolio: Quantum
-    Total Return:                   1.0510 (105.10%)
-    Annualized Return:             0.1461 (14.61%)
-    Annualized Volatility:         0.1378 (13.78%)
-    Sharpe Ratio (rf=5%):          0.6973
-    Maximum Drawdown:              -0.2246 (-22.46%)
+    Total Return:                   1.0382 (103.82%)
+    Annualized Return:             0.1448 (14.48%)
+    Annualized Volatility:         0.1389 (13.89%)
+    Sharpe Ratio (rf=5%):          0.6826
+    Maximum Drawdown:              -0.2213 (-22.13%)
 
   Portfolio: Quantum_Rebalanced
-    Total Return:                   3.4985 (349.85%)
+    Total Return:                   3.4984 (349.84%)
     Annualized Return:             0.3058 (30.58%)
     Annualized Volatility:         0.1930 (19.30%)
     Sharpe Ratio (rf=5%):          1.3259
@@ -114,7 +114,7 @@ QUANTUM-INSPIRED PORTFOLIO OPTIMIZATION - COMPREHENSIVE METRICS REPORT
 [7] PORTFOLIO COMPARISON SUMMARY
 --------------------------------------------------------------------------------
   Classical vs Quantum:
-    Quantum Outperformance:        0.9340 (93.40%)
+    Quantum Outperformance:        0.9212 (92.12%)
 
 
 [8] CONFIGURATION PARAMETERS
