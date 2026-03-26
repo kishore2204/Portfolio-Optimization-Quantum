@@ -1,0 +1,12 @@
+{
+  "generated_at": "2026-03-26T12:59:30.235406",
+  "methodology": "Adaptive K_sell based on scenario performance",
+  "scenarios": {
+    "Present_Present to Mar-11-2026": {
+      "base_k_sell": 4,
+      "adaptive_k_sell": 4,
+      "test_sharpe": 1.349453774438442,
+      "reason": "Normal regime. Standard replacement rate."
+    }
+  }
+}

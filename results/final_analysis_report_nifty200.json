@@ -1,0 +1,973 @@
+{
+  "generated_at": "2026-03-26T12:59:32.021716",
+  "title": "NIFTY 200 Portfolio Optimization - Comprehensive Analysis",
+  "sections": {
+    "scenario_metrics": {
+      "summary": {
+        "total_scenarios": 1,
+        "avg_portfolio_sharpe": 1.349453774438442
+      },
+      "count": 1
+    },
+    "adaptive_k_analysis": {
+      "generated_at": "2026-03-26T12:59:30.235406",
+      "methodology": "Adaptive K_sell based on scenario performance",
+      "scenarios": {
+        "Present_Present to Mar-11-2026": {
+          "base_k_sell": 4,
+          "adaptive_k_sell": 4,
+          "test_sharpe": 1.349453774438442,
+          "reason": "Normal regime. Standard replacement rate."
+        }
+      }
+    },
+    "strategy_comparison": {
+      "generated_at": "2026-03-26T12:59:31.924715",
+      "total_scenarios": 8,
+      "comparisons": {
+        "Bear Market - Crashes_COVID Peak Crash": {
+          "scenario": "Bear Market - Crashes_COVID Peak Crash",
+          "metadata": {
+            "train_period": "2019-02-20 to 2020-02-19",
+            "test_period": "2020-02-20 to 2020-04-30",
+            "available_stocks": 198,
+            "universe": "NIFTY200",
+            "K_stocks": 8,
+            "K_sell": 4
+          },
+          "strategies": {
+            "Greedy": {
+              "strategy": "Greedy_Selection",
+              "selected_stocks": [
+                "ADANIGREEN",
+                "TATACONSUM",
+                "AUBANK",
+                "SRF",
+                "PIIND",
+                "DIXON",
+                "IGL",
+                "HDFCLIFE"
+              ],
+              "weights": {
+                "ADANIGREEN": 0.125,
+                "TATACONSUM": 0.125,
+                "AUBANK": 0.125,
+                "SRF": 0.125,
+                "PIIND": 0.125,
+                "DIXON": 0.125,
+                "IGL": 0.125,
+                "HDFCLIFE": 0.125
+              },
+              "metrics": {
+                "Annual Return": -0.36128134207086443,
+                "Annual Volatility": 0.5923188536575285,
+                "Sharpe Ratio": -0.7112396106081627,
+                "Max Drawdown": -0.02779633714884107,
+                "Cumulative Return": -0.08951138191461327,
+                "Win Rate": 0.5454545454545454
+              }
+            },
+            "Quantum_NoRebalance": {
+              "strategy": "Quantum_NoRebalance",
+              "selected_stocks": [
+                "ADANIGREEN",
+                "TATACONSUM",
+                "AUBANK",
+                "SRF",
+                "PIIND",
+                "DIXON",
+                "IGL",
+                "HDFCLIFE"
+              ],
+              "weights": {
+                "ADANIGREEN": 0.125,
+                "TATACONSUM": 0.125,
+                "AUBANK": 0.125,
+                "SRF": 0.125,
+                "PIIND": 0.125,
+                "DIXON": 0.125,
+                "IGL": 0.125,
+                "HDFCLIFE": 0.125
+              },
+              "metrics": {
+                "Annual Return": -0.36128134207086443,
+                "Annual Volatility": 0.5923188536575285,
+                "Sharpe Ratio": -0.7112396106081627,
+                "Max Drawdown": -0.02779633714884107,
+                "Cumulative Return": -0.08951138191461327,
+                "Win Rate": 0.5454545454545454
+              }
+            },
+            "Quantum_WithRebalance": {
+              "strategy": "Quantum_WithRebalance",
+              "selected_stocks": [
+                "ADANIGREEN",
+                "TATACONSUM",
+                "AUBANK",
+                "SRF",
+                "PIIND",
+                "ADANIENT",
+                "SBILIFE",
+                "SHREECEM"
+              ],
+              "weights": {
+                "ADANIGREEN": 0.125,
+                "TATACONSUM": 0.125,
+                "AUBANK": 0.125,
+                "SRF": 0.125,
+                "PIIND": 0.125,
+                "ADANIENT": 0.125,
+                "SBILIFE": 0.125,
+                "SHREECEM": 0.125
+              },
+              "rebalancing_events": 21,
+              "metrics": {
+                "Annual Return": -1.0924741309585764,
+                "Annual Volatility": 0.5749865244956116,
+                "Sharpe Ratio": -2.0043463238085826,
+                "Max Drawdown": -0.02536995343158581,
+                "Cumulative Return": -0.19767751961380708,
+                "Win Rate": 0.4772727272727273
+              }
+            }
+          },
+          "winner": "Greedy",
+          "sharpe_scores": {
+            "Greedy": -0.7112396106081627,
+            "Quantum_NoRebalance": -0.7112396106081627,
+            "Quantum_WithRebalance": -2.0043463238085826
+          }
+        },
+        "Bear Market - Crashes_China Bubble Burst Peak": {
+          "scenario": "Bear Market - Crashes_China Bubble Burst Peak",
+          "metadata": {
+            "train_period": "2014-06-12 to 2015-06-11",
+            "test_period": "2015-06-12 to 2015-09-30",
+            "available_stocks": 198,
+            "universe": "NIFTY200",
+            "K_stocks": 8,
+            "K_sell": 4
+          },
+          "strategies": {
+            "Greedy": {
+              "strategy": "Greedy_Selection",
+              "selected_stocks": [
+                "BRITANNIA",
+                "EICHERMOT",
+                "PAGEIND",
+                "WHIRLPOOL",
+                "LUPIN",
+                "PIDILITIND",
+                "SOLARINDS",
+                "TORNTPHARM"
+              ],
+              "weights": {
+                "BRITANNIA": 0.125,
+                "EICHERMOT": 0.125,
+                "PAGEIND": 0.125,
+                "WHIRLPOOL": 0.125,
+                "LUPIN": 0.125,
+                "PIDILITIND": 0.125,
+                "SOLARINDS": 0.125,
+                "TORNTPHARM": 0.125
+              },
+              "metrics": {
+                "Annual Return": 0.2357462648524079,
+                "Annual Volatility": 0.19660697317482212,
+                "Sharpe Ratio": 0.8938918499309071,
+                "Max Drawdown": 0.0062940519937486755,
+                "Cumulative Return": 0.06742073100471901,
+                "Win Rate": 0.5921052631578947
+              }
+            },
+            "Quantum_NoRebalance": {
+              "strategy": "Quantum_NoRebalance",
+              "selected_stocks": [
+                "BRITANNIA",
+                "EICHERMOT",
+                "PAGEIND",
+                "WHIRLPOOL",
+                "LUPIN",
+                "PIDILITIND",
+                "SOLARINDS",
+                "TORNTPHARM"
+              ],
+              "weights": {
+                "BRITANNIA": 0.125,
+                "EICHERMOT": 0.125,
+                "PAGEIND": 0.125,
+                "WHIRLPOOL": 0.125,
+                "LUPIN": 0.125,
+                "PIDILITIND": 0.125,
+                "SOLARINDS": 0.125,
+                "TORNTPHARM": 0.125
+              },
+              "metrics": {
+                "Annual Return": 0.2357462648524079,
+                "Annual Volatility": 0.19660697317482212,
+                "Sharpe Ratio": 0.8938918499309071,
+                "Max Drawdown": 0.0062940519937486755,
+                "Cumulative Return": 0.06742073100471901,
+                "Win Rate": 0.5921052631578947
+              }
+            },
+            "Quantum_WithRebalance": {
+              "strategy": "Quantum_WithRebalance",
+              "selected_stocks": [
+                "BRITANNIA",
+                "EICHERMOT",
+                "PAGEIND",
+                "WHIRLPOOL",
+                "LUPIN",
+                "BHARATFORG",
+                "PIIND",
+                "MARUTI"
+              ],
+              "weights": {
+                "BRITANNIA": 0.125,
+                "EICHERMOT": 0.125,
+                "PAGEIND": 0.125,
+                "WHIRLPOOL": 0.125,
+                "LUPIN": 0.125,
+                "BHARATFORG": 0.125,
+                "PIIND": 0.125,
+                "MARUTI": 0.125
+              },
+              "rebalancing_events": 33,
+              "metrics": {
+                "Annual Return": 0.18272223204162083,
+                "Annual Volatility": 0.22277317859091053,
+                "Sharpe Ratio": 0.5508817620509815,
+                "Max Drawdown": 0.003725635324125884,
+                "Cumulative Return": 0.048726473158865025,
+                "Win Rate": 0.5789473684210527
+              }
+            }
+          },
+          "winner": "Greedy",
+          "sharpe_scores": {
+            "Greedy": 0.8938918499309071,
+            "Quantum_NoRebalance": 0.8938918499309071,
+            "Quantum_WithRebalance": 0.5508817620509815
+          }
+        },
+        "Bear Market - Crashes_European Debt Stress": {
+          "scenario": "Bear Market - Crashes_European Debt Stress",
+          "metadata": {
+            "train_period": "2011-03-14 to 2012-03-13",
+            "test_period": "2012-03-14 to 2012-09-28",
+            "available_stocks": 198,
+            "universe": "NIFTY200",
+            "K_stocks": 8,
+            "K_sell": 4
+          },
+          "strategies": {
+            "Greedy": {
+              "strategy": "Greedy_Selection",
+              "selected_stocks": [
+                "BRITANNIA",
+                "SHREECEM",
+                "EICHERMOT",
+                "HAVELLS",
+                "MRF",
+                "JUBLFOOD",
+                "ULTRACEMCO",
+                "PAGEIND"
+              ],
+              "weights": {
+                "BRITANNIA": 0.125,
+                "SHREECEM": 0.125,
+                "EICHERMOT": 0.125,
+                "HAVELLS": 0.125,
+                "MRF": 0.125,
+                "JUBLFOOD": 0.125,
+                "ULTRACEMCO": 0.125,
+                "PAGEIND": 0.125
+              },
+              "metrics": {
+                "Annual Return": 0.30239531123776936,
+                "Annual Volatility": 0.15134048355567498,
+                "Sharpe Ratio": 1.6016448731890343,
+                "Max Drawdown": 0.001513559171755996,
+                "Cumulative Return": 0.17266805725964463,
+                "Win Rate": 0.5869565217391305
+              }
+            },
+            "Quantum_NoRebalance": {
+              "strategy": "Quantum_NoRebalance",
+              "selected_stocks": [
+                "BRITANNIA",
+                "SHREECEM",
+                "EICHERMOT",
+                "HAVELLS",
+                "MRF",
+                "JUBLFOOD",
+                "ULTRACEMCO",
+                "PAGEIND"
+              ],
+              "weights": {
+                "BRITANNIA": 0.125,
+                "SHREECEM": 0.125,
+                "EICHERMOT": 0.125,
+                "HAVELLS": 0.125,
+                "MRF": 0.125,
+                "JUBLFOOD": 0.125,
+                "ULTRACEMCO": 0.125,
+                "PAGEIND": 0.125
+              },
+              "metrics": {
+                "Annual Return": 0.30239531123776936,
+                "Annual Volatility": 0.15134048355567498,
+                "Sharpe Ratio": 1.6016448731890343,
+                "Max Drawdown": 0.001513559171755996,
+                "Cumulative Return": 0.17266805725964463,
+                "Win Rate": 0.5869565217391305
+              }
+            },
+            "Quantum_WithRebalance": {
+              "strategy": "Quantum_WithRebalance",
+              "selected_stocks": [
+                "BRITANNIA",
+                "SHREECEM",
+                "EICHERMOT",
+                "HAVELLS",
+                "MRF",
+                "IDEA",
+                "SOLARINDS",
+                "SUPREMEIND"
+              ],
+              "weights": {
+                "BRITANNIA": 0.125,
+                "SHREECEM": 0.125,
+                "EICHERMOT": 0.125,
+                "HAVELLS": 0.125,
+                "MRF": 0.125,
+                "IDEA": 0.125,
+                "SOLARINDS": 0.125,
+                "SUPREMEIND": 0.125
+              },
+              "rebalancing_events": 54,
+              "metrics": {
+                "Annual Return": 0.21472066533226097,
+                "Annual Volatility": 0.13111071031295912,
+                "Sharpe Ratio": 1.1800674780532425,
+                "Max Drawdown": 0.0014710450004534609,
+                "Cumulative Return": 0.1194858858469301,
+                "Win Rate": 0.5652173913043478
+              }
+            }
+          },
+          "winner": "Greedy",
+          "sharpe_scores": {
+            "Greedy": 1.6016448731890343,
+            "Quantum_NoRebalance": 1.6016448731890343,
+            "Quantum_WithRebalance": 1.1800674780532425
+          }
+        },
+        "Bear Market - Crashes_2022 Global Bear Phase": {
+          "scenario": "Bear Market - Crashes_2022 Global Bear Phase",
+          "metadata": {
+            "train_period": "2021-01-01 to 2021-12-31",
+            "test_period": "2022-01-03 to 2022-06-30",
+            "available_stocks": 198,
+            "universe": "NIFTY200",
+            "K_stocks": 8,
+            "K_sell": 4
+          },
+          "strategies": {
+            "Greedy": {
+              "strategy": "Greedy_Selection",
+              "selected_stocks": [
+                "CGPOWER",
+                "KPITTECH",
+                "PERSISTENT",
+                "JSWENERGY",
+                "TATAELXSI",
+                "ADANIENT",
+                "POLYCAB",
+                "BSE"
+              ],
+              "weights": {
+                "CGPOWER": 0.125,
+                "KPITTECH": 0.125,
+                "PERSISTENT": 0.125,
+                "JSWENERGY": 0.125,
+                "TATAELXSI": 0.125,
+                "ADANIENT": 0.125,
+                "POLYCAB": 0.125,
+                "BSE": 0.125
+              },
+              "metrics": {
+                "Annual Return": -0.016999114861222003,
+                "Annual Volatility": 0.31328137667584166,
+                "Sharpe Ratio": -0.24578182685614083,
+                "Max Drawdown": 0.00856262422150858,
+                "Cumulative Return": -0.03142886250453314,
+                "Win Rate": 0.5409836065573771
+              }
+            },
+            "Quantum_NoRebalance": {
+              "strategy": "Quantum_NoRebalance",
+              "selected_stocks": [
+                "CGPOWER",
+                "KPITTECH",
+                "PERSISTENT",
+                "JSWENERGY",
+                "TATAELXSI",
+                "ADANIENT",
+                "POLYCAB",
+                "BSE"
+              ],
+              "weights": {
+                "CGPOWER": 0.125,
+                "KPITTECH": 0.125,
+                "PERSISTENT": 0.125,
+                "JSWENERGY": 0.125,
+                "TATAELXSI": 0.125,
+                "ADANIENT": 0.125,
+                "POLYCAB": 0.125,
+                "BSE": 0.125
+              },
+              "metrics": {
+                "Annual Return": -0.016999114861222003,
+                "Annual Volatility": 0.31328137667584166,
+                "Sharpe Ratio": -0.24578182685614083,
+                "Max Drawdown": 0.00856262422150858,
+                "Cumulative Return": -0.03142886250453314,
+                "Win Rate": 0.5409836065573771
+              }
+            },
+            "Quantum_WithRebalance": {
+              "strategy": "Quantum_WithRebalance",
+              "selected_stocks": [
+                "CGPOWER",
+                "KPITTECH",
+                "PERSISTENT",
+                "JSWENERGY",
+                "TATAELXSI",
+                "MPHASIS",
+                "SRF",
+                "TECHM"
+              ],
+              "weights": {
+                "CGPOWER": 0.125,
+                "KPITTECH": 0.125,
+                "PERSISTENT": 0.125,
+                "JSWENERGY": 0.125,
+                "TATAELXSI": 0.125,
+                "MPHASIS": 0.125,
+                "SRF": 0.125,
+                "TECHM": 0.125
+              },
+              "rebalancing_events": 43,
+              "metrics": {
+                "Annual Return": -0.31954976117505823,
+                "Annual Volatility": 0.301738507617856,
+                "Sharpe Ratio": -1.257872275896157,
+                "Max Drawdown": 0.00827775277032837,
+                "Cumulative Return": -0.16206067320642858,
+                "Win Rate": 0.5163934426229508
+              }
+            }
+          },
+          "winner": "Greedy",
+          "sharpe_scores": {
+            "Greedy": -0.24578182685614083,
+            "Quantum_NoRebalance": -0.24578182685614083,
+            "Quantum_WithRebalance": -1.257872275896157
+          }
+        },
+        "Bull Market - Recovery/Profit_Post-COVID Recovery": {
+          "scenario": "Bull Market - Recovery/Profit_Post-COVID Recovery",
+          "metadata": {
+            "train_period": "2019-04-01 to 2020-03-31",
+            "test_period": "2020-04-01 to 2021-03-31",
+            "available_stocks": 198,
+            "universe": "NIFTY200",
+            "K_stocks": 8,
+            "K_sell": 4
+          },
+          "strategies": {
+            "Greedy": {
+              "strategy": "Greedy_Selection",
+              "selected_stocks": [
+                "ADANIGREEN",
+                "DMART",
+                "HINDUNILVR",
+                "ALKEM",
+                "DIXON",
+                "TATACONSUM",
+                "BHARTIARTL",
+                "IGL"
+              ],
+              "weights": {
+                "ADANIGREEN": 0.125,
+                "DMART": 0.125,
+                "HINDUNILVR": 0.125,
+                "ALKEM": 0.125,
+                "DIXON": 0.125,
+                "TATACONSUM": 0.125,
+                "BHARTIARTL": 0.125,
+                "IGL": 0.125
+              },
+              "metrics": {
+                "Annual Return": 0.7756584371461113,
+                "Annual Volatility": 0.1894428425898581,
+                "Sharpe Ratio": 3.777681171171641,
+                "Max Drawdown": -0.008235910416568903,
+                "Cumulative Return": 1.1059987854906494,
+                "Win Rate": 0.6048387096774194
+              }
+            },
+            "Quantum_NoRebalance": {
+              "strategy": "Quantum_NoRebalance",
+              "selected_stocks": [
+                "ADANIGREEN",
+                "DMART",
+                "HINDUNILVR",
+                "ALKEM",
+                "DIXON",
+                "TATACONSUM",
+                "BHARTIARTL",
+                "IGL"
+              ],
+              "weights": {
+                "ADANIGREEN": 0.125,
+                "DMART": 0.125,
+                "HINDUNILVR": 0.125,
+                "ALKEM": 0.125,
+                "DIXON": 0.125,
+                "TATACONSUM": 0.125,
+                "BHARTIARTL": 0.125,
+                "IGL": 0.125
+              },
+              "metrics": {
+                "Annual Return": 0.7756584371461113,
+                "Annual Volatility": 0.1894428425898581,
+                "Sharpe Ratio": 3.777681171171641,
+                "Max Drawdown": -0.008235910416568903,
+                "Cumulative Return": 1.1059987854906494,
+                "Win Rate": 0.6048387096774194
+              }
+            },
+            "Quantum_WithRebalance": {
+              "strategy": "Quantum_WithRebalance",
+              "selected_stocks": [
+                "ADANIGREEN",
+                "DMART",
+                "HINDUNILVR",
+                "ALKEM",
+                "DIXON",
+                "WHIRLPOOL",
+                "SRF",
+                "DIVISLAB"
+              ],
+              "weights": {
+                "ADANIGREEN": 0.125,
+                "DMART": 0.125,
+                "HINDUNILVR": 0.125,
+                "ALKEM": 0.125,
+                "DIXON": 0.125,
+                "WHIRLPOOL": 0.125,
+                "SRF": 0.125,
+                "DIVISLAB": 0.125
+              },
+              "rebalancing_events": 87,
+              "metrics": {
+                "Annual Return": 0.8112964359575824,
+                "Annual Volatility": 0.1848985022538997,
+                "Sharpe Ratio": 4.063269109972614,
+                "Max Drawdown": -0.004896499221933914,
+                "Cumulative Return": 1.1826922982810384,
+                "Win Rate": 0.6370967741935484
+              }
+            }
+          },
+          "winner": "Quantum_WithRebalance",
+          "sharpe_scores": {
+            "Greedy": 3.777681171171641,
+            "Quantum_NoRebalance": 3.777681171171641,
+            "Quantum_WithRebalance": 4.063269109972614
+          }
+        },
+        "Bull Market - Recovery/Profit_2023 Bull Run": {
+          "scenario": "Bull Market - Recovery/Profit_2023 Bull Run",
+          "metadata": {
+            "train_period": "2022-01-03 to 2022-12-30",
+            "test_period": "2023-01-02 to 2023-12-29",
+            "available_stocks": 198,
+            "universe": "NIFTY200",
+            "K_stocks": 8,
+            "K_sell": 4
+          },
+          "strategies": {
+            "Greedy": {
+              "strategy": "Greedy_Selection",
+              "selected_stocks": [
+                "ADANIENT",
+                "HAL",
+                "VBL",
+                "BANKBARODA",
+                "MAZDOCK",
+                "ADANIPOWER",
+                "BDL",
+                "SOLARINDS"
+              ],
+              "weights": {
+                "ADANIENT": 0.125,
+                "HAL": 0.125,
+                "VBL": 0.125,
+                "BANKBARODA": 0.125,
+                "MAZDOCK": 0.125,
+                "ADANIPOWER": 0.125,
+                "BDL": 0.125,
+                "SOLARINDS": 0.125
+              },
+              "metrics": {
+                "Annual Return": 0.6130135232688324,
+                "Annual Volatility": 0.24101431006821497,
+                "Sharpe Ratio": 2.2945161579665294,
+                "Max Drawdown": 0.005459060876978936,
+                "Cumulative Return": 0.76320482144668,
+                "Win Rate": 0.5795918367346938
+              }
+            },
+            "Quantum_NoRebalance": {
+              "strategy": "Quantum_NoRebalance",
+              "selected_stocks": [
+                "ADANIENT",
+                "HAL",
+                "VBL",
+                "BANKBARODA",
+                "MAZDOCK",
+                "ADANIPOWER",
+                "BDL",
+                "SOLARINDS"
+              ],
+              "weights": {
+                "ADANIENT": 0.125,
+                "HAL": 0.125,
+                "VBL": 0.125,
+                "BANKBARODA": 0.125,
+                "MAZDOCK": 0.125,
+                "ADANIPOWER": 0.125,
+                "BDL": 0.125,
+                "SOLARINDS": 0.125
+              },
+              "metrics": {
+                "Annual Return": 0.6130135232688324,
+                "Annual Volatility": 0.24101431006821497,
+                "Sharpe Ratio": 2.2945161579665294,
+                "Max Drawdown": 0.005459060876978936,
+                "Cumulative Return": 0.76320482144668,
+                "Win Rate": 0.5795918367346938
+              }
+            },
+            "Quantum_WithRebalance": {
+              "strategy": "Quantum_WithRebalance",
+              "selected_stocks": [
+                "ADANIENT",
+                "HAL",
+                "VBL",
+                "BANKBARODA",
+                "MAZDOCK",
+                "ITC",
+                "TVSMOTOR",
+                "INDIANB"
+              ],
+              "weights": {
+                "ADANIENT": 0.125,
+                "HAL": 0.125,
+                "VBL": 0.125,
+                "BANKBARODA": 0.125,
+                "MAZDOCK": 0.125,
+                "ITC": 0.125,
+                "TVSMOTOR": 0.125,
+                "INDIANB": 0.125
+              },
+              "rebalancing_events": 82,
+              "metrics": {
+                "Annual Return": 0.561049221685635,
+                "Annual Volatility": 0.20032519592132103,
+                "Sharpe Ratio": 2.501166756455677,
+                "Max Drawdown": 0.0013822541987965897,
+                "Cumulative Return": 0.6911377565642627,
+                "Win Rate": 0.6122448979591837
+              }
+            }
+          },
+          "winner": "Quantum_WithRebalance",
+          "sharpe_scores": {
+            "Greedy": 2.2945161579665294,
+            "Quantum_NoRebalance": 2.2945161579665294,
+            "Quantum_WithRebalance": 2.501166756455677
+          }
+        },
+        "Bull Market - Recovery/Profit_2024 Momentum Year": {
+          "scenario": "Bull Market - Recovery/Profit_2024 Momentum Year",
+          "metadata": {
+            "train_period": "2023-01-02 to 2023-12-29",
+            "test_period": "2024-01-01 to 2024-12-31",
+            "available_stocks": 198,
+            "universe": "NIFTY200",
+            "K_stocks": 8,
+            "K_sell": 4
+          },
+          "strategies": {
+            "Greedy": {
+              "strategy": "Greedy_Selection",
+              "selected_stocks": [
+                "RECLTD",
+                "BSE",
+                "AUROPHARMA",
+                "TRENT",
+                "PFC",
+                "BAJAJ-AUTO",
+                "NTPC",
+                "TMPV"
+              ],
+              "weights": {
+                "RECLTD": 0.125,
+                "BSE": 0.125,
+                "AUROPHARMA": 0.125,
+                "TRENT": 0.125,
+                "PFC": 0.125,
+                "BAJAJ-AUTO": 0.125,
+                "NTPC": 0.125,
+                "TMPV": 0.125
+              },
+              "metrics": {
+                "Annual Return": 0.40336235331803383,
+                "Annual Volatility": 0.24734252747151042,
+                "Sharpe Ratio": 1.3882002768703259,
+                "Max Drawdown": -0.003524752638541434,
+                "Cumulative Return": 0.4424970478526955,
+                "Win Rate": 0.5887096774193549
+              }
+            },
+            "Quantum_NoRebalance": {
+              "strategy": "Quantum_NoRebalance",
+              "selected_stocks": [
+                "RECLTD",
+                "BSE",
+                "AUROPHARMA",
+                "TRENT",
+                "PFC",
+                "BAJAJ-AUTO",
+                "NTPC",
+                "TMPV"
+              ],
+              "weights": {
+                "RECLTD": 0.125,
+                "BSE": 0.125,
+                "AUROPHARMA": 0.125,
+                "TRENT": 0.125,
+                "PFC": 0.125,
+                "BAJAJ-AUTO": 0.125,
+                "NTPC": 0.125,
+                "TMPV": 0.125
+              },
+              "metrics": {
+                "Annual Return": 0.40336235331803383,
+                "Annual Volatility": 0.24734252747151042,
+                "Sharpe Ratio": 1.3882002768703259,
+                "Max Drawdown": -0.003524752638541434,
+                "Cumulative Return": 0.4424970478526955,
+                "Win Rate": 0.5887096774193549
+              }
+            },
+            "Quantum_WithRebalance": {
+              "strategy": "Quantum_WithRebalance",
+              "selected_stocks": [
+                "RECLTD",
+                "BSE",
+                "AUROPHARMA",
+                "TRENT",
+                "PFC",
+                "POLYCAB",
+                "HAL",
+                "TVSMOTOR"
+              ],
+              "weights": {
+                "RECLTD": 0.125,
+                "BSE": 0.125,
+                "AUROPHARMA": 0.125,
+                "TRENT": 0.125,
+                "PFC": 0.125,
+                "POLYCAB": 0.125,
+                "HAL": 0.125,
+                "TVSMOTOR": 0.125
+              },
+              "rebalancing_events": 80,
+              "metrics": {
+                "Annual Return": 0.48160849939500633,
+                "Annual Volatility": 0.2644253955545409,
+                "Sharpe Ratio": 1.5944266778315817,
+                "Max Drawdown": -0.007677487286515516,
+                "Cumulative Return": 0.5510501782958785,
+                "Win Rate": 0.5725806451612904
+              }
+            }
+          },
+          "winner": "Quantum_WithRebalance",
+          "sharpe_scores": {
+            "Greedy": 1.3882002768703259,
+            "Quantum_NoRebalance": 1.3882002768703259,
+            "Quantum_WithRebalance": 1.5944266778315817
+          }
+        },
+        "Present_Present to Mar-11-2026": {
+          "scenario": "Present_Present to Mar-11-2026",
+          "metadata": {
+            "train_period": "2024-03-11 to 2025-03-10",
+            "test_period": "2025-03-11 to 2026-03-11",
+            "available_stocks": 198,
+            "universe": "NIFTY200",
+            "K_stocks": 8,
+            "K_sell": 4
+          },
+          "strategies": {
+            "Greedy": {
+              "strategy": "Greedy_Selection",
+              "selected_stocks": [
+                "DIXON",
+                "MUTHOOTFIN",
+                "DIVISLAB",
+                "COROMANDEL",
+                "MAZDOCK",
+                "VEDL",
+                "POWERINDIA",
+                "FORTIS"
+              ],
+              "weights": {
+                "DIXON": 0.125,
+                "MUTHOOTFIN": 0.125,
+                "DIVISLAB": 0.125,
+                "COROMANDEL": 0.125,
+                "MAZDOCK": 0.125,
+                "VEDL": 0.125,
+                "POWERINDIA": 0.125,
+                "FORTIS": 0.125
+              },
+              "metrics": {
+                "Annual Return": 0.32475521959064313,
+                "Annual Volatility": 0.1961933599741441,
+                "Sharpe Ratio": 1.3494537744384418,
+                "Max Drawdown": 0.0034296775948191582,
+                "Cumulative Return": 0.350572715323755,
+                "Win Rate": 0.5685483870967742
+              }
+            },
+            "Quantum_NoRebalance": {
+              "strategy": "Quantum_NoRebalance",
+              "selected_stocks": [
+                "DIXON",
+                "MUTHOOTFIN",
+                "DIVISLAB",
+                "COROMANDEL",
+                "MAZDOCK",
+                "VEDL",
+                "POWERINDIA",
+                "FORTIS"
+              ],
+              "weights": {
+                "DIXON": 0.125,
+                "MUTHOOTFIN": 0.125,
+                "DIVISLAB": 0.125,
+                "COROMANDEL": 0.125,
+                "MAZDOCK": 0.125,
+                "VEDL": 0.125,
+                "POWERINDIA": 0.125,
+                "FORTIS": 0.125
+              },
+              "metrics": {
+                "Annual Return": 0.32475521959064313,
+                "Annual Volatility": 0.1961933599741441,
+                "Sharpe Ratio": 1.3494537744384418,
+                "Max Drawdown": 0.0034296775948191582,
+                "Cumulative Return": 0.350572715323755,
+                "Win Rate": 0.5685483870967742
+              }
+            },
+            "Quantum_WithRebalance": {
+              "strategy": "Quantum_WithRebalance",
+              "selected_stocks": [
+                "DIXON",
+                "MUTHOOTFIN",
+                "DIVISLAB",
+                "COROMANDEL",
+                "MAZDOCK",
+                "GLENMARK",
+                "BHARTIHEXA",
+                "BHARTIARTL"
+              ],
+              "weights": {
+                "DIXON": 0.125,
+                "MUTHOOTFIN": 0.125,
+                "DIVISLAB": 0.125,
+                "COROMANDEL": 0.125,
+                "MAZDOCK": 0.125,
+                "GLENMARK": 0.125,
+                "BHARTIHEXA": 0.125,
+                "BHARTIARTL": 0.125
+              },
+              "rebalancing_events": 85,
+              "metrics": {
+                "Annual Return": 0.19652017108859443,
+                "Annual Volatility": 0.16905537138145385,
+                "Sharpe Ratio": 0.8075423006717346,
+                "Max Drawdown": -0.0028895045055035706,
+                "Cumulative Return": 0.19639203313874476,
+                "Win Rate": 0.5483870967741935
+              }
+            }
+          },
+          "winner": "Greedy",
+          "sharpe_scores": {
+            "Greedy": 1.3494537744384418,
+            "Quantum_NoRebalance": 1.3494537744384418,
+            "Quantum_WithRebalance": 0.8075423006717346
+          }
+        }
+      },
+      "summary": {
+        "strategy_wins": {
+          "Greedy": 5,
+          "Quantum_NoRebalance": 0,
+          "Quantum_WithRebalance": 3
+        },
+        "average_sharpe": {
+          "Greedy": 1.293545833262822,
+          "Quantum_NoRebalance": 1.293545833262822,
+          "Quantum_WithRebalance": 0.9293919356663866
+        },
+        "quantum_outperformance": {
+          "vs_greedy": -2,
+          "sharpe_improvement": -0.36415389759643546
+        }
+      }
+    }
+  },
+  "summary": {
+    "total_scenarios": 8,
+    "system_performance": {
+      "strategy_wins": {
+        "Greedy": 5,
+        "Quantum_NoRebalance": 0,
+        "Quantum_WithRebalance": 3
+      },
+      "average_sharpe": {
+        "Greedy": 1.293545833262822,
+        "Quantum_NoRebalance": 1.293545833262822,
+        "Quantum_WithRebalance": 0.9293919356663866
+      },
+      "quantum_outperformance": {
+        "vs_greedy": -2,
+        "sharpe_improvement": -0.36415389759643546
+      }
+    },
+    "recommendations": [
+      "Consider running with different K_sell values for further optimization"
+    ]
+  }
+}

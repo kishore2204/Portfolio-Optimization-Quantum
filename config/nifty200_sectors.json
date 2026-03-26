@@ -1,0 +1,80 @@
+{
+  "NIFTY_200_STOCKS": {
+    "Financial_Services": [
+      "360ONE", "AUBANK", "ABCAPITAL", "AXISBANK", "BSE", "BAJFINANCE", "BAJAJFINSV",
+      "BAJAJHLDNG", "BAJAJHFL", "BANKBARODA", "BANKINDIA", "CANBK", "CHOLAFIN",
+      "FEDERALBNK", "HDFCAMC", "HDFCBANK", "HDFCLIFE", "HUDCO", "ICICIBANK", "ICICIGI",
+      "IDFCFIRSTB", "INDIANB", "INDUSINDBK", "IRFC", "IREDA", "JIOFIN", "KOTAKBANK",
+      "LTF", "LICHSGFIN", "LICI", "M&MFIN", "MFSL", "MOTILALOFS", "MUTHOOTFIN", "PFC",
+      "PAYTM", "POLICYBZR", "RECLTD", "SBICARD", "SBILIFE", "SBIN", "SHRIRAMFIN",
+      "YESBANK", "UNIONBANK", "PNB"
+    ],
+    "IT": [
+      "COFORGE", "HCLTECH", "INFY", "KPITTECH", "LTM", "MPHASIS", "OFSS", 
+      "PERSISTENT", "TCS", "TATAELXSI", "TATATECH", "TECHM", "WIPRO"
+    ],
+    "Oil_Gas_Consumable": [
+      "ATGL", "BPCL", "COALINDIA", "GAIL", "HINDPETRO", "IOC", "IGL", 
+      "OIL", "ONGC", "RELIANCE"
+    ],
+    "FMCG": [
+      "BRITANNIA", "COLPAL", "DABUR", "GODREJCP", "GODFRYPHLP", "HINDUNILVR", 
+      "ITC", "MARICO", "NESTLEIND", "TATACONSUM", "UNITDSPR", "VBL", "PATANJALI"
+    ],
+    "Automobile": [
+      "ASHOKLEY", "BAJAJ-AUTO", "BHARATFORG", "BOSCHLTD", "EICHERMOT", "EXIDEIND",
+      "HEROMOTOCO", "HYUNDAI", "M&M", "MARUTI", "MRF", "MOTHERSON", "SONACOMS",
+      "TIINDIA", "TMPV", "TVSMOTOR"
+    ],
+    "Healthcare": [
+      "ALKEM", "APOLLOHOSP", "AUROPHARMA", "BIOCON", "CIPLA", "DIVISLAB", 
+      "DRREDDY", "FORTIS", "GLENMARK", "LUPIN", "MANKIND", "MAXHEALTH", 
+      "SUNPHARMA", "TORNTPHARM"
+    ],
+    "Metals_Mining": [
+      "ADANIENT", "HINDALCO", "HINDZINC", "JSWSTEEL", "JINDALSTEL", "NATIONALUM",
+      "NMDC", "SAIL", "TATASTEEL", "VEDL"
+    ],
+    "Cement": [
+      "ACC", "AMBUJACEM", "GRASIM", "RAMCOCEM", "SHREECEM", "ULTRACEMCO"
+    ],
+    "Construction_Materials": [
+      "ACC", "AMBUJACEM", "GRASIM", "SHREECEM", "ULTRACEMCO"
+    ],
+    "Telecom": [
+      "BHARTIARTL", "BHARTIHEXA", "IDEA", "INDUSINDBK", "INDUSTOWER", "TATACOMM"
+    ],
+    "Consumer_Durables": [
+      "ASIANPAINT", "BLUESTARCO", "CROMPTON", "DIXON", "HAVELLS", "KALYANKJIL",
+      "TITAN", "VOLTAS", "WHIRLPOOL"
+    ],
+    "Capital_Goods": [
+      "ABB", "APLAPOLLO", "ASHOKLEY", "ASTRAL", "BDL", "BEL", "BHEL", "BOSCHLTD",
+      "CGPOWER", "COCHINSHIP", "CUMMINSIND", "HAL", "KEI", "LT", "MAZDOCK", "POLYCAB",
+      "POWERINDIA", "PREMIERENE", "SIEMENS", "SUPREMEIND", "SUZLON", "WAAREEENER"
+    ],
+    "Power": [
+      "ADANIENSOL", "ADANIGREEN", "ADANIPOWER", "JSWENERGY", "NTPC", "NTPCGREEN",
+      "POWERGRID", "TATAPOWER", "TORNTPOWER"
+    ],
+    "Realty": [
+      "DLF", "GODREJPROP", "LODHA", "OBEROIRLTY", "PHOENIXLTD", "PRESTIGE"
+    ],
+    "Consumer_Services": [
+      "DMART", "ETERNAL", "NYKAA", "INDHOTEL", "IRCTC", "JUBLFOOD", "NAUKRI",
+      "SWIGGY", "TRENT"
+    ],
+    "Chemicals": [
+      "COROMANDEL", "PIDILITIND", "PIIND", "SRF", "UPL", "SOLARINDS"
+    ],
+    "Logistics_Services": [
+      "ADANIPORTS", "CONCOR", "GMRAIRPORT", "INDIGO"
+    ],
+    "Construction": [
+      "IRB", "LT", "RVNL"
+    ],
+    "Textiles": [
+      "PAGEIND"
+    ]
+  }
+}

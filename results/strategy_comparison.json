@@ -1,5 +1,5 @@
 {
-  "comparison_date": "2026-03-25T13:43:35.264026",
+  "comparison_date": "2026-03-26T12:24:24.562538",
   "metrics": [
     {
       "strategy": "Equal-Weight Buy-Hold",
@@ -16,28 +16,28 @@
     },
     {
       "strategy": "Quantum Buy-Hold",
-      "total_return": 41.95971803033298,
-      "annual_return": 17.586894744999526,
-      "volatility": 22.0795379537828,
-      "sharpe_ratio": 0.5247797652855497,
-      "sortino_ratio": 0.7341619463592353,
-      "max_drawdown": -29.96389257213954,
-      "calmar_ratio": 0.5869362501103025,
-      "win_rate": 53.39449541284404,
-      "var_95": -2.264505193090531,
+      "total_return": 43.08302780357827,
+      "annual_return": 18.016210038732282,
+      "volatility": 22.91160357508733,
+      "sharpe_ratio": 0.5244595822091638,
+      "sortino_ratio": 0.739920609440254,
+      "max_drawdown": -26.27333268727466,
+      "calmar_ratio": 0.6857222969455388,
+      "win_rate": 53.027522935779814,
+      "var_95": -2.0949340024857896,
       "num_periods": 545
     },
     {
       "strategy": "Quantum + Quarterly Rebalancing",
-      "total_return": 51.61646919143625,
-      "annual_return": 21.22005377709215,
-      "volatility": 21.58841090636595,
-      "sharpe_ratio": 0.7050103800184797,
-      "sortino_ratio": 0.9960662103445082,
-      "max_drawdown": -26.859154067161594,
-      "calmar_ratio": 0.7900492221024976,
-      "win_rate": 54.49541284403669,
-      "var_95": -2.182824995423427,
+      "total_return": 47.74832863721801,
+      "annual_return": 19.780121997092603,
+      "volatility": 23.213962345455545,
+      "sharpe_ratio": 0.593613524137996,
+      "sortino_ratio": 0.848097934833135,
+      "max_drawdown": -25.473883137288762,
+      "calmar_ratio": 0.776486328781904,
+      "win_rate": 53.027522935779814,
+      "var_95": -2.0847963599656403,
       "num_periods": 545
     }
   ],

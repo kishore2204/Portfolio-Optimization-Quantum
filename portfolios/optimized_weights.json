@@ -1,31 +1,31 @@
 {
   "stocks": [
-    "TVSMOTOR",
-    "PERSISTENT",
-    "TRENT",
     "ADANIPOWER",
-    "ABB",
-    "CHOLAFIN",
-    "INDIGO",
-    "SHREECEM"
+    "PRESTIGE",
+    "MAXHEALTH",
+    "CUMMINSIND",
+    "ADANIENT",
+    "BAJAJ-AUTO",
+    "ONGC",
+    "PIDILITIND"
   ],
   "weights": [
-    0.26057472005907767,
-    0.2402470593825856,
-    0.18529645002901723,
-    0.12009583607286348,
-    0.19378593445645603,
-    6.268808084165831e-17,
-    0.0,
-    0.0
+    0.17728299149846677,
+    0.23346140047327688,
+    0.2563678604858998,
+    0.12829490206367497,
+    0.011562057173003803,
+    0.0741744398969728,
+    0.0839741405436012,
+    0.03488220786510384
   ],
   "optimization_info": {
-    "sharpe_ratio": 2.418098440421155,
-    "portfolio_return": 0.554926319488665,
-    "portfolio_volatility": 0.20467583586153124,
+    "sharpe_ratio": 2.122970588730891,
+    "portfolio_return": 0.5149048466352925,
+    "portfolio_volatility": 0.2142775076819288,
     "risk_free_rate": 0.06,
     "method": "SLSQP_Sharpe_Maximization",
-    "max_weight": 0.26057472005907767,
-    "min_weight": 0.0
+    "max_weight": 0.2563678604858998,
+    "min_weight": 0.011562057173003803
   }
 }

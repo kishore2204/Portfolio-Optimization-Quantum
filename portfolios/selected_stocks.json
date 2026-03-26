@@ -1,36 +1,36 @@
 {
   "selected_stocks": [
-    "TVSMOTOR",
-    "PERSISTENT",
-    "TRENT",
     "ADANIPOWER",
-    "ABB",
-    "CHOLAFIN",
-    "INDIGO",
-    "SHREECEM"
+    "PRESTIGE",
+    "MAXHEALTH",
+    "CUMMINSIND",
+    "ADANIENT",
+    "BAJAJ-AUTO",
+    "ONGC",
+    "PIDILITIND"
   ],
   "num_stocks": 8,
-  "energy": -3952.787705900162,
+  "energy": -3952.697723657344,
   "num_sectors": 8,
   "max_concentration": 0.125,
   "sector_counts": {
-    "Automobile": 1,
-    "IT": 1,
-    "Retail": 1,
     "Power": 1,
+    "Real_Estate": 1,
+    "Healthcare": 1,
     "Capital_Goods": 1,
-    "Financial_Services": 1,
     "Others": 1,
-    "Cement": 1
+    "Automobile": 1,
+    "Oil_Gas": 1,
+    "Paints": 1
   },
   "stock_to_sector": {
-    "TVSMOTOR": "Automobile",
-    "PERSISTENT": "IT",
-    "TRENT": "Retail",
     "ADANIPOWER": "Power",
-    "ABB": "Capital_Goods",
-    "CHOLAFIN": "Financial_Services",
-    "INDIGO": "Others",
-    "SHREECEM": "Cement"
+    "PRESTIGE": "Real_Estate",
+    "MAXHEALTH": "Healthcare",
+    "CUMMINSIND": "Capital_Goods",
+    "ADANIENT": "Others",
+    "BAJAJ-AUTO": "Automobile",
+    "ONGC": "Oil_Gas",
+    "PIDILITIND": "Paints"
   }
 }

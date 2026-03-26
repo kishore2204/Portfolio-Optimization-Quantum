@@ -1,0 +1,99 @@
+{
+  "Bear Market - Crashes_COVID Peak Crash": null,
+  "Bear Market - Crashes_China Bubble Burst Peak": null,
+  "Bear Market - Crashes_European Debt Stress": null,
+  "Bear Market - Crashes_2022 Global Bear Phase": null,
+  "Bull Market - Recovery/Profit_Post-COVID Recovery": null,
+  "Bull Market - Recovery/Profit_2023 Bull Run": null,
+  "Bull Market - Recovery/Profit_2024 Momentum Year": null,
+  "Present_Present to Mar-11-2026": {
+    "scenario_name": "Present_Present to Mar-11-2026",
+    "metadata": {
+      "scenario_name": "Train 1Y before present period, test until latest available date",
+      "train_period": "2024-03-11 to 2025-03-10",
+      "test_period": "2025-03-11 to 2026-03-11",
+      "train_days": 249,
+      "test_days": 249,
+      "available_stocks": 198,
+      "nifty200_used": true
+    },
+    "selected_stocks": {
+      "count": 8,
+      "symbols": [
+        "DIXON",
+        "MUTHOOTFIN",
+        "DIVISLAB",
+        "COROMANDEL",
+        "MAZDOCK",
+        "VEDL",
+        "POWERINDIA",
+        "FORTIS"
+      ],
+      "metrics": {
+        "DIXON": {
+          "train_return": 0.7283750119764951,
+          "train_sharpe": 1.533187256972272,
+          "test_return": -0.16031987135971063,
+          "test_sharpe": -0.592989232993911
+        },
+        "MUTHOOTFIN": {
+          "train_return": 0.4902298150383096,
+          "train_sharpe": 1.5331550683423174,
+          "test_return": 0.4419718356600365,
+          "test_sharpe": 1.0576717788373267
+        },
+        "DIVISLAB": {
+          "train_return": 0.46821691317697683,
+          "train_sharpe": 1.5136456735628652,
+          "test_return": 0.1693558618025052,
+          "test_sharpe": 0.43478700448624263
+        },
+        "COROMANDEL": {
+          "train_return": 0.4955863184063177,
+          "train_sharpe": 1.506808913690709,
+          "test_return": 0.2167767511718815,
+          "test_sharpe": 0.46358100630665255
+        },
+        "MAZDOCK": {
+          "train_return": 1.0290842764751746,
+          "train_sharpe": 1.4677362782390277,
+          "test_return": 0.15968081799683523,
+          "test_sharpe": 0.24491687688586344
+        },
+        "VEDL": {
+          "train_return": 0.5830155208880303,
+          "train_sharpe": 1.3856404917463478,
+          "test_return": 0.5515457205361245,
+          "test_sharpe": 1.531596217371169
+        },
+        "POWERINDIA": {
+          "train_return": 0.8580427421156859,
+          "train_sharpe": 1.3177948871038798,
+          "test_return": 0.8350152693232388,
+          "test_sharpe": 1.6824128551816395
+        },
+        "FORTIS": {
+          "train_return": 0.46969958510035387,
+          "train_sharpe": 1.2448966800066066,
+          "test_return": 0.3840153715942338,
+          "test_sharpe": 1.1643913862115558
+        }
+      }
+    },
+    "weights": {
+      "DIXON": 0.125,
+      "MUTHOOTFIN": 0.125,
+      "DIVISLAB": 0.125,
+      "COROMANDEL": 0.125,
+      "MAZDOCK": 0.125,
+      "VEDL": 0.125,
+      "POWERINDIA": 0.125,
+      "FORTIS": 0.125
+    },
+    "portfolio_metrics": {
+      "test_return": 0.32475521959064313,
+      "test_volatility": 0.19619335997414408,
+      "test_sharpe": 1.349453774438442
+    }
+  }
+}

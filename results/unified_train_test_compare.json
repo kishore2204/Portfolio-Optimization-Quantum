@@ -1,6 +1,6 @@
 {
   "dataset": {
-    "path": "C:\\Users\\kisho\\Downloads\\Portfolio Optimization Quantum_fin\\Portfolio Optimization Quantum\\Dataset\\prices_timeseries_complete.csv",
+    "path": "E:\\Files Git\\Portfolio-Optimization-Quantum\\Dataset\\prices_timeseries_complete.csv",
     "rows": 3719,
     "assets": 2248,
     "assets_after_universe_filter_horizon": 109,
@@ -59,14 +59,48 @@
       },
       "scenario_k": 15,
       "eligible_stocks": 963,
-      "matrix_export_file": "C:\\Users\\kisho\\Downloads\\Portfolio Optimization Quantum_fin\\Portfolio Optimization Quantum\\run_artifacts\\matrix_exports\\20260325_134344\\crash\\COVID_Peak_Crash.json",
+      "matrix_export_file": "E:\\Files Git\\Portfolio-Optimization-Quantum\\run_artifacts\\matrix_exports\\20260326_122431\\crash\\COVID_Peak_Crash.json",
       "methods": {
         "Quantum": {
-          "total_return": -18.9466997045588,
-          "volatility": 46.09641014753563,
-          "max_drawdown": -37.8753110922889,
-          "var_95": -5.086451101824486,
-          "sharpe": -2.49761328526067,
+          "total_return": -18.946699730691098,
+          "volatility": 46.09641010533075,
+          "max_drawdown": -37.87531112122273,
+          "var_95": -5.08645111099248,
+          "sharpe": -2.497613291962628,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0000000001,
+            "cash": -1.1641532182693481e-10,
+            "top_allocations": [
+              {
+                "stock": "SANGINITA",
+                "amount": 148815.1743006522
+              },
+              {
+                "stock": "RELAXO",
+                "amount": 137667.02351150877
+              },
+              {
+                "stock": "BBOX",
+                "amount": 99025.64572962138
+              },
+              {
+                "stock": "ADANIGREEN",
+                "amount": 80813.7875923796
+              },
+              {
+                "stock": "NAVINFLUOR",
+                "amount": 64993.56967232939
+              }
+            ]
+          }
+        },
+        "Greedy": {
+          "total_return": -23.38901447496038,
+          "volatility": 46.718210498633034,
+          "max_drawdown": -37.68729908890074,
+          "var_95": -5.235232080265109,
+          "sharpe": -3.1467753677820434,
           "budget_partition": {
             "budget": 1000000.0,
             "invested": 1000000.0,
@@ -74,91 +108,57 @@
             "top_allocations": [
               {
                 "stock": "SANGINITA",
-                "amount": 148815.1727325871
+                "amount": 165651.93051302878
               },
               {
                 "stock": "RELAXO",
-                "amount": 137667.02007239842
+                "amount": 147914.24153350748
               },
               {
                 "stock": "BBOX",
-                "amount": 99025.64529492328
+                "amount": 121127.4873396473
               },
               {
                 "stock": "ADANIGREEN",
-                "amount": 80813.78801483777
+                "amount": 92485.05711682925
               },
               {
                 "stock": "NAVINFLUOR",
-                "amount": 64993.56973855666
+                "amount": 72796.23105743313
               }
             ]
           }
         },
-        "Greedy": {
-          "total_return": -23.389014492761873,
-          "volatility": 46.71821047783511,
-          "max_drawdown": -37.687299066012066,
-          "var_95": -5.2352320870600755,
-          "sharpe": -3.1467753722729332,
+        "Classical": {
+          "total_return": -18.619598140005866,
+          "volatility": 44.36089377393273,
+          "max_drawdown": -32.46625610774075,
+          "var_95": -4.794720154544206,
+          "sharpe": -2.5610658555811634,
           "budget_partition": {
             "budget": 1000000.0,
             "invested": 999999.9999999999,
             "cash": 1.1641532182693481e-10,
             "top_allocations": [
               {
-                "stock": "SANGINITA",
-                "amount": 165651.93139030965
-              },
-              {
                 "stock": "RELAXO",
-                "amount": 147914.23750578522
-              },
-              {
-                "stock": "BBOX",
-                "amount": 121127.48746997108
-              },
-              {
-                "stock": "ADANIGREEN",
-                "amount": 92485.05638454261
-              },
-              {
-                "stock": "NAVINFLUOR",
-                "amount": 72796.2334928429
-              }
-            ]
-          }
-        },
-        "Classical": {
-          "total_return": -18.619598196154886,
-          "volatility": 44.36089388100209,
-          "max_drawdown": -32.46625611919258,
-          "var_95": -4.794720156026973,
-          "sharpe": -2.561065857136931,
-          "budget_partition": {
-            "budget": 1000000.0,
-            "invested": 1000000.0,
-            "cash": 0.0,
-            "top_allocations": [
-              {
-                "stock": "RELAXO",
-                "amount": 170049.28056409114
+                "amount": 170049.2807859466
               },
               {
                 "stock": "SANGINITA",
-                "amount": 134016.44640842197
+                "amount": 134016.44815660725
               },
               {
                 "stock": "RATNAMANI",
-                "amount": 120604.16857127944
+                "amount": 120604.16762336134
               },
               {
                 "stock": "ALKEM",
-                "amount": 89982.03518279425
+                "amount": 89982.03581076006
               },
               {
                 "stock": "PIIND",
-                "amount": 86849.77605618714
+                "amount": 86849.77446213564
               }
             ]
           }
@@ -182,48 +182,48 @@
       },
       "scenario_k": 15,
       "eligible_stocks": 942,
-      "matrix_export_file": "C:\\Users\\kisho\\Downloads\\Portfolio Optimization Quantum_fin\\Portfolio Optimization Quantum\\run_artifacts\\matrix_exports\\20260325_134344\\crash\\China_Bubble_Burst_Peak.json",
+      "matrix_export_file": "E:\\Files Git\\Portfolio-Optimization-Quantum\\run_artifacts\\matrix_exports\\20260326_122431\\crash\\China_Bubble_Burst_Peak.json",
       "methods": {
         "Quantum": {
-          "total_return": 52.98882426485678,
-          "volatility": 31.679902307533336,
-          "max_drawdown": -13.324094426825786,
-          "var_95": -2.9089814395953826,
-          "sharpe": 4.4332508539769755,
+          "total_return": 52.98882526130615,
+          "volatility": 31.679902065088054,
+          "max_drawdown": -13.324094402932129,
+          "var_95": -2.9089813538229694,
+          "sharpe": 4.433250953997021,
           "budget_partition": {
             "budget": 1000000.0,
-            "invested": 1000000.0,
-            "cash": 0.0,
+            "invested": 1000000.0000000002,
+            "cash": -2.3283064365386963e-10,
             "top_allocations": [
               {
                 "stock": "TRANSWORLD",
-                "amount": 142024.40891661207
+                "amount": 142024.40428511458
               },
               {
                 "stock": "BOSCH-HCIL",
-                "amount": 99603.1449861608
+                "amount": 99603.14116605408
               },
               {
                 "stock": "NORBTEAEXP",
-                "amount": 95241.88807309266
+                "amount": 95241.88539661856
               },
               {
                 "stock": "VIVIDHA",
-                "amount": 92115.2509492
+                "amount": 92115.24989375168
               },
               {
                 "stock": "MANGALAM",
-                "amount": 72056.86496126644
+                "amount": 72056.8651158468
               }
             ]
           }
         },
         "Greedy": {
-          "total_return": 33.10227659461384,
-          "volatility": 35.03463801794258,
-          "max_drawdown": -13.270157326845386,
-          "var_95": -3.4477897011945897,
-          "sharpe": 2.7170014110346496,
+          "total_return": 33.10227857402002,
+          "volatility": 35.03463829883446,
+          "max_drawdown": -13.27015710759884,
+          "var_95": -3.447789666187316,
+          "sharpe": 2.717001533085083,
           "budget_partition": {
             "budget": 1000000.0,
             "invested": 999999.9999999999,
@@ -231,57 +231,57 @@
             "top_allocations": [
               {
                 "stock": "TRANSWORLD",
-                "amount": 166994.2746920125
+                "amount": 166994.2758062904
               },
               {
                 "stock": "VIVIDHA",
-                "amount": 127047.39737650767
+                "amount": 127047.39519051586
               },
               {
                 "stock": "BOSCH-HCIL",
-                "amount": 114503.66545173197
+                "amount": 114503.66695122284
               },
               {
                 "stock": "BRITANNIA",
-                "amount": 96219.07482009212
+                "amount": 96219.06885336766
               },
               {
                 "stock": "MANGALAM",
-                "amount": 87571.58957838546
+                "amount": 87571.59432875327
               }
             ]
           }
         },
         "Classical": {
-          "total_return": 3.9839865352029324,
-          "volatility": 25.526000230447117,
-          "max_drawdown": -15.57513911994532,
-          "var_95": -2.3252841750284747,
-          "sharpe": 0.4017476761118426,
+          "total_return": 3.983986767212433,
+          "volatility": 25.525999903400077,
+          "max_drawdown": -15.575138689915885,
+          "var_95": -2.3252841379572273,
+          "sharpe": 0.4017477069855625,
           "budget_partition": {
             "budget": 1000000.0,
-            "invested": 1000000.0,
-            "cash": 0.0,
+            "invested": 1000000.0000000001,
+            "cash": -1.1641532182693481e-10,
             "top_allocations": [
               {
                 "stock": "TRANSWORLD",
-                "amount": 199438.2664132528
+                "amount": 199438.26249892465
               },
               {
                 "stock": "ABBOTINDIA",
-                "amount": 123609.88103886094
+                "amount": 123609.87936936384
               },
               {
                 "stock": "PIDILITIND",
-                "amount": 113545.0936697518
+                "amount": 113545.08871255403
               },
               {
                 "stock": "GILLETTE",
-                "amount": 105363.12908456694
+                "amount": 105363.12637759521
               },
               {
                 "stock": "SUNDARMFIN",
-                "amount": 99301.83129659118
+                "amount": 99301.83509752361
               }
             ]
           }
@@ -305,72 +305,72 @@
       },
       "scenario_k": 15,
       "eligible_stocks": 878,
-      "matrix_export_file": "C:\\Users\\kisho\\Downloads\\Portfolio Optimization Quantum_fin\\Portfolio Optimization Quantum\\run_artifacts\\matrix_exports\\20260325_134344\\crash\\European_Debt_Stress.json",
+      "matrix_export_file": "E:\\Files Git\\Portfolio-Optimization-Quantum\\run_artifacts\\matrix_exports\\20260326_122431\\crash\\European_Debt_Stress.json",
       "methods": {
         "Quantum": {
-          "total_return": 21.174840806456107,
-          "volatility": 13.970966702137694,
-          "max_drawdown": -8.858245296416536,
-          "var_95": -1.235569529226648,
-          "sharpe": 2.1524679599860175,
+          "total_return": 21.17484095698248,
+          "volatility": 13.9709667772899,
+          "max_drawdown": -8.858245325138679,
+          "var_95": -1.2355695432043912,
+          "sharpe": 2.1524679654191163,
           "budget_partition": {
             "budget": 1000000.0,
-            "invested": 1000000.0000000001,
-            "cash": -1.1641532182693481e-10,
+            "invested": 1000000.0,
+            "cash": 0.0,
             "top_allocations": [
               {
                 "stock": "ASTRAZEN",
-                "amount": 123493.07309513382
+                "amount": 123493.07472596968
               },
               {
                 "stock": "SHREECEM",
-                "amount": 106533.58226181181
+                "amount": 106533.58288943331
               },
               {
                 "stock": "BALKRISIND",
-                "amount": 91466.65279893862
+                "amount": 91466.65244600801
               },
               {
                 "stock": "BRITANNIA",
-                "amount": 91188.34865673137
+                "amount": 91188.34150664655
               },
               {
                 "stock": "HINDUNILVR",
-                "amount": 67864.76915260935
+                "amount": 67864.76998388833
               }
             ]
           }
         },
         "Greedy": {
-          "total_return": 8.914994321806757,
-          "volatility": 14.924780525262301,
-          "max_drawdown": -12.190364161692,
-          "var_95": -1.392688912668614,
-          "sharpe": 0.7177783484950383,
+          "total_return": 8.91499416162651,
+          "volatility": 14.924780490529036,
+          "max_drawdown": -12.190364071369975,
+          "var_95": -1.3926889024617548,
+          "sharpe": 0.7177783318141308,
           "budget_partition": {
             "budget": 1000000.0,
-            "invested": 1000000.0000000001,
-            "cash": -1.1641532182693481e-10,
+            "invested": 1000000.0,
+            "cash": 0.0,
             "top_allocations": [
               {
                 "stock": "SHREECEM",
-                "amount": 179043.22973509243
+                "amount": 179043.2220309727
               },
               {
                 "stock": "BRITANNIA",
-                "amount": 129069.51190556202
+                "amount": 129069.51352162422
               },
               {
                 "stock": "ASTRAZEN",
-                "amount": 127676.27878394394
+                "amount": 127676.27922952476
               },
               {
                 "stock": "KAJARIACER",
-                "amount": 78724.76349155774
+                "amount": 78724.76629004405
               },
               {
                 "stock": "20MICRONS",
-                "amount": 76319.22811751839
+                "amount": 76319.22915810367
               }
             ]
           }
@@ -428,48 +428,14 @@
       },
       "scenario_k": 15,
       "eligible_stocks": 1491,
-      "matrix_export_file": "C:\\Users\\kisho\\Downloads\\Portfolio Optimization Quantum_fin\\Portfolio Optimization Quantum\\run_artifacts\\matrix_exports\\20260325_134344\\crash\\2022_Global_Bear_Phase.json",
+      "matrix_export_file": "E:\\Files Git\\Portfolio-Optimization-Quantum\\run_artifacts\\matrix_exports\\20260326_122431\\crash\\2022_Global_Bear_Phase.json",
       "methods": {
         "Quantum": {
-          "total_return": -13.17620109313119,
-          "volatility": 23.438196605880467,
-          "max_drawdown": -28.81921537787933,
-          "var_95": -2.5030250382849353,
-          "sharpe": -1.4042129056101547,
-          "budget_partition": {
-            "budget": 1000000.0,
-            "invested": 999999.9999999999,
-            "cash": 1.1641532182693481e-10,
-            "top_allocations": [
-              {
-                "stock": "21STCENMGM",
-                "amount": 220698.21297167434
-              },
-              {
-                "stock": "RAJMET",
-                "amount": 112426.42133281895
-              },
-              {
-                "stock": "XPROINDIA",
-                "amount": 109310.63092261952
-              },
-              {
-                "stock": "SABEVENTS",
-                "amount": 100277.29116763463
-              },
-              {
-                "stock": "GATECHDVR",
-                "amount": 64147.314457325716
-              }
-            ]
-          }
-        },
-        "Greedy": {
-          "total_return": -16.531023523405576,
-          "volatility": 24.370307845632286,
-          "max_drawdown": -29.606708189190723,
-          "var_95": -2.63887586260929,
-          "sharpe": -1.6749344102024006,
+          "total_return": -13.176201073400517,
+          "volatility": 23.438195717525456,
+          "max_drawdown": -28.819213606785315,
+          "var_95": -2.5030247587986,
+          "sharpe": -1.4042129656439806,
           "budget_partition": {
             "budget": 1000000.0,
             "invested": 1000000.0,
@@ -477,57 +443,91 @@
             "top_allocations": [
               {
                 "stock": "21STCENMGM",
-                "amount": 262832.89924427075
-              },
-              {
-                "stock": "XPROINDIA",
-                "amount": 127737.46225023206
+                "amount": 220698.20646325752
               },
               {
                 "stock": "RAJMET",
-                "amount": 116868.60500438305
+                "amount": 112426.42718491754
+              },
+              {
+                "stock": "XPROINDIA",
+                "amount": 109310.6087117915
               },
               {
                 "stock": "SABEVENTS",
-                "amount": 106143.87684326568
+                "amount": 100277.30353098497
+              },
+              {
+                "stock": "GATECHDVR",
+                "amount": 64147.302500910024
+              }
+            ]
+          }
+        },
+        "Greedy": {
+          "total_return": -16.531023635892684,
+          "volatility": 24.370307824873187,
+          "max_drawdown": -29.606708183893154,
+          "var_95": -2.6388758664391063,
+          "sharpe": -1.6749344232391215,
+          "budget_partition": {
+            "budget": 1000000.0,
+            "invested": 1000000.0000000002,
+            "cash": -2.3283064365386963e-10,
+            "top_allocations": [
+              {
+                "stock": "21STCENMGM",
+                "amount": 262832.89715196105
+              },
+              {
+                "stock": "XPROINDIA",
+                "amount": 127737.46229358071
+              },
+              {
+                "stock": "RAJMET",
+                "amount": 116868.60467525633
+              },
+              {
+                "stock": "SABEVENTS",
+                "amount": 106143.87738581655
               },
               {
                 "stock": "JITFINFRA",
-                "amount": 59686.070374467636
+                "amount": 59686.07048298993
               }
             ]
           }
         },
         "Classical": {
-          "total_return": -13.572477202056488,
-          "volatility": 22.731895868785987,
-          "max_drawdown": -26.426450264841844,
-          "var_95": -2.436507629833316,
-          "sharpe": -1.49660990860795,
+          "total_return": -13.572477114423853,
+          "volatility": 22.73189588088855,
+          "max_drawdown": -26.426450212808867,
+          "var_95": -2.436507652100657,
+          "sharpe": -1.4966098984864402,
           "budget_partition": {
             "budget": 1000000.0,
-            "invested": 1000000.0000000001,
-            "cash": -1.1641532182693481e-10,
+            "invested": 1000000.0,
+            "cash": 0.0,
             "top_allocations": [
               {
                 "stock": "21STCENMGM",
-                "amount": 274580.9520013006
+                "amount": 274580.95015022065
               },
               {
                 "stock": "RAJMET",
-                "amount": 121184.79330791128
+                "amount": 121184.79254532726
               },
               {
                 "stock": "XPROINDIA",
-                "amount": 117403.77961260131
+                "amount": 117403.78025037122
               },
               {
                 "stock": "SABEVENTS",
-                "amount": 104779.02585007944
+                "amount": 104779.0241734749
               },
               {
                 "stock": "LLOYDSENGG",
-                "amount": 70790.44407909458
+                "amount": 70790.4436580864
               }
             ]
           }
@@ -568,6 +568,6 @@
   },
   "matrix_exports": {
     "enabled": true,
-    "run_dir": "C:\\Users\\kisho\\Downloads\\Portfolio Optimization Quantum_fin\\Portfolio Optimization Quantum\\run_artifacts\\matrix_exports\\20260325_134344"
+    "run_dir": "E:\\Files Git\\Portfolio-Optimization-Quantum\\run_artifacts\\matrix_exports\\20260326_122431"
   }
 }
