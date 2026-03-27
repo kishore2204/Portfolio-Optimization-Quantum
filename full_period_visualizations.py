@@ -40,6 +40,17 @@ def _save_plot(path: Path) -> None:
     plt.close()
 
 
+def _sample_series_quarterly(series: pd.Series, interval: int = 63) -> tuple:
+    """Sample series at regular intervals (quarterly by default = 63 trading days).
+    
+    Returns: (sampled_index, sampled_values) for sparse plotting with markers.
+    """
+    indices = np.arange(0, len(series), interval)
+    if len(series) - 1 not in indices:
+        indices = np.append(indices, len(series) - 1)
+    return series.index[indices], series.values[indices]
+
+
 def create_normal_15y_graphs(
     prices: pd.DataFrame,
     sector_map: Dict[str, str],
@@ -133,7 +144,8 @@ def create_normal_15y_graphs(
         ("Quantum_Rebalanced", "#ff7f0e"),
     ]:
         if name in combined.columns:
-            plt.plot(combined.index, combined[name], label=name, linewidth=2.2, color=color)
+            x, y = _sample_series_quarterly(combined[name])
+            plt.plot(x, y, label=name, linewidth=2.2, color=color, marker='o', markersize=6)
     plt.title("15-Year Normal Dataset: Classical vs Quantum vs Quantum Rebalanced")
     plt.xlabel("Date")
     plt.ylabel("Normalized Portfolio Value")
@@ -148,7 +160,8 @@ def create_normal_15y_graphs(
         ("Quantum_Rebalanced", "#ff7f0e"),
     ]:
         if name in combined.columns:
-            plt.plot(combined.index, combined[name], label=name, linewidth=2.4, color=color)
+            x, y = _sample_series_quarterly(combined[name])
+            plt.plot(x, y, label=name, linewidth=2.4, color=color, marker='o', markersize=6)
     plt.title("15-Year Normal Dataset: Quantum vs Quantum Rebalanced")
     plt.xlabel("Date")
     plt.ylabel("Normalized Portfolio Value")

@@ -12,6 +12,17 @@ import numpy as np
 import pandas as pd
 
 
+def _sample_series_quarterly(series: pd.Series, interval: int = 63) -> tuple:
+    """Sample series at regular intervals (quarterly by default = 63 trading days).
+    
+    Returns: (sampled_index, sampled_values) for sparse plotting with markers.
+    """
+    indices = np.arange(0, len(series), interval)
+    if len(series) - 1 not in indices:
+        indices = np.append(indices, len(series) - 1)
+    return series.index[indices], series.values[indices]
+
+
 def create_5_comparison_graphs(
     portfolio_values: dict,
     benchmark_values: dict,
@@ -54,8 +65,9 @@ def _plot_graph_1_cumulative_returns(portfolio_values: dict, output_dir: Path) -
         if name in portfolio_values and not portfolio_values[name].empty:
             values = portfolio_values[name]
             cumulative_returns = (values / values.iloc[0] - 1) * 100
-            ax.plot(cumulative_returns.index, cumulative_returns.values, 
-                   label=name, linewidth=2.5, color=colors.get(name), alpha=0.8)
+            x, y = _sample_series_quarterly(cumulative_returns)
+            ax.plot(x, y, label=name, linewidth=2.5, color=colors.get(name), alpha=0.8, 
+                   marker='o', markersize=6)
     
     ax.set_xlabel("Date", fontsize=12, fontweight="bold")
     ax.set_ylabel("Cumulative Returns (%)", fontsize=12, fontweight="bold")
@@ -358,8 +370,9 @@ def _plot_graph_1_with_classical(portfolio_values: dict, output_dir: Path) -> No
         if name in portfolio_values and not portfolio_values[name].empty:
             values = portfolio_values[name]
             cumulative_returns = (values / values.iloc[0] - 1) * 100
-            ax.plot(cumulative_returns.index, cumulative_returns.values, 
-                   label=name, linewidth=2.5, color=colors[name], alpha=0.8)
+            x, y = _sample_series_quarterly(cumulative_returns)
+            ax.plot(x, y, label=name, linewidth=2.5, color=colors[name], alpha=0.8,
+                   marker='o', markersize=6)
     
     ax.set_xlabel("Date", fontsize=12, fontweight="bold")
     ax.set_ylabel("Cumulative Returns (%)", fontsize=12, fontweight="bold")

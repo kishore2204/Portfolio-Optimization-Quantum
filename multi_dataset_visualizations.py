@@ -13,6 +13,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+
+def _sample_series_quarterly(series: pd.Series, interval: int = 63) -> tuple:
+    """Sample series at regular intervals (quarterly by default = 63 trading days).
+    
+    Returns: (sampled_index, sampled_values) for sparse plotting with markers.
+    """
+    indices = np.arange(0, len(series), interval)
+    if len(series) - 1 not in indices:
+        indices = np.append(indices, len(series) - 1)
+    return series.index[indices], series.values[indices]
+
 def _normalize_benchmark_with_discontinuity_fix(benchmark_series: pd.Series, dataset_name: str) -> pd.Series:
     """
     Normalize benchmark handling ETF mergers/splits/discontinuities.
@@ -142,25 +153,29 @@ def _create_cumulative_returns_comparison(
             values = portfolio_values[name]
             cumulative_returns = (values / values.iloc[0] - 1) * 100
             color = "#1f77b4" if name == "Quantum" else "#ff7f0e"
+            x, y = _sample_series_quarterly(cumulative_returns)
             ax.plot(
-                cumulative_returns.index,
-                cumulative_returns.values,
+                x, y,
                 label=name,
                 linewidth=2.5,
                 color=color,
                 alpha=0.9,
+                marker='o',
+                markersize=6,
             )
 
     # Add benchmark
     benchmark_returns = (benchmark_cleaned - 1) * 100
+    x, y = _sample_series_quarterly(benchmark_returns)
     ax.plot(
-        benchmark_returns.index,
-        benchmark_returns.values,
+        x, y,
         label=f"{dataset_name} (Benchmark)",
         linewidth=2.0,
         color="gray",
         linestyle="--",
         alpha=0.7,
+        marker='s',
+        markersize=4,
     )
 
     ax.set_xlabel("Date", fontsize=12, fontweight="bold")

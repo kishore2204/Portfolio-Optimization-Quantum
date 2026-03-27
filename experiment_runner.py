@@ -74,6 +74,17 @@ def _save_markdown_table(df: pd.DataFrame, path: Path):
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def _sample_series_quarterly(series: pd.Series, interval: int = 63) -> tuple:
+    """Sample series at regular intervals (quarterly by default = 63 trading days).
+    
+    Returns: (sampled_index, sampled_values) for sparse plotting with markers.
+    """
+    indices = np.arange(0, len(series), interval)
+    if len(series) - 1 not in indices:
+        indices = np.append(indices, len(series) - 1)
+    return series.index[indices], series.values[indices]
+
+
 def _plot_best_regime_comparison(
     out_dir: Path,
     best_regime_name: str,
@@ -85,13 +96,19 @@ def _plot_best_regime_comparison(
     plt.style.use("seaborn-v0_8-whitegrid")
     plt.figure(figsize=(13, 7))
 
-    plt.plot(classical.index, classical.values, label="Classical", linewidth=2.5)
-    plt.plot(quantum_best.index, quantum_best.values, label=f"Quantum ({best_regime_name})", linewidth=2.5)
-    plt.plot(rebalanced_best.index, rebalanced_best.values, label=f"Quantum+Rebal ({best_regime_name})", linewidth=2.8)
+    x, y = _sample_series_quarterly(classical)
+    plt.plot(x, y, label="Classical", linewidth=2.5, marker='o', markersize=6)
+    
+    x, y = _sample_series_quarterly(quantum_best)
+    plt.plot(x, y, label=f"Quantum ({best_regime_name})", linewidth=2.5, marker='o', markersize=6)
+    
+    x, y = _sample_series_quarterly(rebalanced_best)
+    plt.plot(x, y, label=f"Quantum+Rebal ({best_regime_name})", linewidth=2.8, marker='o', markersize=6)
 
     for key in sorted(benchmarks.keys()):
         s = benchmarks[key].reindex(classical.index).ffill().bfill()
-        plt.plot(s.index, s.values, label=key, linewidth=1.5, alpha=0.9)
+        x, y = _sample_series_quarterly(s)
+        plt.plot(x, y, label=key, linewidth=1.5, alpha=0.9, marker='s', markersize=4)
 
     plt.title("Portfolio Value Comparison Across Best Regime and Benchmarks")
     plt.xlabel("Time")
@@ -110,9 +127,11 @@ def _plot_top_rebalanced_regimes(
     plt.style.use("seaborn-v0_8-whitegrid")
     plt.figure(figsize=(13, 7))
 
-    plt.plot(classical.index, classical.values, label="Classical Baseline", linewidth=2.0, color="black")
+    x, y = _sample_series_quarterly(classical)
+    plt.plot(x, y, label="Classical Baseline", linewidth=2.0, color="black", marker='o', markersize=6)
     for name, s in top_regime_values.items():
-        plt.plot(s.index, s.values, label=name, linewidth=2.0)
+        x, y = _sample_series_quarterly(s)
+        plt.plot(x, y, label=name, linewidth=2.0, marker='o', markersize=6)
 
     plt.title("Top Rebalanced Regimes: Portfolio Value Over Time")
     plt.xlabel("Time")
