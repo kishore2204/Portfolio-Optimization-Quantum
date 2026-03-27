@@ -42,14 +42,19 @@ def annualize_stats(returns: pd.DataFrame) -> Tuple[pd.Series, pd.DataFrame, pd.
     return mu, cov, downside
 
 
-def time_series_split(prices: pd.DataFrame, train_years: int = 10, test_years: int = 5) -> SplitData:
+def time_series_split(prices: pd.DataFrame, train_years: int = 10, test_years: int = 5, test_end_date=None) -> SplitData:
     if prices.empty:
         raise ValueError("Price frame is empty.")
 
     returns = log_returns(prices)
     start = returns.index.min()
     train_end = start + pd.DateOffset(years=train_years)
-    test_end = train_end + pd.DateOffset(years=test_years)
+    
+    # Use test_end_date if provided, otherwise calculate from test_years
+    if test_end_date is not None:
+        test_end = pd.Timestamp(test_end_date)
+    else:
+        test_end = train_end + pd.DateOffset(years=test_years)
 
     train_returns = returns.loc[(returns.index >= start) & (returns.index < train_end)].copy()
     test_returns = returns.loc[(returns.index >= train_end) & (returns.index < test_end)].copy()

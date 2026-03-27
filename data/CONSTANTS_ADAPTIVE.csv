@@ -1,0 +1,3 @@
+,Constant,Value,Description,Source
+0,lambda_card,,Cardinality penalty (computed from scale and N/K ratio),Computed (Adaptive)
+1,gamma_sector,,Sector penalty (0.1 × lambda_card),Computed (Adaptive)

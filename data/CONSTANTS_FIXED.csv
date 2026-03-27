@@ -1,0 +1,12 @@
+,Constant,Value,Description,Source
+0,q_risk,0.5,Risk weighting in QUBO covariance term,config_constants.py (Fixed)
+1,beta_downside,0.3,Downside risk penalty coefficient,config_constants.py (Fixed)
+2,max_weight,0.12,Maximum weight per asset constraint,config_constants.py (Fixed)
+3,max_per_sector,,Maximum assets per sector constraint,config_constants.py (Fixed)
+4,risk_free_rate,,Risk-free rate for Sharpe ratio,config_constants.py (Fixed)
+5,transaction_cost,,Transaction cost per unit turnover,config_constants.py (Fixed)
+6,lookback_days,,Lookback window for rebalancing (days),config_constants.py (Fixed)
+7,rebalance_days,,Rebalancing cadence (days),config_constants.py (Fixed)
+8,annealing_t0,,Initial temperature for simulated annealing,config_constants.py (Fixed)
+9,annealing_t1,,Final temperature for simulated annealing,config_constants.py (Fixed)
+10,annealing_steps,,Number of annealing iterations,config_constants.py (Fixed)

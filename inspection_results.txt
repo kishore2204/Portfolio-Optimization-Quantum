@@ -1,0 +1,237 @@
+========================================================================================================================
+                                        [COMPREHENSIVE INSPECTION REPORT]
+========================================================================================================================
+
+[SECTION 1] FILE & FOLDER INVENTORY CHECK
+------------------------------------------------------------------------------------------------------------------------
+
+1.1 ROOT DIRECTORY FILES:
+  Total Python files: 35
+  Total docs: 16
+  [PASS] main.py
+  [PASS] config_constants.py
+  [PASS] qubo.py
+  [PASS] annealing.py
+  [PASS] hybrid_optimizer.py
+  [PASS] rebalancing.py
+  [PASS] classical_optimizer.py
+  [PASS] preprocessing.py
+  [PASS] visualization.py
+
+1.2 DATA FOLDER FILES:
+  Total files in data/: 20
+  [PASS] 01_covariance_matrix.csv                      (  9220.6 KB)
+  [PASS] 02_train_returns.csv                          ( 33520.2 KB)
+  [PASS] 03_test_returns.csv                           ( 17347.9 KB)
+  [PASS] 04_expected_returns_and_downside.csv          (    33.3 KB)
+  [PASS] 05_qubo_matrix.csv                            (   179.8 KB)
+  [PASS] 06_qubo_diagonal_terms.csv                    (     3.0 KB)
+  [PASS] 07_portfolio_weights.csv                      (     1.0 KB)
+  [PASS] 08_train_prices.csv                           (  9810.8 KB)
+  [PASS] 09_test_prices.csv                            (  5261.4 KB)
+  [PASS] 10_portfolio_values.csv                       (    83.6 KB)
+  [PASS] 11_benchmark_values.csv                       (   124.8 KB)
+
+1.3 OUTPUTS FOLDER (GRAPHS):
+  Total graphs: 11
+     1. 1_classical_vs_quantum_vs_rebalanced.png
+     2. 2_quantum_vs_rebalanced.png
+     3. 3_quantum_rebalanced_vs_benchmarks.png
+     4. 4_rebalanced_vs_nonrebalanced.png
+     5. D1_cumulative_returns_BSE_500.png
+     6. D1_cumulative_returns_HDFCNIF100.png
+     7. D1_cumulative_returns_Nifty_100.png
+     8. D1_cumulative_returns_Nifty_200.png
+     9. D1_cumulative_returns_Nifty_50.png
+    10. G1_classical_quantum_vs_rebalanced.png
+    11. G1_cumulative_returns_quantum_vs_rebalanced.png
+
+1.4 DATASETS FOLDER:
+  Total datasets: 8
+    - BSE_500_2011_to_2026.csv
+    - HDFCNIF100_2011_to_2026.csv
+    - ind_nifty200list.csv
+    - Nifty_100_2011_to_2026.csv
+    - Nifty_200_2011_to_2026.csv
+    - Nifty_50_2011_to_2026.csv
+    - NIFTYBEES_2011_to_2026.csv
+    - prices_timeseries_complete.csv
+
+
+[SECTION 2] K VALUE & CONFIGURATION VALIDATION
+------------------------------------------------------------------------------------------------------------------------
+
+2.1 K CALCULATION:
+  K_RATIO: 0.0221
+  Universe size: 680
+  K = max(10, int(0.0221 ╫ 680))
+  K computed: 15
+
+2.2 PORTFOLIO COMPOSITION:
+  Classical assets selected: 15
+  Quantum assets selected: 12
+  Expected (K): 15
+  [PASS] Classical has correct K value
+  [FAIL] Quantum has 12 but expected 15
+
+
+[SECTION 3] BUDGET CALCULATION VALIDATION
+------------------------------------------------------------------------------------------------------------------------
+
+3.1 PORTFOLIO VALUES PROPERTIES:
+  Shape: (1240, 3)
+  Columns: ['Classical', 'Quantum', 'Quantum_Rebalanced']
+  Time period: 1240 days
+  Date range: 2021-03-15 to 2026-03-11
+
+3.2 BUDGET VERIFICATION (per strategy):
+
+  Classical:
+    First normalized value: 0.993940
+    Last normalized value:  1.048988
+    Total return:    5.54%
+    Final value: $ 1,048,987.99
+    Profit/Loss: $    48,987.99
+
+  Quantum:
+    First normalized value: 0.988447
+    Last normalized value:  1.475989
+    Total return:   49.32%
+    Final value: $ 1,475,989.24
+    Profit/Loss: $   475,989.24
+
+  Quantum_Rebalanced:
+    First normalized value: 0.987738
+    Last normalized value:  4.684611
+    Total return:  374.28%
+    Final value: $ 4,684,611.33
+    Profit/Loss: $ 3,684,611.33
+
+
+[SECTION 4] PORTFOLIO WEIGHTS VALIDATION
+------------------------------------------------------------------------------------------------------------------------
+
+4.1 WEIGHT CONSTRAINTS CHECK:
+
+  Classical:
+    Assets: 15
+    Sum of weights: 1.000000
+    [PASS] Weights sum to 1.0
+    Max weight: 0.1190 (12% limit: True)
+    [PASS] Max weight constraint satisfied
+    [PASS] No negative weights
+
+  Quantum:
+    Assets: 12
+    Sum of weights: 1.000000
+    [PASS] Weights sum to 1.0
+    Max weight: 0.1200 (12% limit: False)
+    [FAIL] Max weight EXCEEDS 12%: 0.1200
+    [PASS] No negative weights
+
+
+[SECTION 5] QUBO MATRIX VALIDATION
+------------------------------------------------------------------------------------------------------------------------
+
+5.1 QUBO MATRIX PROPERTIES:
+  Dimensions: 100 ╫ 100
+  [PASS] Expected 100╫100 dimension
+  Symmetric: True
+  [PASS] Matrix is symmetric
+
+5.2 DIAGONAL TERMS (sample):
+    Q[0,0] = -1450.2738
+    Q[1,1] = -1450.2899
+    Q[2,2] = -1450.3156
+    Q[3,3] = -1450.2778
+    Q[4,4] = -1450.2273
+
+  Diagonal range: [-1450.3156, -1450.0232]
+  Large negative values (< -100): 100
+  [PASS] Cardinality penalty applied (large negatives in diagonal)
+
+
+[SECTION 6] COVARIANCE MATRIX VALIDATION
+------------------------------------------------------------------------------------------------------------------------
+
+6.1 COVARIANCE MATRIX PROPERTIES:
+  Dimensions: 680 ╫ 680
+  Symmetric: True
+  Diagonal (variance) range: [0.0508, 21.7048]
+  [PASS] All diagonal values positive (valid variance)
+
+
+[SECTION 7] RETURNS DATA VALIDATION
+------------------------------------------------------------------------------------------------------------------------
+
+7.1 TRAIN RETURNS:
+  Shape: (2478, 680)
+  Date range: 2011-03-15 to 2021-03-12
+  NaN count: 0
+  Mean return: 0.000282
+  Mean volatility: 0.030299
+  [PASS] No NaN values in training returns
+
+7.2 TEST RETURNS:
+  Shape: (1240, 680)
+  Date range: 2021-03-15 to 2026-03-11
+  NaN count: 0
+  [PASS] No NaN values in test returns
+
+
+[SECTION 8] REBALANCING LOGIC VALIDATION
+------------------------------------------------------------------------------------------------------------------------
+
+8.1 REBALANCING CONFIGURATION:
+  Cadence: 63 trading days (~quarterly)
+  Test period: 1240 days
+  Expected rebalances: ~19
+
+8.2 TIME ALIGNMENT:
+  Portfolio values dates: 1240
+  Test return dates: 1240
+  [PASS] Portfolio and test returns aligned
+
+
+[SECTION 9] BENCHMARK COMPARISON
+------------------------------------------------------------------------------------------------------------------------
+
+9.1 BENCHMARK DATA:
+  Benchmarks: ['BSE_500', 'HDFCNIF100', 'Nifty_100', 'Nifty_200', 'Nifty_50']
+  Time period: 1240 days
+
+9.2 BENCHMARK RETURNS:
+  BSE_500        :   73.38%
+  HDFCNIF100     :  -85.77%
+  Nifty_100      :   63.39%
+  Nifty_200      :   72.26%
+  Nifty_50       :   59.86%
+
+
+[SECTION 10] CONSTRAINTS ENFORCEMENT CHECK
+------------------------------------------------------------------------------------------------------------------------
+
+10.1 SECTOR CONSTRAINTS:
+  Quantum portfolio sector distribution:
+    [FAIL] UNKNOWN             : 12 assets (limit: 4)
+
+
+[SECTION 11] NUMERICAL CONSISTENCY CHECK
+------------------------------------------------------------------------------------------------------------------------
+
+11.1 PORTFOLIO VALUE CONTINUITY:
+  Mean daily log-return: 0.001256
+  Std dev daily return: 0.012563
+  [WARN] 2 outlier returns detected (>4 std dev)
+
+========================================================================================================================
+                                             [FINAL SUMMARY]
+========================================================================================================================
+Traceback (most recent call last):
+  File "C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\COMPREHENSIVE_INSPECTION.py", line 451, in <module>
+    print(summary)
+    ~~~~~^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode characters in position 23-139: character maps to <undefined>

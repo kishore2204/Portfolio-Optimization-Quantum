@@ -7,9 +7,59 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Dict, List
+import time
+import gc
+import warnings
 
 import numpy as np
 import pandas as pd
+
+warnings.filterwarnings('ignore')
+
+
+def _safe_export_csv(df: Any, filepath: Path, max_retries: int = 10) -> None:
+    """Safely export CSV with retry logic for locked files."""
+    import tempfile
+    
+    tmppath = None
+    for attempt in range(max_retries):
+        try:
+            gc.collect()
+            time.sleep(0.1 * (attempt + 1))
+            
+            # Write to temporary file first
+            with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv', dir=filepath.parent) as tmp:
+                tmppath = Path(tmp.name)
+                
+                if isinstance(df, pd.DataFrame):
+                    df.to_csv(tmp, index=True)
+                elif isinstance(df, pd.Series):
+                    df.to_csv(tmp, index=True)
+                else:
+                    df.to_csv(tmp)
+            
+            # Atomic replace
+            if filepath.exists():
+                try:
+                    filepath.unlink()
+                except:
+                    pass
+            
+            tmppath.replace(filepath)
+            time.sleep(0.05)
+            return
+            
+        except (PermissionError, OSError, FileNotFoundError) as e:
+            if tmppath and tmppath.exists():
+                try:
+                    tmppath.unlink()
+                except:
+                    pass
+            
+            if attempt < max_retries - 1:
+                gc.collect()
+            else:
+                print(f"  ⚠️  Warning: Could not write {filepath.name} - {str(e)}")
 
 
 def export_matrices_and_metrics(
@@ -54,19 +104,24 @@ def export_matrices_and_metrics(
     # ==================== 1. Input Matrices ====================
     print("[Exporting] Input matrices...")
     
-    # Covariance matrix
-    cov_train.to_csv(data_dir / "01_covariance_matrix.csv")
+    # Covariance matrix - ensure row/column labels
+    cov_with_index = pd.DataFrame(
+        cov_train.values,
+        index=cov_train.index,
+        columns=cov_train.columns,
+    )
+    _safe_export_csv(cov_with_index, data_dir / "01_covariance_matrix.csv")
     
     # Returns matrix
-    train_returns.to_csv(data_dir / "02_train_returns.csv")
-    test_returns.to_csv(data_dir / "03_test_returns.csv")
+    _safe_export_csv(train_returns, data_dir / "02_train_returns.csv")
+    _safe_export_csv(test_returns, data_dir / "03_test_returns.csv")
     
     # Mean returns and downside
     stats_df = pd.DataFrame({
         "Expected_Return": mu_train,
         "Downside_Risk": downside_train,
     })
-    stats_df.to_csv(data_dir / "04_expected_returns_and_downside.csv")
+    _safe_export_csv(stats_df, data_dir / "04_expected_returns_and_downside.csv")
 
     # ==================== 2. QUBO Matrix ====================
     print("[Exporting] QUBO matrices...")
@@ -76,7 +131,7 @@ def export_matrices_and_metrics(
         index=qubo_model.assets,
         columns=qubo_model.assets,
     )
-    qubo_df.to_csv(data_dir / "05_qubo_matrix.csv")
+    _safe_export_csv(qubo_df, data_dir / "05_qubo_matrix.csv")
     
     # QUBO diagonal terms
     qubo_diag = pd.Series(
@@ -84,7 +139,7 @@ def export_matrices_and_metrics(
         index=qubo_model.assets,
         name="Diagonal_Terms"
     )
-    qubo_diag.to_csv(data_dir / "06_qubo_diagonal_terms.csv")
+    _safe_export_csv(qubo_diag, data_dir / "06_qubo_diagonal_terms.csv")
 
     # ==================== 3. Portfolio Weights ====================
     print("[Exporting] Portfolio weights...")
@@ -93,25 +148,46 @@ def export_matrices_and_metrics(
         "Classical": classical_weights,
         "Quantum": quantum_weights,
     }).fillna(0.0)
-    weights_df.to_csv(data_dir / "07_portfolio_weights.csv")
+    _safe_export_csv(weights_df, data_dir / "07_portfolio_weights.csv")
 
     # ==================== 4. Prices ====================
     print("[Exporting] Price series...")
     
-    train_prices.to_csv(data_dir / "08_train_prices.csv")
-    test_prices.to_csv(data_dir / "09_test_prices.csv")
+    _safe_export_csv(train_prices, data_dir / "08_train_prices.csv")
+    _safe_export_csv(test_prices, data_dir / "09_test_prices.csv")
 
     # ==================== 5. Portfolio Values ====================
     print("[Exporting] Portfolio values...")
     
     portfolio_df = pd.DataFrame(portfolio_values)
-    portfolio_df.to_csv(data_dir / "10_portfolio_values.csv")
+    _safe_export_csv(portfolio_df, data_dir / "10_portfolio_values.csv")
 
     if benchmark_values:
         benchmark_df = pd.DataFrame(benchmark_values)
-        benchmark_df.to_csv(data_dir / "11_benchmark_values.csv")
+        _safe_export_csv(benchmark_df, data_dir / "11_benchmark_values.csv")
 
-    # ==================== 6. Comprehensive Metrics Report ====================
+    # ==================== 6. QUBO Inputs (All Components) ====================
+    print("[Exporting] QUBO inputs breakdown...")
+    
+    qubo_inputs = _export_qubo_inputs(
+        mu_train=mu_train,
+        cov_train=cov_train,
+        downside_train=downside_train,
+        qubo_model=qubo_model,
+        config_dict=config_dict,
+        data_dir=data_dir,
+    )
+
+    # ==================== 7. Constants (Fixed & Adaptive) ====================
+    print("[Exporting] All constants...")
+    
+    _export_all_constants(
+        config_dict=config_dict,
+        qubo_model=qubo_model,
+        data_dir=data_dir,
+    )
+
+    # ==================== 8. Comprehensive Metrics Report ====================
     print("[Exporting] Comprehensive metrics report...")
     
     report = _build_comprehensive_report(
@@ -130,7 +206,7 @@ def export_matrices_and_metrics(
     )
     
     report_path = data_dir / "12_COMPREHENSIVE_METRICS_REPORT.txt"
-    with open(report_path, "w") as f:
+    with open(report_path, "w", encoding="utf-8") as f:
         f.write(report)
     print(f"✓ Report saved to {report_path}")
 
@@ -295,3 +371,260 @@ def _build_comprehensive_report(
     lines.append("=" * 80)
 
     return "\n".join(lines)
+
+
+def _export_qubo_inputs(
+    mu_train: pd.Series,
+    cov_train: pd.DataFrame,
+    downside_train: pd.Series,
+    qubo_model: Any,
+    config_dict: dict,
+    data_dir: Path,
+) -> dict:
+    """
+    Export all QUBO input components separately for inspection.
+    
+    Creates:
+    - QUBO_inputs_expected_returns.csv: μ (expected returns)
+    - QUBO_inputs_downside_risk.csv: σ_down (downside volatility)
+    - QUBO_inputs_linear_terms.csv: Diagonal components of QUBO
+    - QUBO_inputs_summary.txt: Human-readable summary
+    """
+    
+    # 1. Expected returns (μ)
+    mu_df = pd.DataFrame({
+        "Asset": mu_train.index,
+        "Expected_Return_Annual": mu_train.values,
+    })
+    mu_df.set_index("Asset", inplace=True)
+    _safe_export_csv(mu_df, data_dir / "QUBO_inputs_expected_returns.csv")
+    
+    # 2. Downside risk (σ_down)
+    downside_df = pd.DataFrame({
+        "Asset": downside_train.index,
+        "Downside_Risk_Annual": downside_train.values,
+    })
+    downside_df.set_index("Asset", inplace=True)
+    _safe_export_csv(downside_df, data_dir / "QUBO_inputs_downside_risk.csv")
+    
+    # 3. Linear terms (covariance + expected returns penalty + downside penalty)
+    q_risk = config_dict.get("q_risk", 0.5)
+    beta_downside = config_dict.get("beta_downside", 0.3)
+    
+    # Extract covariance diagonals
+    cov_diag = np.diag(cov_train.values)
+    
+    # Linear terms = -μ + β*σ_down (from QUBO construction)
+    linear_terms = -mu_train.values + beta_downside * downside_train.values
+    
+    linear_df = pd.DataFrame({
+        "Asset": mu_train.index,
+        "Covariance_Diagonal": cov_diag,
+        "Expected_Return_Penalty": -mu_train.values,
+        "Downside_Risk_Penalty": (beta_downside * downside_train.values),
+        "Total_Linear_Term": linear_terms,
+    })
+    linear_df.set_index("Asset", inplace=True)
+    _safe_export_csv(linear_df, data_dir / "QUBO_inputs_linear_terms.csv")
+    
+    # 4. Covariance correlation matrix (for reference)
+    cov_std = np.sqrt(np.diag(cov_train.values))
+    corr_matrix = cov_train.values / np.outer(cov_std, cov_std)
+    corr_df = pd.DataFrame(corr_matrix, index=cov_train.index, columns=cov_train.columns)
+    _safe_export_csv(corr_df, data_dir / "QUBO_inputs_correlation_matrix.csv")
+    
+    # 5. Summary document
+    summary_lines = []
+    summary_lines.append("=" * 80)
+    summary_lines.append("QUBO INPUT COMPONENTS - SUMMARY")
+    summary_lines.append("=" * 80)
+    summary_lines.append("")
+    
+    summary_lines.append("[1] COVARIANCE MATRIX")
+    summary_lines.append("-" * 80)
+    summary_lines.append(f"Shape: {cov_train.shape}")
+    summary_lines.append(f"Diagonal Mean: {np.mean(cov_diag):.6f}")
+    summary_lines.append(f"Diagonal Min: {np.min(cov_diag):.6f}")
+    summary_lines.append(f"Diagonal Max: {np.max(cov_diag):.6f}")
+    summary_lines.append("")
+    
+    summary_lines.append("[2] EXPECTED RETURNS (μ)")
+    summary_lines.append("-" * 80)
+    summary_lines.append(f"Mean: {mu_train.mean():.6f}")
+    summary_lines.append(f"Min: {mu_train.min():.6f}")
+    summary_lines.append(f"Max: {mu_train.max():.6f}")
+    summary_lines.append(f"Std Dev: {mu_train.std():.6f}")
+    summary_lines.append("")
+    
+    summary_lines.append("[3] DOWNSIDE RISK (σ_down)")
+    summary_lines.append("-" * 80)
+    summary_lines.append(f"Mean: {downside_train.mean():.6f}")
+    summary_lines.append(f"Min: {downside_train.min():.6f}")
+    summary_lines.append(f"Max: {downside_train.max():.6f}")
+    summary_lines.append(f"Std Dev: {downside_train.std():.6f}")
+    summary_lines.append("")
+    
+    summary_lines.append("[4] LINEAR TERMS BREAKDOWN")
+    summary_lines.append("-" * 80)
+    summary_lines.append(f"Expected Return Penalty (mean): {(-mu_train.values).mean():.6f}")
+    summary_lines.append(f"Downside Risk Penalty (mean): {(beta_downside * downside_train.values).mean():.6f}")
+    summary_lines.append(f"Total Linear Term (mean): {linear_terms.mean():.6f}")
+    summary_lines.append("")
+    
+    summary_lines.append("[5] CORRELATION MATRIX STATS")
+    summary_lines.append("-" * 80)
+    summary_lines.append(f"Mean Correlation: {(corr_matrix[np.triu_indices_from(corr_matrix, k=1)]).mean():.6f}")
+    summary_lines.append(f"Min Correlation: {(corr_matrix[np.triu_indices_from(corr_matrix, k=1)]).min():.6f}")
+    summary_lines.append(f"Max Correlation: {(corr_matrix[np.triu_indices_from(corr_matrix, k=1)]).max():.6f}")
+    summary_lines.append("")
+    
+    summary_lines.append("=" * 80)
+    summary_lines.append("END QUBO INPUTS SUMMARY")
+    summary_lines.append("=" * 80)
+    
+    summary_path = data_dir / "QUBO_inputs_summary.txt"
+    with open(summary_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(summary_lines))
+    
+    return {"status": "exported"}
+
+
+def _export_all_constants(
+    config_dict: dict,
+    qubo_model: Any,
+    data_dir: Path,
+) -> None:
+    """
+    Export all constants (fixed and adaptive) in separate CSV files.
+    
+    Creates:
+    - CONSTANTS_FIXED.csv: Fixed parameter values
+    - CONSTANTS_ADAPTIVE.csv: Computed/adaptive constants
+    - CONSTANTS_full_summary.txt: Human-readable complete summary
+    """
+    
+    # ==================== Fixed Constants ====================
+    fixed_constants = {
+        "q_risk": "Risk weighting in QUBO covariance term",
+        "beta_downside": "Downside risk penalty coefficient",
+        "max_weight": "Maximum weight per asset constraint",
+        "max_per_sector": "Maximum assets per sector constraint",
+        "risk_free_rate": "Risk-free rate for Sharpe ratio",
+        "transaction_cost": "Transaction cost per unit turnover",
+        "lookback_days": "Lookback window for rebalancing (days)",
+        "rebalance_days": "Rebalancing cadence (days)",
+        "annealing_t0": "Initial temperature for simulated annealing",
+        "annealing_t1": "Final temperature for simulated annealing",
+        "annealing_steps": "Number of annealing iterations",
+    }
+    
+    fixed_df_list = []
+    for const_name, description in fixed_constants.items():
+        value = config_dict.get(const_name, None)
+        fixed_df_list.append({
+            "Constant": const_name,
+            "Value": value,
+            "Description": description,
+            "Source": "config_constants.py (Fixed)",
+        })
+    
+    fixed_df = pd.DataFrame(fixed_df_list)
+    _safe_export_csv(fixed_df, data_dir / "CONSTANTS_FIXED.csv")
+    
+    # ==================== Adaptive Constants ====================
+    adaptive_constants = {
+        "lambda_card": "Cardinality penalty (computed from scale and N/K ratio)",
+        "gamma_sector": "Sector penalty (0.1 × lambda_card)",
+    }
+    
+    adaptive_df_list = []
+    for const_name, description in adaptive_constants.items():
+        value = config_dict.get(const_name, None)
+        adaptive_df_list.append({
+            "Constant": const_name,
+            "Value": value,
+            "Description": description,
+            "Source": "Computed (Adaptive)",
+        })
+    
+    adaptive_df = pd.DataFrame(adaptive_df_list)
+    _safe_export_csv(adaptive_df, data_dir / "CONSTANTS_ADAPTIVE.csv")
+    
+    # ==================== Full Summary Document ====================
+    summary_lines = []
+    summary_lines.append("=" * 80)
+    summary_lines.append("COMPLETE CONSTANTS REFERENCE")
+    summary_lines.append("=" * 80)
+    summary_lines.append("")
+    
+    summary_lines.append("[PART 1: FIXED CONSTANTS]")
+    summary_lines.append("-" * 80)
+    summary_lines.append("These constants are fixed in config_constants.py")
+    summary_lines.append("")
+    
+    for const_name, description in fixed_constants.items():
+        value = config_dict.get(const_name, "NOT SET")
+        summary_lines.append(f"{const_name:25} = {value}")
+        summary_lines.append(f"{'':25}   {description}")
+        summary_lines.append("")
+    
+    summary_lines.append("")
+    summary_lines.append("[PART 2: ADAPTIVE CONSTANTS]")
+    summary_lines.append("-" * 80)
+    summary_lines.append("These constants are computed based on problem size and scale")
+    summary_lines.append("")
+    
+    for const_name, description in adaptive_constants.items():
+        value = config_dict.get(const_name, "NOT SET")
+        summary_lines.append(f"{const_name:25} = {value}")
+        summary_lines.append(f"{'':25}   {description}")
+        summary_lines.append("")
+    
+    summary_lines.append("")
+    summary_lines.append("[PART 3: DERIVED VALUES]")
+    summary_lines.append("-" * 80)
+    summary_lines.append(f"QUBO Matrix Size:         {qubo_model.Q.shape}")
+    summary_lines.append(f"Number of Selected Assets: {len(qubo_model.assets)}")
+    summary_lines.append(f"Targeting Portfolio K:     {config_dict.get('selected_k', 'NOT SET')}")
+    summary_lines.append("")
+    
+    summary_lines.append("[PART 4: FORMULAS]")
+    summary_lines.append("-" * 80)
+    summary_lines.append("")
+    summary_lines.append("Lambda (Cardinality Penalty) Computation:")
+    summary_lines.append("  λ = clip(10 × scale × (N / K), 50, 500)")
+    summary_lines.append("  where:")
+    summary_lines.append("    N = number of assets in candidate universe")
+    summary_lines.append("    K = target portfolio size")
+    summary_lines.append("    scale = max(|diagonal terms|) of QUBO")
+    summary_lines.append("")
+    
+    summary_lines.append("Gamma (Sector Penalty) Computation:")
+    summary_lines.append("  γ = 0.1 × λ")
+    summary_lines.append("")
+    
+    summary_lines.append("QUBO Objective Function:")
+    summary_lines.append("  E(x) = x^T Q x")
+    summary_lines.append("  where Q = q_risk × Σ + linear_terms + cardinality_penalty + sector_penalty")
+    summary_lines.append("")
+    
+    summary_lines.append("Sharpe Ratio Calculation:")
+    summary_lines.append("  Sharpe = (μ_p - r_f) / σ_p")
+    summary_lines.append("  where:")
+    summary_lines.append("    μ_p = portfolio annualized expected return")
+    summary_lines.append("    σ_p = portfolio annualized volatility")
+    summary_lines.append("    r_f = risk-free rate (5%)")
+    summary_lines.append("")
+    
+    summary_lines.append("=" * 80)
+    summary_lines.append("All constants are accessible in data/ folder CSV files")
+    summary_lines.append("=" * 80)
+    
+    summary_path = data_dir / "CONSTANTS_full_summary.txt"
+    with open(summary_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(summary_lines))
+    
+    print(f"✓ Constants exported to {data_dir}/")
+    print(f"  - CONSTANTS_FIXED.csv")
+    print(f"  - CONSTANTS_ADAPTIVE.csv")
+    print(f"  - CONSTANTS_full_summary.txt")

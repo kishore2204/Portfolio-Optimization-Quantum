@@ -10,22 +10,32 @@ from classical_optimizer import optimize_sharpe
 from preprocessing import annualize_stats
 from qubo import build_qubo
 from annealing import select_assets_via_annealing
+from config_constants import (
+    Q_RISK, BETA_DOWNSIDE, MAX_WEIGHT_PER_ASSET, RISK_FREE_RATE,
+    MAX_ASSETS_PER_SECTOR, REBALANCE_CADENCE, LOOKBACK_WINDOW,
+    TRANSACTION_COST
+)
 
 
 @dataclass
 class RebalanceConfig:
+    """Quarterly Rebalancing Configuration
+    
+    IMPORTANT: Uses FIXED CONSTANTS from config_constants.py
+    No parameter tuning - all values are theoretically justified.
+    """
     K: int = 25
-    max_weight: float = 0.12
-    rf: float = 0.05
-    q_risk: float = 1.0
-    beta_downside: float = 0.5
-    lambda_card: float = 5.0
-    gamma_sector: float = 0.5
-    max_per_sector: int = 4
-    rebalance_days: int = 63
-    lookback_days: int = 252
+    max_weight: float = MAX_WEIGHT_PER_ASSET
+    rf: float = RISK_FREE_RATE
+    q_risk: float = Q_RISK              # Fixed: 0.5
+    beta_downside: float = BETA_DOWNSIDE  # Fixed: 0.3
+    lambda_card: float = None            # Computed adaptive
+    gamma_sector: float = None           # Computed from lambda
+    max_per_sector: int = MAX_ASSETS_PER_SECTOR
+    rebalance_days: int = REBALANCE_CADENCE
+    lookback_days: int = LOOKBACK_WINDOW
     replace_frac: float = 0.2
-    transaction_cost: float = 0.001
+    transaction_cost: float = TRANSACTION_COST
 
 
 def _underperformers(selected: List[str], lookback: pd.DataFrame, frac: float) -> List[str]:

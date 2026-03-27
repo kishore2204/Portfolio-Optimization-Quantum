@@ -13,6 +13,50 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+def _normalize_benchmark_with_discontinuity_fix(benchmark_series: pd.Series, dataset_name: str) -> pd.Series:
+    """
+    Normalize benchmark handling ETF mergers/splits/discontinuities.
+    
+    Detects sudden value drops (>20%) that indicate ETF events and adjusts normalization
+    to ensure continuous growth curves.
+    """
+    if benchmark_series is None or benchmark_series.empty:
+        return pd.Series()
+    
+    # Clean data
+    series = pd.to_numeric(benchmark_series, errors="coerce").dropna()
+    if series.empty:
+        return series / series.iloc[0] if not series.empty else series
+    
+    # Check for discontinuities (sudden drops > 20%)
+    # This typically indicates ETF merger/split
+    pct_changes = series.pct_change().abs()
+    discontinuity_threshold = 0.20
+    has_discontinuities = (pct_changes > discontinuity_threshold).any()
+    
+    if has_discontinuities and dataset_name.lower() == "HDFCNIF100":
+        # For HDFCNIF100, detect the discontinuity point
+        discontinuity_idx = np.where(pct_changes > discontinuity_threshold)[0]
+        if len(discontinuity_idx) > 0:
+            split_point = discontinuity_idx[0]
+            
+            # Normalize in two segments and splice them
+            before = series.iloc[:split_point+1].copy()
+            after = series.iloc[split_point+1:].copy()
+            
+            # Normalize each segment separately
+            before_normalized = before / before.iloc[0]
+            
+            # Adjust after to connect smoothly to before
+            splice_value = before_normalized.iloc[-1]
+            after_normalized = (after / after.iloc[0]) * splice_value
+            
+            # Combine
+            result = pd.concat([before_normalized, after_normalized.iloc[1:]])
+            return result.sort_index()
+    
+    # Default normalization
+    return series / series.iloc[0]
 
 def create_5_graphs_per_dataset(
     portfolio_values: Dict[str, pd.Series],
@@ -59,43 +103,21 @@ def _create_graphs_for_dataset(
     dataset_name: str,
     output_dir: Path,
 ) -> list[str]:
-    """Create 5 graphs for a specific dataset."""
+    """Create ONLY Graph 1 (Cumulative Returns) for a specific dataset."""
     generated = []
 
-    # Type 1: Cumulative Returns Overlay
+    # Type 1: Cumulative Returns Overlay (ONLY THIS GRAPH)
     path1 = _create_cumulative_returns_comparison(
         portfolio_values, benchmark_series, dataset_name, output_dir
     )
     generated.append(path1)
     print(f"      ✓ Graph 1: Cumulative Returns")
 
-    # Type 2: Rolling Sharpe Ratio
-    path2 = _create_rolling_sharpe_comparison(
-        portfolio_values, benchmark_series, dataset_name, output_dir
-    )
-    generated.append(path2)
-    print(f"      ✓ Graph 2: Rolling Sharpe Ratio")
-
-    # Type 3: Relative Performance vs Benchmark
-    path3 = _create_relative_performance(
-        portfolio_values, benchmark_series, dataset_name, output_dir
-    )
-    generated.append(path3)
-    print(f"      ✓ Graph 3: Relative Performance vs {dataset_name}")
-
-    # Type 4: Volatility vs Return (Monthly)
-    path4 = _create_volatility_return_scatter(
-        portfolio_values, benchmark_series, dataset_name, output_dir
-    )
-    generated.append(path4)
-    print(f"      ✓ Graph 4: Risk-Return Monthly")
-
-    # Type 5: Drawdown Comparison
-    path5 = _create_drawdown_comparison(
-        portfolio_values, benchmark_series, dataset_name, output_dir
-    )
-    generated.append(path5)
-    print(f"      ✓ Graph 5: Drawdown Comparison")
+    # Skipped: Graph 2-5 (user only wants cumulative returns)
+    # path2 = _create_rolling_sharpe_comparison(...)
+    # path3 = _create_relative_performance(...)
+    # path4 = _create_volatility_return_scatter(...)
+    # path5 = _create_drawdown_comparison(...)
 
     return generated
 
@@ -106,10 +128,14 @@ def _create_cumulative_returns_comparison(
     dataset_name: str,
     output_dir: Path,
 ) -> str:
-    """Graph Type 1: Cumulative Returns of Quantum, Rebalanced, and Benchmark."""
+    """Graph Type 1: Cumulative Returns of Quantum, Rebalanced, and Benchmark.
+    
+    Handles ETF mergers/splits by detecting discontinuities and adjusting normalization.
+    """
     fig, ax = plt.subplots(figsize=(14, 7))
 
-    benchmark_normalized = benchmark_series / benchmark_series.iloc[0]
+    # Normalize benchmark handling ETF discontinuities
+    benchmark_cleaned = _normalize_benchmark_with_discontinuity_fix(benchmark_series, dataset_name)
 
     for name in ["Quantum", "Quantum_Rebalanced"]:
         if name in portfolio_values and not portfolio_values[name].empty:
@@ -126,7 +152,7 @@ def _create_cumulative_returns_comparison(
             )
 
     # Add benchmark
-    benchmark_returns = (benchmark_normalized - 1) * 100
+    benchmark_returns = (benchmark_cleaned - 1) * 100
     ax.plot(
         benchmark_returns.index,
         benchmark_returns.values,

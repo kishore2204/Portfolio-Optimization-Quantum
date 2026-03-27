@@ -19,7 +19,9 @@ def create_5_comparison_graphs(
     config_dict: Optional[dict] = None,
 ) -> list[str]:
     """
-    Create 5 comprehensive comparison graphs.
+    Create only the 2 graphs user needs:
+    1. G1: Quantum vs Quantum Rebalanced (cumulative returns)
+    2. G1_with_classical: Quantum, Quantum Rebalanced, and Classical (cumulative returns)
     
     Returns:
         List of generated image paths
@@ -27,32 +29,17 @@ def create_5_comparison_graphs(
     output_dir.mkdir(parents=True, exist_ok=True)
     generated_files = []
 
-    print("[Visualizations] Creating 5 comparison graphs...")
+    print("[Visualizations] Creating 2 cumulative returns comparison graphs...")
 
-    # Graph 1: Cumulative Returns Comparison
+    # Graph 1: Quantum vs Quantum Rebalanced ONLY (as specified)
     fig = _plot_graph_1_cumulative_returns(portfolio_values, output_dir)
     generated_files.append(str(output_dir / "G1_cumulative_returns_quantum_vs_rebalanced.png"))
-    print(f"  ✓ Graph 1: Cumulative Returns")
+    print(f"  ✓ Graph 1: Cumulative Returns (Quantum vs Quantum Rebalanced)")
 
-    # Graph 2: Rolling Sharpe Ratio
-    fig = _plot_graph_2_rolling_sharpe(portfolio_values, output_dir)
-    generated_files.append(str(output_dir / "G2_rolling_sharpe_quantum_vs_rebalanced.png"))
-    print(f"  ✓ Graph 2: Rolling Sharpe Ratio")
-
-    # Graph 3: Drawdown Analysis
-    fig = _plot_graph_3_drawdown_analysis(portfolio_values, output_dir)
-    generated_files.append(str(output_dir / "G3_drawdown_quantum_vs_rebalanced.png"))
-    print(f"  ✓ Graph 3: Drawdown Analysis")
-
-    # Graph 4: Monthly Returns Distribution
-    fig = _plot_graph_4_monthly_returns(portfolio_values, output_dir)
-    generated_files.append(str(output_dir / "G4_monthly_returns_quantum_vs_rebalanced.png"))
-    print(f"  ✓ Graph 4: Monthly Returns Distribution")
-
-    # Graph 5: Risk vs Return Scatter with Benchmarks
-    fig = _plot_graph_5_risk_return_scatter(portfolio_values, benchmark_values, output_dir)
-    generated_files.append(str(output_dir / "G5_risk_return_scatter_all.png"))
-    print(f"  ✓ Graph 5: Risk-Return Scatter")
+    # Graph 2: NEW - Quantum, Quantum Rebalanced, AND Classical
+    fig = _plot_graph_1_with_classical(portfolio_values, output_dir)
+    generated_files.append(str(output_dir / "G1_classical_quantum_vs_rebalanced.png"))
+    print(f"  ✓ Graph 2: Cumulative Returns (Classical + Quantum + Quantum Rebalanced)")
 
     return generated_files
 
@@ -273,3 +260,223 @@ def _plot_graph_5_risk_return_scatter(
     plt.tight_layout()
     plt.savefig(output_dir / "G5_risk_return_scatter_all.png", dpi=300, bbox_inches="tight")
     plt.close()
+
+def _plot_all_strategies_cumulative(portfolio_values: dict, output_dir: Path) -> None:
+    """NEW Graph 6: All Strategies - Classical + Quantum + Quantum_Rebalanced."""
+    fig, ax = plt.subplots(figsize=(14, 7))
+    
+    colors = {
+        "Classical": "#2ca02c",
+        "Quantum": "#1f77b4",
+        "Quantum_Rebalanced": "#ff7f0e"
+    }
+    
+    for name in ["Classical", "Quantum", "Quantum_Rebalanced"]:
+        if name in portfolio_values and not portfolio_values[name].empty:
+            values = portfolio_values[name]
+            cumulative_returns = (values / values.iloc[0] - 1) * 100
+            ax.plot(cumulative_returns.index, cumulative_returns.values,
+                   label=name, linewidth=2.5, color=colors.get(name), alpha=0.85)
+    
+    ax.set_xlabel("Date", fontsize=12, fontweight="bold")
+    ax.set_ylabel("Cumulative Returns (%)", fontsize=12, fontweight="bold")
+    ax.set_title("All Strategies: Classical vs Quantum vs Quantum_Rebalanced",
+                fontsize=14, fontweight="bold")
+    ax.legend(fontsize=11, loc="best")
+    ax.grid(True, alpha=0.3)
+    ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
+    
+    plt.tight_layout()
+    plt.savefig(output_dir / "G6_all_strategies_cumulative_returns.png", dpi=300, bbox_inches="tight")
+    plt.close()
+
+
+def _plot_classical_quantum_rebalanced_detailed(portfolio_values: dict, output_dir: Path) -> None:
+    """NEW Graph 7: Classical + Quantum + Quantum_Rebalanced detailed comparison (2 subplots)."""
+    fig, axes = plt.subplots(2, 1, figsize=(14, 10))
+    
+    # Color scheme
+    colors = {
+        "Classical": "#2ca02c",
+        "Quantum": "#1f77b4",
+        "Quantum_Rebalanced": "#ff7f0e"
+    }
+    
+    # Subplot 1: All three strategies
+    ax = axes[0]
+    for name in ["Classical", "Quantum", "Quantum_Rebalanced"]:
+        if name in portfolio_values and not portfolio_values[name].empty:
+            values = portfolio_values[name]
+            cumulative_returns = (values / values.iloc[0] - 1) * 100
+            ax.plot(cumulative_returns.index, cumulative_returns.values,
+                   label=name, linewidth=2.5, color=colors.get(name), alpha=0.85)
+    
+    ax.set_ylabel("Cumulative Returns (%)", fontsize=11, fontweight="bold")
+    ax.set_title("All Three Strategies Comparison",
+                fontsize=13, fontweight="bold")
+    ax.legend(fontsize=10, loc="best")
+    ax.grid(True, alpha=0.3)
+    ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
+    
+    # Subplot 2: Quantum vs Quantum_Rebalanced (with Classical reference)
+    ax = axes[1]
+    for name in ["Classical", "Quantum", "Quantum_Rebalanced"]:
+        if name in portfolio_values and not portfolio_values[name].empty:
+            values = portfolio_values[name]
+            cumulative_returns = (values / values.iloc[0] - 1) * 100
+            linestyle = ":" if name == "Classical" else "-"
+            linewidth = 2.0 if name == "Classical" else 2.5
+            alpha = 0.5 if name == "Classical" else 0.85
+            ax.plot(cumulative_returns.index, cumulative_returns.values,
+                   label=name, linewidth=linewidth, color=colors.get(name), 
+                   linestyle=linestyle, alpha=alpha)
+    
+    ax.set_xlabel("Date", fontsize=11, fontweight="bold")
+    ax.set_ylabel("Cumulative Returns (%)", fontsize=11, fontweight="bold")
+    ax.set_title("Quantum Strategy Focus (Classical shown as reference)",
+                fontsize=13, fontweight="bold")
+    ax.legend(fontsize=10, loc="best")
+    ax.grid(True, alpha=0.3)
+    ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
+    
+    plt.tight_layout()
+    plt.savefig(output_dir / "G7_classical_quantum_rebalanced_detailed.png", dpi=300, bbox_inches="tight")
+    plt.close()
+
+def _plot_graph_1_with_classical(portfolio_values: dict, output_dir: Path) -> None:
+    """NEW Graph: Cumulative Returns of Classical, Quantum, and Quantum_Rebalanced."""
+    fig, ax = plt.subplots(figsize=(14, 7))
+    
+    colors = {
+        "Classical": "#2ca02c",
+        "Quantum": "#1f77b4", 
+        "Quantum_Rebalanced": "#ff7f0e"
+    }
+    
+    # Plot all three strategies
+    for name in ["Classical", "Quantum", "Quantum_Rebalanced"]:
+        if name in portfolio_values and not portfolio_values[name].empty:
+            values = portfolio_values[name]
+            cumulative_returns = (values / values.iloc[0] - 1) * 100
+            ax.plot(cumulative_returns.index, cumulative_returns.values, 
+                   label=name, linewidth=2.5, color=colors[name], alpha=0.8)
+    
+    ax.set_xlabel("Date", fontsize=12, fontweight="bold")
+    ax.set_ylabel("Cumulative Returns (%)", fontsize=12, fontweight="bold")
+    ax.set_title("Cumulative Returns: Classical vs Quantum vs Quantum_Rebalanced", 
+                fontsize=14, fontweight="bold")
+    ax.legend(fontsize=11, loc="best")
+    ax.grid(True, alpha=0.3)
+    ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
+    
+    plt.tight_layout()
+    plt.savefig(output_dir / "G1_classical_quantum_vs_rebalanced.png", dpi=300, bbox_inches="tight")
+    plt.close()
+
+
+def create_15y_cumulative_returns_graph(
+    prices: pd.DataFrame,
+    output_dir: Path,
+) -> str:
+    """
+    Create 15-year cumulative returns graph for Classical, Quantum, and Quantum_Rebalanced
+    using the full price history.
+    
+    This is a SIMPLIFIED version that only creates the one graph needed.
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    try:
+        # Ensure prices are sorted by index
+        prices = prices.sort_index()
+        
+        # Log returns
+        log_returns = np.diff(np.log(prices.values), axis=0)
+        returns_df = pd.DataFrame(log_returns, index=prices.index[1:], columns=prices.columns)
+        
+        # Compute 3 strategies on full price history
+        portfolio_values_15y = {}
+        
+        # Classical (Markowitz on all assets)
+        from classical_optimizer import optimize_markowitz, optimize_sharpe
+        mu = returns_df.mean()
+        cov = returns_df.cov()
+        
+        w_mvo = optimize_markowitz(mu, cov, risk_aversion=4.0, w_max=0.12)
+        classical_returns = (returns_df @ w_mvo).values
+        classical_value = np.cumprod(1 + classical_returns)
+        portfolio_values_15y["Classical"] = pd.Series(classical_value, index=returns_df.index)
+        
+        # Quantum (simplified quad optimization)
+        w_quantum = optimize_sharpe(mu, cov, rf=0.05, w_max=0.12)
+        quantum_returns = (returns_df @ w_quantum).values
+        quantum_value = np.cumprod(1 + quantum_returns)
+        portfolio_values_15y["Quantum"] = pd.Series(quantum_value, index=returns_df.index)
+        
+        # Quantum Rebalanced (quarterly)
+        lookback = 252
+        rebalance_freq = 63
+        q_rebal_returns = []
+        q_rebal_weights = w_quantum.copy()
+        
+        for i in range(lookback, len(returns_df)):
+            # Get lookback window
+            window_returns = returns_df.iloc[i-lookback:i]
+            mu_window = window_returns.mean()
+            cov_window = window_returns.cov()
+            w_window = optimize_sharpe(mu_window, cov_window, rf=0.05, w_max=0.12)
+            
+            # Rebalance every 63 days
+            if (i - lookback) % rebalance_freq == 0:
+                q_rebal_weights = w_window.copy()
+            
+            day_return = returns_df.iloc[i] @ q_rebal_weights
+            q_rebal_returns.append(day_return)
+        
+        q_rebal_value = np.cumprod([1] + q_rebal_returns)
+        portfolio_values_15y["Quantum_Rebalanced"] = pd.Series(
+            q_rebal_value, 
+            index=returns_df.index[lookback:]
+        )
+        
+        # Create plot
+        fig, ax = plt.subplots(figsize=(15, 8))
+        
+        colors = {
+            "Classical": "#2ca02c",
+            "Quantum": "#1f77b4",
+            "Quantum_Rebalanced": "#ff7f0e"
+        }
+        
+        for name in ["Classical", "Quantum", "Quantum_Rebalanced"]:
+            if name in portfolio_values_15y:
+                values = portfolio_values_15y[name]
+                cumulative_returns = (values / values.iloc[0] - 1) * 100
+                ax.plot(
+                    cumulative_returns.index, 
+                    cumulative_returns.values,
+                    label=name,
+                    linewidth=2.5,
+                    color=colors[name],
+                    alpha=0.85
+                )
+        
+        ax.set_xlabel("Date", fontsize=12, fontweight="bold")
+        ax.set_ylabel("Cumulative Returns (%)", fontsize=12, fontweight="bold")
+        ax.set_title("15-Year Cumulative Returns: Classical vs Quantum vs Quantum_Rebalanced",
+                    fontsize=14, fontweight="bold")
+        ax.legend(fontsize=11, loc="best")
+        ax.grid(True, alpha=0.3)
+        ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
+        
+        plt.tight_layout()
+        output_file = output_dir / "15y_1_classical_vs_quantum_vs_rebalanced.png"
+        plt.savefig(output_file, dpi=300, bbox_inches="tight")
+        plt.close()
+        
+        return str(output_file)
+        
+    except Exception as e:
+        print(f"  WARNING: Could not create 15y graph: {e}")
+        return ""
+

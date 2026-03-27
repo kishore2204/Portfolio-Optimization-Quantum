@@ -1,0 +1,9 @@
+====================================================================================================
+Traceback (most recent call last):
+  File "C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\FINAL_INSPECTION_REPORT.py", line 12, in <module>
+    print(" " * 25 + "\u2705 FINAL COMPREHENSIVE INSPECTION REPORT")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\u2705' in position 25: character maps to <undefined>

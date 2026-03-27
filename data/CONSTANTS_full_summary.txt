@@ -1,0 +1,86 @@
+================================================================================
+COMPLETE CONSTANTS REFERENCE
+================================================================================
+
+[PART 1: FIXED CONSTANTS]
+--------------------------------------------------------------------------------
+These constants are fixed in config_constants.py
+
+q_risk                    = 0.5
+                            Risk weighting in QUBO covariance term
+
+beta_downside             = 0.3
+                            Downside risk penalty coefficient
+
+max_weight                = 0.12
+                            Maximum weight per asset constraint
+
+max_per_sector            = NOT SET
+                            Maximum assets per sector constraint
+
+risk_free_rate            = NOT SET
+                            Risk-free rate for Sharpe ratio
+
+transaction_cost          = NOT SET
+                            Transaction cost per unit turnover
+
+lookback_days             = NOT SET
+                            Lookback window for rebalancing (days)
+
+rebalance_days            = NOT SET
+                            Rebalancing cadence (days)
+
+annealing_t0              = NOT SET
+                            Initial temperature for simulated annealing
+
+annealing_t1              = NOT SET
+                            Final temperature for simulated annealing
+
+annealing_steps           = NOT SET
+                            Number of annealing iterations
+
+
+[PART 2: ADAPTIVE CONSTANTS]
+--------------------------------------------------------------------------------
+These constants are computed based on problem size and scale
+
+lambda_card               = NOT SET
+                            Cardinality penalty (computed from scale and N/K ratio)
+
+gamma_sector              = NOT SET
+                            Sector penalty (0.1 × lambda_card)
+
+
+[PART 3: DERIVED VALUES]
+--------------------------------------------------------------------------------
+QUBO Matrix Size:         (100, 100)
+Number of Selected Assets: 100
+Targeting Portfolio K:     15
+
+[PART 4: FORMULAS]
+--------------------------------------------------------------------------------
+
+Lambda (Cardinality Penalty) Computation:
+  λ = clip(10 × scale × (N / K), 50, 500)
+  where:
+    N = number of assets in candidate universe
+    K = target portfolio size
+    scale = max(|diagonal terms|) of QUBO
+
+Gamma (Sector Penalty) Computation:
+  γ = 0.1 × λ
+
+QUBO Objective Function:
+  E(x) = x^T Q x
+  where Q = q_risk × Σ + linear_terms + cardinality_penalty + sector_penalty
+
+Sharpe Ratio Calculation:
+  Sharpe = (μ_p - r_f) / σ_p
+  where:
+    μ_p = portfolio annualized expected return
+    σ_p = portfolio annualized volatility
+    r_f = risk-free rate (5%)
+
+================================================================================
+All constants are accessible in data/ folder CSV files
+================================================================================
