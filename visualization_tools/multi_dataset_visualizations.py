@@ -103,7 +103,7 @@ def create_5_graphs_per_dataset(
             output_dir=output_dir,
         )
         results[dataset_name] = generated_files
-        print(f"    ✓ Generated {len(generated_files)} graphs")
+        print(f"    [OK] Generated {len(generated_files)} graphs")
 
     return results
 
@@ -122,7 +122,7 @@ def _create_graphs_for_dataset(
         portfolio_values, benchmark_series, dataset_name, output_dir
     )
     generated.append(path1)
-    print(f"      ✓ Graph 1: Cumulative Returns")
+    print(f"      [OK] Graph 1: Cumulative Returns")
 
     # Skipped: Graph 2-5 (user only wants cumulative returns)
     # path2 = _create_rolling_sharpe_comparison(...)

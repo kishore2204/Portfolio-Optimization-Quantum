@@ -9,14 +9,14 @@ Diagonal Mean: 0.285627
 Diagonal Min: 0.048542
 Diagonal Max: 18.128949
 
-[2] EXPECTED RETURNS (μ)
+[2] EXPECTED RETURNS (mu)
 --------------------------------------------------------------------------------
 Mean: 0.084480
 Min: -0.369641
 Max: 0.420491
 Std Dev: 0.124277
 
-[3] DOWNSIDE RISK (σ_down)
+[3] DOWNSIDE RISK (sigma_down)
 --------------------------------------------------------------------------------
 Mean: 0.315597
 Min: 0.145044

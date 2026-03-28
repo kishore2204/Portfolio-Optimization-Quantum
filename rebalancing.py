@@ -6,7 +6,7 @@ from typing import Dict, List
 import numpy as np
 import pandas as pd
 
-from classical_optimizer import optimize_sharpe
+from classical_optimizer import optimize_sharpe, optimize_sharpe_with_min_weight
 from preprocessing import annualize_stats
 from qubo import build_qubo
 from annealing import select_assets_via_annealing
@@ -145,7 +145,7 @@ def run_quarterly_rebalance(
 
                 mu_s = mu.loc[merged]
                 cov_s = cov.loc[merged, merged]
-                new_w = optimize_sharpe(mu_s, cov_s, rf=config.rf, w_max=config.max_weight)
+                new_w = optimize_sharpe_with_min_weight(mu_s, cov_s, rf=config.rf, w_max=config.max_weight, min_weight=0.02)
 
                 prev_w = weights.reindex(new_w.index).fillna(0.0)
                 turnover = float(np.abs(new_w - prev_w).sum())

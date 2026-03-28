@@ -9,15 +9,15 @@ import pandas as pd
 
 from data_loader import load_all_data
 from preprocessing import clean_prices, time_series_split, annualize_stats
-from classical_optimizer import optimize_markowitz, optimize_sharpe
+from classical_optimizer import optimize_markowitz, optimize_sharpe, optimize_sharpe_with_min_weight
 from hybrid_optimizer import HybridConfig, run_quantum_hybrid_selection, portfolio_returns
 from rebalancing import RebalanceConfig, run_quarterly_rebalance
 from evaluation import value_from_returns, metrics_table, compute_metrics
-from visualization import plot_comparisons
-from matrix_exporter import export_matrices_and_metrics
-from enhanced_visualizations import create_5_comparison_graphs
-from multi_dataset_visualizations import create_5_graphs_per_dataset
-from full_period_visualizations import create_normal_15y_graphs
+from visualization_tools.visualization import plot_comparisons
+from utilities.matrix_exporter import export_matrices_and_metrics
+from visualization_tools.enhanced_visualizations import create_5_comparison_graphs
+from visualization_tools.multi_dataset_visualizations import create_5_graphs_per_dataset
+from visualization_tools.full_period_visualizations import create_normal_15y_graphs
 from qubo import build_qubo
 from config_constants import (
     TRAIN_YEARS, TEST_YEARS, RISK_FREE_RATE, K_RATIO, TEST_END_DATE,
@@ -77,6 +77,69 @@ def main():
     # Print fixed configuration for transparency
     print_constants_summary()
 
+    # ==================== PRINT REBALANCING METHODOLOGY ====================
+    print("\n" + "="*110)
+    print(" " * 25 + "[PLAN] QUARTERLY REBALANCING STRATEGY (Quantum + Rebalanced)")
+    print("="*110)
+    
+    print("\n[REBALANCE] REBALANCING WORKFLOW (Every 63 Trading Days):\n")
+    
+    print("STEP 1: IDENTIFY UNDERPERFORMERS")
+    print("    - Metric: Average daily returns over 252-day lookback window (1 year)")
+    print("    - Selection: Bottom 20% of current portfolio sorted by returns")
+    print("    - Result: ~3 stocks flagged as underperforming\n")
+    
+    print("STEP 2: QUICK SECTOR-BASED REPLACEMENT")
+    print("    - Action: For each underperformer, find best performer in SAME sector")
+    print("    - Metric: Highest average daily return in that sector")
+    print("    - Constraint: Only replace with available stocks (not already selected)")
+    print("    - Purpose: Maintain sector diversification while swapping out weak stocks")
+    print("    - Result: 'Seeded' portfolio with sector-balanced replacements\n")
+    
+    print("STEP 3: BUILD QUBO MATRIX")
+    print("    - Input Data:")
+    print("       * Expected returns (mu) - mean of returns")
+    print("       * Covariance matrix (Sigma) - asset correlations")
+    print("       * Downside volatility - penalty for negative deviations")
+    print("    - QUBO Terms:")
+    print("       * mu_i x w_i: Maximize expected returns")
+    print("       * Sigma: Minimize portfolio variance (risk)")
+    print("       * Downside risk: Penalize volatility")
+    print("       * lambda_card x (|S| - K)^2: Cardinality constraint (exactly K assets)")
+    print("       * gamma_sector: Sector concentration penalty\n")
+    
+    print("STEP 4: RUN QUANTUM ANNEALING")
+    print("    - Candidate Pool: Top 100 stocks by Sharpe-like score")
+    print("    - Algorithm: Simulated Annealing (quantum-inspired)")
+    print("    - Objective: Select K=15 assets that maximize return-risk trade-off")
+    print("    - Output: 15 assets optimized via QUBO formulation\n")
+    
+    print("STEP 5: OPTIMIZE WEIGHTS FOR SHARPE RATIO")
+    print("    - Problem: Given 15 selected stocks, allocate optimal weights")
+    print("    - Metric: Sharpe Ratio = (E[R] - Rf) / sigma")
+    print("       * E[R]: Expected portfolio return")
+    print("       * Rf: Risk-free rate (5%)")
+    print("       * sigma: Portfolio volatility")
+    print("    - Constraint: Max 12% per asset, optimal risk-adjusted allocation")
+    print("    - Result: Portfolio weights that maximize excess return per unit risk\n")
+    
+    print("STEP 6: MERGE & FINALIZE")
+    print("    - Seeded Portfolio: 13-15 stocks (from sector replacements)")
+    print("    - Annealing Portfolio: 15 stocks (from QUBO + quantum annealing)")
+    print("    - Merge: Combine both, remove duplicates, keep top K=15")
+    print("    - Apply Transaction Costs: Penalize high portfolio turnover")
+    print("    - Update Weights: Use merged assets with Sharpe-optimized weights\n")
+    
+    print("[TARGET] KEY INSIGHTS:")
+    print("  [OK] Quick Replacement = Fast, practical sector-based swaps (warm start)")
+    print("  [OK] Full Re-optimization = Global search via QUBO + quantum annealing")
+    print("  [OK] Sharpe Ratio Calc = Applied AFTER asset selection (Step 5)")
+    print("  [OK] Both Approches Used = Seeded results inform QUBO optimization")
+    print("  [OK] Frequency = 4 times/year (every ~quarter = 63 trading days)")
+    print("  [OK] Result = Adaptive portfolio that removes weak performers & rebalances weights\n")
+    
+    print("="*110)
+
     bundle = load_all_data(dataset_root)
     prices = clean_prices(bundle.asset_prices)
 
@@ -97,7 +160,7 @@ def main():
 
     mu_top = mu_train.loc[top_assets]
     cov_top = cov_train.loc[top_assets, top_assets]
-    w_classical = optimize_sharpe(mu_top, cov_top, rf=cfg.rf, w_max=cfg.max_weight)
+    w_classical = optimize_sharpe_with_min_weight(mu_top, cov_top, rf=cfg.rf, w_max=cfg.max_weight, min_weight=0.02)
 
     classical_test_lr = portfolio_returns(test_r, w_classical)
     classical_value = value_from_returns(classical_test_lr)
@@ -211,7 +274,7 @@ def main():
         split_dates=split.split_dates,
         config_dict=config_dict,
     )
-    print(f"✓ Matrices exported to: {data_dir}")
+    print(f"[OK] Matrices exported to: {data_dir}")
 
     # ==================== CREATE 5 COMPARISON GRAPHS ====================
     print("\n[Step 2] Creating 5 enhanced comparison graphs...")
@@ -221,7 +284,7 @@ def main():
         output_dir=out_dir,
         config_dict=config_dict,
     )
-    print(f"✓ 5 graphs created in: {out_dir}")
+    print(f"[OK] 5 graphs created in: {out_dir}")
 
     # ==================== CREATE 5 GRAPHS PER DATASET ====================
     print("\n[Step 3] Creating 5 graphs per dataset (25 total graphs)...")
@@ -230,7 +293,7 @@ def main():
         benchmark_values=bench_norm,
         output_dir=out_dir,
     )
-    print(f"✓ Multi-dataset graphs created in: {out_dir}")
+    print(f"[OK] Multi-dataset graphs created in: {out_dir}")
 
     # ==================== SKIP STEP 4 (Not needed - causes long waits) ====================
     # Step 4 disabled - 15y graph calculation too slow, user wants quick results
@@ -250,13 +313,13 @@ def main():
     pd.Series(summary, dtype=object).to_json(out_dir / "run_summary.json", indent=2)
 
     # ==================== PERFORMANCE SUMMARY ====================
-    print("\n" + "="*110)
-    print(" " * 35 + "🎯 PERFORMANCE RESULTS SUMMARY")
-    print("="*110)
+    print("\n" + "="*130)
+    print(" " * 45 + "[TARGET] PERFORMANCE RESULTS SUMMARY")
+    print("="*130)
     
     # Extract key metrics for cleaner display
     perf_summary = pd.DataFrame({
-        'Strategy': ['Classical', 'Quantum', 'Quantum+Rebalance'],
+        'Strategy': ['Classical', 'Quantum', 'Quantum+Rebalanced'],
         'Total Return': [
             f"{metric_df.loc['Classical', 'Total Return']:.2%}",
             f"{metric_df.loc['Quantum', 'Total Return']:.2%}",
@@ -284,8 +347,10 @@ def main():
         ],
     })
     
-    print("\n📊 PORTFOLIO PERFORMANCE COMPARISON TABLE:")
+    print("\n[DATA] PORTFOLIO PERFORMANCE COMPARISON:")
+    print("-" * 130)
     print(perf_summary.to_string(index=False))
+    print("-" * 130)
     
     # Benchmark comparison
     if benchmark_metrics:
@@ -304,13 +369,15 @@ def main():
                 for b in benchmark_metrics.keys()
             ],
         })
-        print("\n📈 MARKET BENCHMARK COMPARISON TABLE:")
+        print("\n[BENCHMARK] MARKET BENCHMARK COMPARISON:")
+        print("-" * 130)
         print(benchmark_perf.to_string(index=False))
+        print("-" * 130)
     
     # Budget analysis (using $1,000,000 initial investment)
     initial_budget = 1_000_000
-    print(f"\n💰 BUDGET ANALYSIS (Initial Investment: ${initial_budget:,.0f})")
-    print("─" * 110)
+    print(f"\n[BUDGET] BUDGET ANALYSIS  (Initial Investment: ${initial_budget:,.0f})")
+    print("-" * 130)
     
     final_vals = {
         'Classical': classical_value.iloc[-1] * initial_budget,
@@ -329,8 +396,11 @@ def main():
             for s in final_vals.keys()
         ],
     })
-    print("\nPORTFOLIO BUDGET ANALYSIS:")
-    print(budget_table.to_string(index=False))
+    print("\n   PORTFOLIO BUDGET:")
+    print("   " + "-" * 126)
+    for line in budget_table.to_string(index=False).split('\n'):
+        print("   " + line)
+    print("   " + "-" * 126)
     
     bench_budget = pd.DataFrame({
         'Benchmark': list(bench_final_vals.keys()),
@@ -341,8 +411,11 @@ def main():
             for b in bench_final_vals.keys()
         ],
     })
-    print("\nBENCHMARK BUDGET ANALYSIS:")
-    print(bench_budget.to_string(index=False))
+    print("\n   BENCHMARK BUDGET:")
+    print("   " + "-" * 126)
+    for line in bench_budget.to_string(index=False).split('\n'):
+        print("   " + line)
+    print("   " + "-" * 126)
     
     # Key insights
     quantum_rebal_return = metric_df.loc['Quantum_Rebalanced', 'Total Return']
@@ -354,57 +427,106 @@ def main():
     classical_profit = final_vals['Classical'] - initial_budget
     profit_diff = quantum_profit - classical_profit
     
-    print("\n🎖️  KEY PERFORMANCE INSIGHTS:")
-    print(f"  ✓ Quantum+Rebalance vs Classical outperformance: {outperformance:.2%}")
-    print(f"  ✓ Quantum+Rebalance Sharpe ratio improvement: {metric_df.loc['Quantum_Rebalanced', 'Sharpe Ratio'] - metric_df.loc['Classical', 'Sharpe Ratio']:.4f}")
-    print(f"  ✓ Rebalancing boost (Quantum vs Quantum+Rebal): {quantum_rebal_return - quantum_return:.2%}")
-    print(f"  ✓ Profit difference: ${profit_diff:,.2f}")
+    print("\n[INSIGHT]  KEY PERFORMANCE INSIGHTS:")
+    print("-" * 130)
+    print(f"     [OK] Quantum+Rebalance vs Classical outperformance  :  {outperformance:.2%}")
+    print(f"     [OK] Quantum+Rebalance Sharpe ratio improvement      :  {metric_df.loc['Quantum_Rebalanced', 'Sharpe Ratio'] - metric_df.loc['Classical', 'Sharpe Ratio']:.4f}")
+    print(f"     [OK] Rebalancing boost (Quantum vs Quantum+Rebal)    :  {quantum_rebal_return - quantum_return:.2%}")
+    print(f"     [OK] Profit difference (Quantum+Rebal vs Classical)  :  ${profit_diff:,.2f}")
+    print("-" * 130)
+    
+    # Selected stocks - Classical
+    print("\n[BEST] CLASSICAL PORTFOLIO  (15 Selected Stocks & Weights):")
+    print("-" * 130)
+    classical_stocks_df = pd.DataFrame({
+        'Rank': range(1, len(w_classical) + 1),
+        'Stock': w_classical.index,
+        'Weight': [f"{w*100:.2f}%" for w in w_classical.values],
+    })
+    print("   " + "\n   ".join(classical_stocks_df.to_string(index=False).split('\n')))
+    print("-" * 130)
+    
+    # Selected stocks - Quantum
+    print("\n[QUANTUM]  QUANTUM PORTFOLIO  (15 Selected Stocks & Weights):")
+    print("-" * 130)
+    quantum_stocks_df = pd.DataFrame({
+        'Rank': range(1, len(q_weights) + 1),
+        'Stock': q_weights.index,
+        'Weight': [f"{w*100:.2f}%" for w in q_weights.values],
+    })
+    print("   " + "\n   ".join(quantum_stocks_df.to_string(index=False).split('\n')))
+    print("-" * 130)
     
     # Portfolio composition
-    print("\n🎯 PORTFOLIO COMPOSITION:")
-    print(f"  ✓ Classical portfolio: {len(top_assets)} assets selected")
-    print(f"  ✓ Quantum portfolio: {len(q_assets)} assets selected")
-    print(f"  ✓ Universe size: {n_assets} total available assets")
+    print("\n[TARGET] PORTFOLIO COMPOSITION:")
+    print("-" * 130)
+    print(f"     [OK] Classical portfolio       :  {len(top_assets)} assets selected")
+    print(f"     [OK] Quantum portfolio         :  {len(q_assets)} assets selected")
+    print(f"     [OK] Universe size             :  {n_assets} total available assets")
+    print(f"     [OK] Selection ratio (K/N)     :  {cfg.k_ratio*100:.2f}%")
+    print("-" * 130)
     
     # QUBO validation
-    print("\n✅ QUBO MODEL VALIDATION:")
-    print(f"  ✓ QUBO Matrix size: {qubo_model.Q.shape}")
-    print(f"  ✓ Cardinality constraint (K): {K} assets selected")
-    print(f"  ✓ Lambda (cardinality penalty): {qubo_model.lambda_card:.2f}")
-    print(f"  ✓ Gamma (sector penalty): {qubo_model.gamma_sector:.2f}")
-    print(f"  ✓ Matrix is symmetric: {np.allclose(qubo_model.Q, qubo_model.Q.T)}")
-    print(f"  ✓ Fixed constants used: q_risk={Q_RISK}, beta_downside={BETA_DOWNSIDE}")
+    print("\n[OK] QUBO MODEL VALIDATION:")
+    print("-" * 130)
+    print(f"     [OK] QUBO Matrix size              :  {qubo_model.Q.shape}")
+    print(f"     [OK] Cardinality constraint (K)    :  {K} assets selected")
+    print(f"     [OK] Lambda (cardinality penalty)  :  {qubo_model.lambda_card:.2f}")
+    print(f"     [OK] Gamma (sector penalty)        :  {qubo_model.gamma_sector:.2f}")
+    print(f"     [OK] Matrix is symmetric           :  {np.allclose(qubo_model.Q, qubo_model.Q.T)}")
+    print(f"     [OK] Fixed constants (q_risk)      :  {Q_RISK}")
+    print(f"     [OK] Fixed constants (beta_downside) : {BETA_DOWNSIDE}")
+    print("-" * 130)
     
     # Data export validation
-    print("\n💾 DATA FILES EXPORTED (21 files):")
-    print(f"  ✓ Input matrices: 01-04 (covariance, returns, price data)")
-    print(f"  ✓ QUBO matrix: 05-06 (matrix and diagonal terms)")
-    print(f"  ✓ QUBO inputs: 7 files (expected returns, downside risk, linear terms, etc.)")
-    print(f"  ✓ Constants: 3 files (fixed, adaptive, formulas)")
-    print(f"  ✓ Portfolio weights: 07 (Classical & Quantum)")
-    print(f"  ✓ Portfolio values: 10-11 (daily performance and benchmarks)")
-    print(f"  ✓ Metrics report: 12 (comprehensive summary)")
-    print(f"  ✓ Documentation: 3 files (guide, reference, dictionary)")
+    print("\n[SAVE] DATA FILES EXPORTED  (21 files):")
+    print("-" * 130)
+    print(f"     [OK] Input matrices              :  01-04 (covariance, returns, price data)")
+    print(f"     [OK] QUBO matrix                 :  05-06 (matrix and diagonal terms)")
+    print(f"     [OK] QUBO inputs                 :  7 files (expected returns, downside risk, etc.)")
+    print(f"     [OK] Constants                   :  3 files (fixed, adaptive, formulas)")
+    print(f"     [OK] Portfolio weights           :  07 (Classical & Quantum)")
+    print(f"     [OK] Portfolio values            :  10-11 (daily performance and benchmarks)")
+    print(f"     [OK] Metrics report              :  12 (comprehensive summary)")
+    print(f"     [OK] Documentation               :  3 files (guide, reference, dictionary)")
+    print("-" * 130)
     
-    print("\n🎨 GRAPHS GENERATED:")
-    print(f"  ✓ Enhanced quantum comparison: {len(enhanced_graphs)} graphs")
-    print(f"  ✓ Multi-dataset comparison: {sum(len(g) for g in multi_dataset_results.values())} graphs")
-    print(f"  ✓ Original comparison: 4 graphs")
-    print(f"  📊 TOTAL: {len(enhanced_graphs) + sum(len(g) for g in multi_dataset_results.values()) + 4} visualization graphs")
+    print("\n[VISUAL] GRAPHS GENERATED:")
+    print("-" * 130)
+    print(f"     [OK] Enhanced quantum comparison      :  {len(enhanced_graphs)} graphs")
+    print(f"     [OK] Multi-dataset comparison         :  {sum(len(g) for g in multi_dataset_results.values())} graphs")
+    print(f"     [OK] Original comparison              :  4 graphs")
+    print(f"     [DATA] TOTAL VISUALIZATIONS            :  {len(enhanced_graphs) + sum(len(g) for g in multi_dataset_results.values()) + 4} graphs")
+    print("-" * 130)
     
-    print("\n" + "="*110)
-    print(" " * 40 + "✅ RUN COMPLETED SUCCESSFULLY")
-    print("="*110)
-    print(f"\n📁 Output directory:        {out_dir}")
-    print(f"📁 Data (matrices) folder:  {data_dir}")
-    print(f"\n⚙️  Configuration used:")
-    print(f"    K (portfolio size):     {K}")
-    print(f"    N (universe size):      {n_assets}")
-    print(f"    K_RATIO:                {cfg.k_ratio:.4f} ({cfg.k_ratio*100:.2f}%)")
-    print(f"\n💡 Next steps:")
-    print(f"   1. Review graphs in: {out_dir}")
-    print(f"   2. Analyze data in: {data_dir}")
-    print(f"   3. Read documentation: {data_dir}/00_DATA_FOLDER_GUIDE.txt")
+    print("\n" + "="*130)
+    print(" " * 50 + "[OK] RUN COMPLETED SUCCESSFULLY")
+    print("="*130)
+    
+    print("\n[CHECK] OUTPUT DIRECTORIES:")
+    print("-" * 130)
+    print(f"     [DIR] Output directory (graphs)    :  {out_dir}")
+    print(f"     [DIR] Data (matrices) folder       :  {data_dir}")
+    print("-" * 130)
+    
+    print("\n[CONFIG] CONFIGURATION SUMMARY:")
+    print("-" * 130)
+    print(f"     * K (portfolio size)            :  {K} assets")
+    print(f"     * N (universe size)             :  {n_assets} assets")
+    print(f"     * K_RATIO                       :  {cfg.k_ratio:.4f} ({cfg.k_ratio*100:.2f}%)")
+    print(f"     * Training period               :  {cfg.train_years} years")
+    print(f"     * Test period                   :  {cfg.test_years} years")
+    print(f"     * Risk-free rate                :  {cfg.rf*100:.1f}%")
+    print("-" * 130)
+    
+    print("\n[INFO] NEXT STEPS:")
+    print("-" * 130)
+    print(f"     1. Review graphs in                 : {out_dir}")
+    print(f"     2. Analyze data matrices in         : {data_dir}")
+    print(f"     3. Read documentation              : {data_dir}/00_DATA_FOLDER_GUIDE.txt")
+    print(f"     4. Check comprehensive metrics     : {data_dir}/12_COMPREHENSIVE_METRICS_REPORT.txt")
+    print("-" * 130)
+    print()
 
 
 if __name__ == "__main__":

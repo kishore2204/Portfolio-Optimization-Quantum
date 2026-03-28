@@ -208,7 +208,7 @@ def export_matrices_and_metrics(
     report_path = data_dir / "12_COMPREHENSIVE_METRICS_REPORT.txt"
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(report)
-    print(f"✓ Report saved to {report_path}")
+    print(f"[OK] Report saved to {report_path}")
 
 
 def _build_comprehensive_report(
@@ -391,7 +391,7 @@ def _export_qubo_inputs(
     - QUBO_inputs_summary.txt: Human-readable summary
     """
     
-    # 1. Expected returns (μ)
+    # 1. Expected returns (mu)
     mu_df = pd.DataFrame({
         "Asset": mu_train.index,
         "Expected_Return_Annual": mu_train.values,
@@ -399,7 +399,7 @@ def _export_qubo_inputs(
     mu_df.set_index("Asset", inplace=True)
     _safe_export_csv(mu_df, data_dir / "QUBO_inputs_expected_returns.csv")
     
-    # 2. Downside risk (σ_down)
+    # 2. Downside risk (sigma_down)
     downside_df = pd.DataFrame({
         "Asset": downside_train.index,
         "Downside_Risk_Annual": downside_train.values,
@@ -414,7 +414,7 @@ def _export_qubo_inputs(
     # Extract covariance diagonals
     cov_diag = np.diag(cov_train.values)
     
-    # Linear terms = -μ + β*σ_down (from QUBO construction)
+    # Linear terms = -mu + beta*sigma_down (from QUBO construction)
     linear_terms = -mu_train.values + beta_downside * downside_train.values
     
     linear_df = pd.DataFrame({
@@ -448,7 +448,7 @@ def _export_qubo_inputs(
     summary_lines.append(f"Diagonal Max: {np.max(cov_diag):.6f}")
     summary_lines.append("")
     
-    summary_lines.append("[2] EXPECTED RETURNS (μ)")
+    summary_lines.append("[2] EXPECTED RETURNS (mu)")
     summary_lines.append("-" * 80)
     summary_lines.append(f"Mean: {mu_train.mean():.6f}")
     summary_lines.append(f"Min: {mu_train.min():.6f}")
@@ -456,7 +456,7 @@ def _export_qubo_inputs(
     summary_lines.append(f"Std Dev: {mu_train.std():.6f}")
     summary_lines.append("")
     
-    summary_lines.append("[3] DOWNSIDE RISK (σ_down)")
+    summary_lines.append("[3] DOWNSIDE RISK (sigma_down)")
     summary_lines.append("-" * 80)
     summary_lines.append(f"Mean: {downside_train.mean():.6f}")
     summary_lines.append(f"Min: {downside_train.min():.6f}")
@@ -534,7 +534,7 @@ def _export_all_constants(
     # ==================== Adaptive Constants ====================
     adaptive_constants = {
         "lambda_card": "Cardinality penalty (computed from scale and N/K ratio)",
-        "gamma_sector": "Sector penalty (0.1 × lambda_card)",
+        "gamma_sector": "Sector penalty (0.1 x lambda_card)",
     }
     
     adaptive_df_list = []
@@ -592,7 +592,7 @@ def _export_all_constants(
     summary_lines.append("-" * 80)
     summary_lines.append("")
     summary_lines.append("Lambda (Cardinality Penalty) Computation:")
-    summary_lines.append("  λ = clip(10 × scale × (N / K), 50, 500)")
+    summary_lines.append("  lambda = clip(10 x scale x (N / K), 50, 500)")
     summary_lines.append("  where:")
     summary_lines.append("    N = number of assets in candidate universe")
     summary_lines.append("    K = target portfolio size")
@@ -600,16 +600,16 @@ def _export_all_constants(
     summary_lines.append("")
     
     summary_lines.append("Gamma (Sector Penalty) Computation:")
-    summary_lines.append("  γ = 0.1 × λ")
+    summary_lines.append("  gamma = 0.1 x lambda")
     summary_lines.append("")
     
     summary_lines.append("QUBO Objective Function:")
     summary_lines.append("  E(x) = x^T Q x")
-    summary_lines.append("  where Q = q_risk × Σ + linear_terms + cardinality_penalty + sector_penalty")
+    summary_lines.append("  where Q = q_risk x Cov + linear_terms + cardinality_penalty + sector_penalty")
     summary_lines.append("")
     
     summary_lines.append("Sharpe Ratio Calculation:")
-    summary_lines.append("  Sharpe = (μ_p - r_f) / σ_p")
+    summary_lines.append("  Sharpe = (mu_p - r_f) / sigma_p")
     summary_lines.append("  where:")
     summary_lines.append("    μ_p = portfolio annualized expected return")
     summary_lines.append("    σ_p = portfolio annualized volatility")
@@ -624,7 +624,7 @@ def _export_all_constants(
     with open(summary_path, "w", encoding="utf-8") as f:
         f.write("\n".join(summary_lines))
     
-    print(f"✓ Constants exported to {data_dir}/")
+    print(f"[OK] Constants exported to {data_dir}/")
     print(f"  - CONSTANTS_FIXED.csv")
     print(f"  - CONSTANTS_ADAPTIVE.csv")
     print(f"  - CONSTANTS_full_summary.txt")

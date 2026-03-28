@@ -6,7 +6,7 @@ from typing import Dict, List
 import numpy as np
 import pandas as pd
 
-from classical_optimizer import optimize_sharpe
+from classical_optimizer import optimize_sharpe, optimize_sharpe_with_min_weight
 from preprocessing import annualize_stats
 from qubo import build_qubo
 from annealing import select_assets_via_annealing
@@ -70,7 +70,7 @@ def run_quantum_hybrid_selection(
 
     mu_s = mu.loc[selected_assets]
     cov_s = cov.loc[selected_assets, selected_assets]
-    w = optimize_sharpe(mu_s, cov_s, rf=config.rf, w_max=config.max_weight)
+    w = optimize_sharpe_with_min_weight(mu_s, cov_s, rf=config.rf, w_max=config.max_weight, min_weight=0.02)
     return selected_assets, w, qubo_model  # Now returns the QUBO used for annealing
 
 

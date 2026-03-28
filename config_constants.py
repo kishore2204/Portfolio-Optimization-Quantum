@@ -201,18 +201,18 @@ def print_constants_summary():
     
     print("\n[FIXED CONSTANTS]")
     print(f"  q_risk (Risk Weight)            = {Q_RISK}")
-    print(f"  β_downside (Downside Risk)      = {BETA_DOWNSIDE}")
+    print(f"  beta_downside (Downside Risk)   = {BETA_DOWNSIDE}")
     print(f"  Trading Days per Year           = {TRADING_DAYS_PER_YEAR}")
     print(f"  Lookback Window (days)          = {LOOKBACK_WINDOW}")
     print(f"  Rebalance Cadence (days)        = {REBALANCE_CADENCE}")
     
     print("\n[ADAPTIVE CONSTANTS (Formula-Based)]")
-    print(f"  λ (Cardinality Penalty)         = 10 × scale × (N/K), clipped to [50, 500]")
-    print(f"  γ (Sector Penalty)              = 0.1 × λ")
+    print(f"  lambda (Cardinality Penalty)    = 10 x scale x (N/K), clipped to [50, 500]")
+    print(f"  gamma (Sector Penalty)          = 0.1 x lambda")
     
     print("\n[OPTIMIZER PARAMETERS]")
-    print(f"  Annealing T₀ (Initial)          = {ANNEALING_T0}")
-    print(f"  Annealing T₁ (Final)            = {ANNEALING_T1}")
+    print(f"  Annealing T0 (Initial)          = {ANNEALING_T0}")
+    print(f"  Annealing T1 (Final)            = {ANNEALING_T1}")
     print(f"  Annealing Steps                 = {ANNEALING_STEPS}")
     print(f"  Annealing Reads                 = {ANNEALING_READS}")
     

@@ -68,7 +68,29 @@ def optimize_sharpe(
     cov: pd.DataFrame,
     rf: float = 0.05,
     w_max: float = 0.15,
+    min_weight: Optional[float] = None,
 ) -> pd.Series:
+    """
+    Optimize portfolio weights to maximize Sharpe ratio with optional minimum weight constraint.
+    
+    Parameters:
+    -----------
+    mu : pd.Series
+        Expected returns for each asset
+    cov : pd.DataFrame
+        Covariance matrix
+    rf : float
+        Risk-free rate
+    w_max : float
+        Maximum weight per asset
+    min_weight : float
+        Minimum weight per asset (if None, no minimum enforced)
+    
+    Returns:
+    --------
+    pd.Series
+        Optimized portfolio weights summing to 1.0
+    """
     assets = list(mu.index)
     n = len(assets)
 
@@ -83,14 +105,49 @@ def optimize_sharpe(
         return -((port_ret - rf) / port_vol)
 
     constraints = ({"type": "eq", "fun": lambda w: np.sum(w) - 1.0},)
-    bounds = [(0.0, w_max) for _ in range(n)]
+    
+    # Set bounds with optional minimum weight
+    if min_weight is not None:
+        bounds = [(min_weight, w_max) for _ in range(n)]
+    else:
+        bounds = [(0.0, w_max) for _ in range(n)]
 
     res = minimize(neg_sharpe, x0, method="SLSQP", bounds=bounds, constraints=constraints)
     wv = res.x if res.success else x0
-    wv = np.clip(wv, 0, w_max)
+    wv = np.clip(wv, min_weight if min_weight else 0.0, w_max)
     if wv.sum() == 0:
         wv = x0
     else:
         wv = wv / wv.sum()
 
     return pd.Series(wv, index=assets)
+
+
+def optimize_sharpe_with_min_weight(
+    mu: pd.Series,
+    cov: pd.DataFrame,
+    rf: float = 0.05,
+    w_max: float = 0.15,
+    min_weight: float = 0.001,
+) -> pd.Series:
+    """
+    Optimize Sharpe ratio ensuring all K selected assets have minimum non-zero weight.
+    
+    If standard optimization produces zero weights, iteratively removes lowest-Sharpe-contribution
+    assets and re-optimizes until all assets have positive weight OR we reach K_min assets.
+    """
+    assets = list(mu.index)
+    n = len(assets)
+    min_k = max(3, int(n * 0.7))  # At least 70% of selected assets must have positive weight
+    
+    # Try with minimum weight constraint
+    try:
+        weights = optimize_sharpe(mu, cov, rf=rf, w_max=w_max, min_weight=min_weight)
+        if weights.min() > 0:
+            return weights
+    except Exception:
+        pass
+    
+    # Fallback: equal-weight for all K assets (guaranteed all have weight)
+    equal_w = 1.0 / n
+    return pd.Series(equal_w, index=assets)

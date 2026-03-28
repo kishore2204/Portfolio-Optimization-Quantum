@@ -32,23 +32,23 @@ QUANTUM-INSPIRED PORTFOLIO OPTIMIZATION - COMPREHENSIVE METRICS REPORT
   Max Weight:                        0.1200
   Top 5 Assets by Weight:
     - SOLARINDS: 0.1200
-    - AJANTPHARM: 0.1161
-    - RELAXO: 0.0894
-    - SCHAEFFLER: 0.0882
-    - ALKYLAMINE: 0.0775
+    - AJANTPHARM: 0.1160
+    - RELAXO: 0.0895
+    - SCHAEFFLER: 0.0881
+    - ALKYLAMINE: 0.0776
 
 
 [4] QUANTUM PORTFOLIO (QUBO + Annealing + Sharpe)
 --------------------------------------------------------------------------------
   Selected Assets:                   15
-  Portfolio Concentration (HHI):     0.0990
+  Portfolio Concentration (HHI):     0.0933
   Max Weight:                        0.1200
   Top 5 Assets by Weight:
+    - PIDILITIND: 0.1200
     - SOLARINDS: 0.1200
     - SUPREMEIND: 0.1200
-    - SCHAEFFLER: 0.1200
-    - PIIND: 0.1200
-    - HINDUNILVR: 0.1142
+    - VGUARD: 0.1115
+    - TORNTPHARM: 0.1048
 
 
 [5] QUBO CONFIGURATION
@@ -63,25 +63,25 @@ QUANTUM-INSPIRED PORTFOLIO OPTIMIZATION - COMPREHENSIVE METRICS REPORT
 --------------------------------------------------------------------------------
 
   Portfolio: Classical
-    Total Return:                   0.4343 (43.43%)
+    Total Return:                   0.4341 (43.41%)
     Annualized Return:             0.1440 (14.40%)
     Annualized Volatility:         0.1558 (15.58%)
-    Sharpe Ratio (rf=5%):          0.6035
+    Sharpe Ratio (rf=5%):          0.6031
     Maximum Drawdown:              -0.2591 (-25.91%)
 
   Portfolio: Quantum
-    Total Return:                   0.6043 (60.43%)
-    Annualized Return:             0.1888 (18.88%)
-    Annualized Volatility:         0.1363 (13.63%)
-    Sharpe Ratio (rf=5%):          1.0183
-    Maximum Drawdown:              -0.2231 (-22.31%)
+    Total Return:                   0.7070 (70.70%)
+    Annualized Return:             0.2136 (21.36%)
+    Annualized Volatility:         0.1307 (13.07%)
+    Sharpe Ratio (rf=5%):          1.2518
+    Maximum Drawdown:              -0.1989 (-19.89%)
 
   Portfolio: Quantum_Rebalanced
-    Total Return:                   1.1846 (118.46%)
-    Annualized Return:             0.3121 (31.21%)
-    Annualized Volatility:         0.1689 (16.89%)
-    Sharpe Ratio (rf=5%):          1.5515
-    Maximum Drawdown:              -0.2190 (-21.90%)
+    Total Return:                   0.8074 (80.74%)
+    Annualized Return:             0.2364 (23.64%)
+    Annualized Volatility:         0.1747 (17.47%)
+    Sharpe Ratio (rf=5%):          1.0667
+    Maximum Drawdown:              -0.3583 (-35.83%)
 
   Benchmarks:
     BSE_500:
@@ -114,7 +114,7 @@ QUANTUM-INSPIRED PORTFOLIO OPTIMIZATION - COMPREHENSIVE METRICS REPORT
 [7] PORTFOLIO COMPARISON SUMMARY
 --------------------------------------------------------------------------------
   Classical vs Quantum:
-    Quantum Outperformance:        0.1700 (17.00%)
+    Quantum Outperformance:        0.2729 (27.29%)
 
 
 [8] CONFIGURATION PARAMETERS

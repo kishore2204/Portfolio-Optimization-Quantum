@@ -48,7 +48,7 @@ lambda_card               = NOT SET
                             Cardinality penalty (computed from scale and N/K ratio)
 
 gamma_sector              = NOT SET
-                            Sector penalty (0.1 × lambda_card)
+                            Sector penalty (0.1 x lambda_card)
 
 
 [PART 3: DERIVED VALUES]
@@ -61,21 +61,21 @@ Targeting Portfolio K:     15
 --------------------------------------------------------------------------------
 
 Lambda (Cardinality Penalty) Computation:
-  λ = clip(10 × scale × (N / K), 50, 500)
+  lambda = clip(10 x scale x (N / K), 50, 500)
   where:
     N = number of assets in candidate universe
     K = target portfolio size
     scale = max(|diagonal terms|) of QUBO
 
 Gamma (Sector Penalty) Computation:
-  γ = 0.1 × λ
+  gamma = 0.1 x lambda
 
 QUBO Objective Function:
   E(x) = x^T Q x
-  where Q = q_risk × Σ + linear_terms + cardinality_penalty + sector_penalty
+  where Q = q_risk x Cov + linear_terms + cardinality_penalty + sector_penalty
 
 Sharpe Ratio Calculation:
-  Sharpe = (μ_p - r_f) / σ_p
+  Sharpe = (mu_p - r_f) / sigma_p
   where:
     μ_p = portfolio annualized expected return
     σ_p = portfolio annualized volatility

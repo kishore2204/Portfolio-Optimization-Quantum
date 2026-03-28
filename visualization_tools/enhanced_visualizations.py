@@ -45,12 +45,12 @@ def create_5_comparison_graphs(
     # Graph 1: Quantum vs Quantum Rebalanced ONLY (as specified)
     fig = _plot_graph_1_cumulative_returns(portfolio_values, output_dir)
     generated_files.append(str(output_dir / "G1_cumulative_returns_quantum_vs_rebalanced.png"))
-    print(f"  ✓ Graph 1: Cumulative Returns (Quantum vs Quantum Rebalanced)")
+    print(f"  [OK] Graph 1: Cumulative Returns (Quantum vs Quantum Rebalanced)")
 
     # Graph 2: NEW - Quantum, Quantum Rebalanced, AND Classical
     fig = _plot_graph_1_with_classical(portfolio_values, output_dir)
     generated_files.append(str(output_dir / "G1_classical_quantum_vs_rebalanced.png"))
-    print(f"  ✓ Graph 2: Cumulative Returns (Classical + Quantum + Quantum Rebalanced)")
+    print(f"  [OK] Graph 2: Cumulative Returns (Classical + Quantum + Quantum Rebalanced)")
 
     return generated_files
 
