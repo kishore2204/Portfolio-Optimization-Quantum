@@ -1,0 +1,544 @@
+
+======================================================================
+QUBO PORTFOLIO OPTIMIZATION - FIXED CONSTANTS
+======================================================================
+
+[FIXED CONSTANTS]
+  q_risk (Risk Weight)            = 0.5
+  beta_downside (Downside Risk)   = 0.3
+  Trading Days per Year           = 252
+  Lookback Window (days)          = 252
+  Rebalance Cadence (days)        = 63
+
+[ADAPTIVE CONSTANTS (Formula-Based)]
+  lambda (Cardinality Penalty)    = 10 x scale x (N/K), clipped to [50, 500]
+  gamma (Sector Penalty)          = 0.1 x lambda
+
+[OPTIMIZER PARAMETERS]
+  Annealing T0 (Initial)          = 2.0
+  Annealing T1 (Final)            = 0.005
+  Annealing Steps                 = 6000
+  Annealing Reads                 = 512
+
+[PORTFOLIO CONSTRAINTS]
+  Max Weight per Asset            = 12.0%
+  Max Assets per Sector           = 4
+  Risk-Free Rate                  = 5.0%
+  Transaction Cost                = 0.15%
+
+[EXPERIMENT SETUP]
+  Training Period                 = 12 years
+  Test Period                     = 3 years
+  K Selection Ratio               = 2.2% of universe
+
+======================================================================
+
+
+==============================================================================================================
+                         [PLAN] QUARTERLY REBALANCING STRATEGY (Quantum + Rebalanced)
+==============================================================================================================
+
+[REBALANCE] REBALANCING WORKFLOW (Every 63 Trading Days):
+
+STEP 1: IDENTIFY UNDERPERFORMERS
+    - Metric: Average daily returns over 252-day lookback window (1 year)
+    - Selection: Bottom 20% of current portfolio sorted by returns
+    - Result: ~3 stocks flagged as underperforming
+
+STEP 2: QUICK SECTOR-BASED REPLACEMENT
+    - Action: For each underperformer, find best performer in SAME sector
+    - Metric: Highest average daily return in that sector
+    - Constraint: Only replace with available stocks (not already selected)
+    - Purpose: Maintain sector diversification while swapping out weak stocks
+    - Result: 'Seeded' portfolio with sector-balanced replacements
+
+STEP 3: BUILD QUBO MATRIX
+    - Input Data:
+       * Expected returns (mu) - mean of returns
+       * Covariance matrix (Sigma) - asset correlations
+       * Downside volatility - penalty for negative deviations
+    - QUBO Terms:
+       * mu_i x w_i: Maximize expected returns
+       * Sigma: Minimize portfolio variance (risk)
+       * Downside risk: Penalize volatility
+       * lambda_card x (|S| - K)^2: Cardinality constraint (exactly K assets)
+       * gamma_sector: Sector concentration penalty
+
+STEP 4: RUN QUANTUM ANNEALING
+    - Candidate Pool: Top 100 stocks by Sharpe-like score
+    - Algorithm: Simulated Annealing (quantum-inspired)
+    - Objective: Select K=15 assets that maximize return-risk trade-off
+    - Output: 15 assets optimized via QUBO formulation
+
+STEP 5: OPTIMIZE WEIGHTS FOR SHARPE RATIO
+    - Problem: Given 15 selected stocks, allocate optimal weights
+    - Metric: Sharpe Ratio = (E[R] - Rf) / sigma
+       * E[R]: Expected portfolio return
+       * Rf: Risk-free rate (5%)
+       * sigma: Portfolio volatility
+    - Constraint: Max 12% per asset, optimal risk-adjusted allocation
+    - Result: Portfolio weights that maximize excess return per unit risk
+
+STEP 6: MERGE & FINALIZE
+    - Seeded Portfolio: 13-15 stocks (from sector replacements)
+    - Annealing Portfolio: 15 stocks (from QUBO + quantum annealing)
+    - Merge: Combine both, remove duplicates, keep top K=15
+    - Apply Transaction Costs: Penalize high portfolio turnover
+    - Update Weights: Use merged assets with Sharpe-optimized weights
+
+[TARGET] KEY INSIGHTS:
+  [OK] Quick Replacement = Fast, practical sector-based swaps (warm start)
+  [OK] Full Re-optimization = Global search via QUBO + quantum annealing
+  [OK] Sharpe Ratio Calc = Applied AFTER asset selection (Step 5)
+  [OK] Both Approches Used = Seeded results inform QUBO optimization
+  [OK] Frequency = 4 times/year (every ~quarter = 63 trading days)
+  [OK] Result = Adaptive portfolio that removes weak performers & rebalances weights
+
+==============================================================================================================
+
+[STEP 7] Running discrete allocation backtest for realistic execution comparison...
+
+[Step 1] Exporting matrices to data/ folder...
+[Exporting] Input matrices...
+[Exporting] QUBO matrices...
+[Exporting] Portfolio weights...
+[Exporting] Price series...
+[Exporting] Portfolio values...
+[Exporting] QUBO inputs breakdown...
+[Exporting] All constants...
+[OK] Constants exported to C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\data/
+  - CONSTANTS_FIXED.csv
+  - CONSTANTS_ADAPTIVE.csv
+  - CONSTANTS_full_summary.txt
+[Exporting] Comprehensive metrics report...
+[OK] Report saved to C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\data\12_COMPREHENSIVE_METRICS_REPORT.txt
+[OK] Matrices exported to: C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\data
+
+[Step 2] Creating 5 enhanced comparison graphs...
+[Visualizations] Creating 2 cumulative returns comparison graphs...
+  [OK] Graph 1: Cumulative Returns (Quantum vs Quantum Rebalanced)
+  [OK] Graph 2: Cumulative Returns (Classical + Quantum + Quantum Rebalanced)
+[OK] 5 graphs created in: C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\outputs
+
+[Step 3] Creating 5 graphs per dataset (25 total graphs)...
+
+[Multi-Dataset Visualizations] Creating 5 graphs per dataset...
+Datasets to process: ['BSE_500', 'HDFCNIF100', 'Nifty_100', 'Nifty_200', 'Nifty_50']
+
+  Processing: BSE_500
+      [OK] Graph 1: Cumulative Returns
+    [OK] Generated 1 graphs
+
+  Processing: HDFCNIF100
+      [OK] Graph 1: Cumulative Returns
+    [OK] Generated 1 graphs
+
+  Processing: Nifty_100
+      [OK] Graph 1: Cumulative Returns
+    [OK] Generated 1 graphs
+
+  Processing: Nifty_200
+      [OK] Graph 1: Cumulative Returns
+    [OK] Generated 1 graphs
+
+  Processing: Nifty_50
+      [OK] Graph 1: Cumulative Returns
+    [OK] Generated 1 graphs
+[OK] Multi-dataset graphs created in: C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\outputs
+
+[Step 4] Skipped (not needed)
+
+==================================================================================================================================
+                                             [TARGET] PERFORMANCE RESULTS SUMMARY
+==================================================================================================================================
+
+[DATA] PORTFOLIO PERFORMANCE COMPARISON:
+----------------------------------------------------------------------------------------------------------------------------------
+          Strategy Total Return Annual Return Volatility Sharpe Ratio Max Drawdown
+         Classical       43.41%        15.49%     15.59%       0.6724      -25.91%
+           Quantum       40.91%        14.68%     12.53%       0.7724      -21.72%
+Quantum+Rebalanced      135.01%        40.67%     16.99%       2.0990      -18.83%
+----------------------------------------------------------------------------------------------------------------------------------
+
+[BENCHMARK] MARKET BENCHMARK COMPARISON:
+----------------------------------------------------------------------------------------------------------------------------------
+ Benchmark Total Return Annual Return Sharpe Ratio
+   BSE_500       56.78%        19.67%       1.1004
+HDFCNIF100      -84.68%       -52.73%      -0.3935
+ Nifty_100       50.46%        17.72%       0.9909
+ Nifty_200       55.51%        19.29%       1.0819
+  Nifty_50       45.15%        16.04%       0.8946
+----------------------------------------------------------------------------------------------------------------------------------
+
+[BUDGET] BUDGET ANALYSIS  (Initial Investment: $1,000,000)
+----------------------------------------------------------------------------------------------------------------------------------
+
+   PORTFOLIO BUDGET:
+   ------------------------------------------------------------------------------------------------------------------------------
+             Strategy   Final Value   Profit/Loss Return %
+            Classical $1,428,619.43   $428,619.43   42.86%
+              Quantum $1,405,531.52   $405,531.52   40.55%
+   Quantum+Rebalanced $2,347,028.77 $1,347,028.77  134.70%
+   ------------------------------------------------------------------------------------------------------------------------------
+
+   BENCHMARK BUDGET:
+   ------------------------------------------------------------------------------------------------------------------------------
+    Benchmark   Final Value  Profit/Loss Return %
+      BSE_500 $1,567,833.36  $567,833.36   56.78%
+   HDFCNIF100   $153,184.98 $-846,815.02  -84.68%
+    Nifty_100 $1,504,592.76  $504,592.76   50.46%
+    Nifty_200 $1,555,147.08  $555,147.08   55.51%
+     Nifty_50 $1,451,489.64  $451,489.64   45.15%
+   ------------------------------------------------------------------------------------------------------------------------------
+
+==================================================================================================================================
+                              [STEP 7] REAL-WORLD EXECUTION LAYER - DISCRETE SHARE ALLOCATION
+==================================================================================================================================
+
+[ANALYSIS] THEORETICAL VS REALISTIC EXECUTION
+
+[DISCRETE ALLOCATION] Converting Quantum portfolio to discrete shares:
+
+   QUANTUM PORTFOLIO - REAL-WORLD ALLOCATION:
+   ------------------------------------------------------------------------------------------------------------------------------
+        Asset  Shares  Invested_$  Weight_%
+        PIIND    40.0   119646.00  11.96000
+    EICHERMOT    34.0   102234.60  10.22000
+   SUPREMEIND    48.0   119450.40  11.95000
+      PAGEIND     2.0    74887.60   7.49000
+     SHREECEM     2.0    50662.20   5.07000
+   HINDUNILVR    44.0   105868.40  10.59000
+      HAVELLS    28.0    33219.20   3.32000
+   TORNTPHARM    70.0   107803.50  10.78000
+   SUNDRMFAST    86.0    82560.00   8.26000
+      HCLTECH    55.0    59380.75   5.94000
+   BAJAJHLDNG     4.0    24164.40   2.42000
+          TCS     6.0    19193.40   1.92000
+     RAMCOCEM    27.0    19325.25   1.93000
+      ESCORTS    10.0    18895.50   1.89000
+          IGL    94.0    19791.70   1.98000
+         CASH     1.0    42917.10   4.29171
+   ------------------------------------------------------------------------------------------------------------------------------
+
+   [CASH] Remaining Cash After Initial Allocation: $42,917.10
+   [CASH] Cash as Portfolio Weight              : 4.29%
+   [CASH] Risk-Free Rate Applied to Cash        : 5.0% annualized
+
+   CLASSICAL PORTFOLIO - REAL-WORLD ALLOCATION:
+   ------------------------------------------------------------------------------------------------------------------------------
+        Asset  Shares  Invested_$  Weight_%
+   AJANTPHARM    96.0   115108.80  11.51000
+    SOLARINDS    31.0   117844.95  11.78000
+   ALKYLAMINE    32.0    75686.40   7.57000
+       RELAXO   116.0    89128.60   8.91000
+   NAVINFLUOR    15.0    62639.25   6.26000
+         CERA    12.0    72903.00   7.29000
+   VINATIORGA    38.0    68069.40   6.81000
+        PIIND    21.0    62814.15   6.28000
+    GARFIBRES    79.0    45136.65   4.51000
+   SCHAEFFLER    31.0    86068.40   8.61000
+      POLYMED    55.0    52522.25   5.25000
+    RATNAMANI    26.0    55216.20   5.52000
+    TIPSMUSIC   185.0    27759.25   2.78000
+     UNOMINDA    50.0    24292.50   2.43000
+       MPSLTD    24.0    25886.40   2.59000
+         CASH     1.0    18923.80   1.89238
+   ------------------------------------------------------------------------------------------------------------------------------
+
+   [CASH] Remaining Cash After Initial Allocation: $18,923.80
+   [CASH] Cash as Portfolio Weight              : 1.89%
+
+[WEIGHT COMPARISON] Target Weights vs Actual Weights (After Discrete Allocation):
+
+   QUANTUM PORTFOLIO WEIGHT COMPARISON:
+   ------------------------------------------------------------------------------------------------------------------------------
+        Asset  Target_Weight_%  Actual_Weight_%  Difference_%
+        PIIND            12.00            11.96         -0.04
+    EICHERMOT            10.28            10.22         -0.06
+   SUPREMEIND            12.00            11.95         -0.05
+      PAGEIND            10.31             7.49         -2.82
+     SHREECEM             5.48             5.07         -0.42
+   HINDUNILVR            10.71            10.59         -0.12
+      HAVELLS             3.40             3.32         -0.08
+   TORNTPHARM            10.83            10.78         -0.05
+   SUNDRMFAST             8.30             8.26         -0.04
+      HCLTECH             6.03             5.94         -0.10
+   BAJAJHLDNG             2.65             2.42         -0.23
+          TCS             2.00             1.92         -0.08
+     RAMCOCEM             2.00             1.93         -0.07
+      ESCORTS             2.00             1.89         -0.11
+          IGL             2.00             1.98         -0.02
+   ------------------------------------------------------------------------------------------------------------------------------
+
+   [OK] Weight adjustment due to discrete shares: 2.15%
+   [OK] All constraints satisfied              : OK
+   [OK] Budget fully deployed                  : OK
+
+[IMPACT ANALYSIS] Real-World Execution Costs:
+
+   [COST] Transaction Cost Rate            : 0.2% per unit turnover
+   [COST] Initial Cash Position            : $42,917.10 (4.29%)
+   [CASH] Daily Cash Return Contribution   : 0.0198% * 4.29%
+   [DRAG] Cumulative Cash Drag (3-yr test) : ~0.21% of total return
+
+[IMPLEMENTATION] Step-by-Step Execution Example (First Day):
+
+   1. Receive allocation from SLSQP: [w1=0.12, w2=0.09, w3=0.08, ...]
+   2. Get current prices: [P1=$66.95, P2=$23371.10, ...]
+   3. Calculate shares: shares_i = floor((w_i * $1,000,000) / P_i)
+   4. Actual investment: invested_i = shares_i * P_i
+   5. Remaining cash: $42,917.10
+   6. Effective weights: w_i^actual = invested_i / ($1,000,000)
+   7. Daily portfolio return: R = SUM(w_i^actual * r_i) + w_cash * r_f
+
+==================================================================================================================================
+
+==================================================================================================================================
+                         [VERIFICATION] THEORETICAL VS DISCRETE ALLOCATION - PERFORMANCE COMPARISON
+==================================================================================================================================
+
+[PERFORMANCE METRICS] Theoretical (Continuous Weights) vs Realistic (Discrete Shares):
+
+                 Metric Theoretical_% Realistic/Discrete_% Difference
+           Total Return        40.91%               40.61%     -0.30%
+      Annualized Return        14.68%               14.58%     -0.10%
+   Volatility (Std Dev)        12.53%               12.06%     -0.48%
+           Sharpe Ratio        0.7724               0.7948     0.0223
+           Max Drawdown       -21.72%              -21.36%      0.36%
+
+[IMPACT ANALYSIS] Execution Cost Breakdown:
+
+                 Impact_Factor                    Value_%                                                          Interpretation
+            Cash Drag (Weight)                      4.29%                   Cash earning 5.0% risk-free vs portfolio 14.7% return
+         Weight Rounding Error                     ~2.15% Average deviation from target weights due to discrete share allocations
+   Transaction Cost (Turnover) ~-0.10% to -0.15% annually            Quarterly rebalancing turnover ╫ 0.15% transaction cost rate
+        Total Realistic Impact                     -0.30%          Net realistic execution impact on 3-year backtest total return
+
+   [SAVED] Detailed comparison report: C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\outputs/discrete_vs_theoretical_comparison.csv
+
+==================================================================================================================================
+
+[INSIGHT]  KEY PERFORMANCE INSIGHTS:
+----------------------------------------------------------------------------------------------------------------------------------
+     [OK] Quantum+Rebalance vs Classical outperformance  :  91.60%
+     [OK] Quantum+Rebalance Sharpe ratio improvement      :  1.4266
+     [OK] Rebalancing boost (Quantum vs Quantum+Rebal)    :  94.10%
+     [OK] Profit difference (Quantum+Rebal vs Classical)  :  $918,409.34
+----------------------------------------------------------------------------------------------------------------------------------
+
+[BEST] CLASSICAL PORTFOLIO  (15 Selected Stocks & Weights):
+----------------------------------------------------------------------------------------------------------------------------------
+    Rank      Stock Weight
+       1 AJANTPHARM 11.60%
+       2  SOLARINDS 12.00%
+       3 ALKYLAMINE  7.76%
+       4     RELAXO  8.95%
+       5 NAVINFLUOR  6.65%
+       6       CERA  7.59%
+       7 VINATIORGA  6.94%
+       8      PIIND  6.41%
+       9  GARFIBRES  4.56%
+      10 SCHAEFFLER  8.81%
+      11    POLYMED  5.29%
+      12  RATNAMANI  5.59%
+      13  TIPSMUSIC  2.79%
+      14   UNOMINDA  2.45%
+      15     MPSLTD  2.60%
+----------------------------------------------------------------------------------------------------------------------------------
+
+[QUANTUM]  QUANTUM PORTFOLIO  (15 Selected Stocks & Weights):
+----------------------------------------------------------------------------------------------------------------------------------
+    Rank      Stock Weight
+       1      PIIND 12.00%
+       2  EICHERMOT 10.28%
+       3 SUPREMEIND 12.00%
+       4    PAGEIND 10.31%
+       5   SHREECEM  5.48%
+       6 HINDUNILVR 10.71%
+       7    HAVELLS  3.40%
+       8 TORNTPHARM 10.83%
+       9 SUNDRMFAST  8.30%
+      10    HCLTECH  6.03%
+      11 BAJAJHLDNG  2.65%
+      12        TCS  2.00%
+      13   RAMCOCEM  2.00%
+      14    ESCORTS  2.00%
+      15        IGL  2.00%
+----------------------------------------------------------------------------------------------------------------------------------
+
+[TARGET] PORTFOLIO COMPOSITION:
+----------------------------------------------------------------------------------------------------------------------------------
+     [OK] Classical portfolio       :  15 assets selected
+     [OK] Quantum portfolio         :  15 assets selected
+     [OK] Universe size             :  680 total available assets
+     [OK] Selection ratio (K/N)     :  2.21%
+----------------------------------------------------------------------------------------------------------------------------------
+
+[OK] QUBO MODEL VALIDATION:
+----------------------------------------------------------------------------------------------------------------------------------
+     [OK] QUBO Matrix size              :  (100, 100)
+     [OK] Cardinality constraint (K)    :  15 assets selected
+     [OK] Lambda (cardinality penalty)  :  50.00
+     [OK] Gamma (sector penalty)        :  5.00
+     [OK] Matrix is symmetric           :  True
+     [OK] Fixed constants (q_risk)      :  0.5
+     [OK] Fixed constants (beta_downside) : 0.3
+----------------------------------------------------------------------------------------------------------------------------------
+
+==================================================================================================================================
+                                        [COMPLETE PIPELINE] FULL EXECUTION WORKFLOW
+==================================================================================================================================
+
+[STEP 1] DATA PREPARATION
+   - Input: Historical price time series (15 years, 680 assets)
+   - Clean prices: Remove missing data, impute, handle edge cases
+   - Compute daily returns: r_t,i = P_t,i / P_{t-1,i} - 1
+   - Annualize: mu_i = 252 * mean(r), Sigma = 252 * Cov(r)
+   - Output: mu (expected returns), Sigma (covariance matrix)
+
+[STEP 2] CONSTANTS & PARAMETERS
+   - Risk weight (q): 0.5 (controls covariance penalty)
+   - Downside penalty (beta): 0.3 (penalizes crash-prone stocks)
+   - Portfolio size (K): 15 assets
+   - Risk-free rate (r_f): 5.0%
+   - Lambda (cardinality): 50.00 (ensures exactly K assets)
+   - Gamma (sector): 5.00 (limits sector concentration)
+
+[STEP 3] DOWNSIDE RISK CALCULATION
+   - For each stock: DD_i = sqrt(252 * Var(negative_returns))
+   - Penalizes stocks with high crash vulnerability
+   - Used in QUBO matrix diagonal: beta * DD_i
+
+[STEP 4] QUBO FORMULATION & MATRIX CONSTRUCTION
+   - Objective: min E(x) = x^T Q x
+   - Diagonal terms: Q_ii = q*Sigma_ii + mu_i - beta*DD_i - lambda(1-2K)
+   - Off-diagonal: Q_ij = q*Sigma_ij + lambda + gamma*A_ij
+   - Ensures: exactly K assets selected (cardinality)
+   - Ensures: sector diversification (at most 4 per sector)
+
+[STEP 5] SIMULATED ANNEALING (QUANTUM-INSPIRED OPTIMIZATION)
+   - Initialize: random binary vector x_i ~ Bernoulli(0.5)
+   - Cool: T_k = T_0 * alpha^k (from 2.0 to 0.005)
+   - Search: flip bits to minimize E(x)
+   - Accept: Metropolis rule with temperature-controlled probability
+   - Output: x* = argmin E(x), selected assets = {i: x*_i = 1}
+   - Result: 15 assets optimized for return-risk trade-off
+
+[STEP 6] WEIGHT OPTIMIZATION (SHARPE RATIO MAXIMIZATION)
+   - Objective: max (w^T mu - r_f) / sqrt(w^T Sigma w)
+   - Constraints: SUM(w_i) = 1, 0 <= w_i <= 0.12 (max weight)
+   - Solver: SLSQP (sequential least-squares programming)
+   - Output: Optimal weights for 15 selected assets
+
+[STEP 7] REAL-WORLD EXECUTION LAYER
+   ========================================
+   CRITICAL INNOVATIONS (Added to Bridge Theory <-> Practice)
+   ========================================
+   7.1 DISCRETE SHARE ALLOCATION
+       - allocation_i = w_i * Budget
+       - shares_i = floor(allocation_i / price_i)
+       - invested_i = shares_i * price_i
+       - Result: Whole shares only, respects budget
+   7.2 CASH HANDLING
+       - cash = Budget - SUM(invested_i)
+       - Uninvested funds earn risk-free rate
+       - Cash considered as portfolio component
+   7.3 EFFECTIVE WEIGHTS
+       - w_i^actual = (shares_i * price_i) / Budget
+       - w_cash = cash / Budget
+       - Sum = 1.0 (portfolio fully allocated)
+   7.4 PORTFOLIO RETURNS
+       - R_t = SUM(w_i^actual * r_{t,i}) + w_cash * r_f
+       - Asset return + risk-free contribution
+       - Daily computation ensures accurate cash drag
+   7.5 TRANSACTION COSTS
+       - turnover = SUM|w_i^new - w_i^old| / 2
+       - cost = turnover * 0.2% per rebalance
+       - Penalizes high portfolio turnover
+
+[STEP 8] QUARTERLY REBALANCING
+   - Cadence: Every 63 trading days (~quarter)
+   - Lookback: 252-day window identifies underperformers
+   - Strategy: Replace bottom 20% with same-sector performers
+   - Optimization: Run QUBO + SLSQP to update weights
+   - Costs: Apply transaction costs based on new turnover
+
+[STEP 9] METRICS COMPUTATION
+   - Total Return: (Final_Value / Initial) - 1
+   - Annualized Return: exp(mean_log_return * 252) - 1
+   - Volatility: std(log_returns) * sqrt(252)
+   - Sharpe Ratio: (Annual_Return - r_f) / Volatility
+   - Max Drawdown: min((Value_t - MaxValue) / MaxValue)
+   - VaR_95: 5th percentile of daily returns
+
+[STEP 10] COMPARISON & VISUALIZATION
+   - Classical: Mean-Variance + Sharpe (Markowitz baseline)
+   - Quantum: QUBO + Simulated Annealing (hybrid optimization)
+   - Quantum+Rebalanced: With quarterly rebalancing strategy
+   - Benchmarks: NIFTY-50, BSE, other market indices
+   - Outputs: 11 graphs + 17 data matrices + metrics tables
+
+==================================================================================================================================
+                                   [OK] COMPLETE HYBRID OPTIMIZATION SYSTEM
+==================================================================================================================================
+
+[SUMMARY] SYSTEM COMPONENTS
+----------------------------------------------------------------------------------------------------------------------------------
+   [OK] Data Layer           : Prices -> Returns -> Statistics
+   [OK] Optimization Layer   : QUBO -> SA -> SLSQP
+   [OK] Execution Layer      : Discrete Shares -> Cash -> Costs
+   [OK] Rebalancing Layer    : Quarterly updates with transaction costs
+   [OK] Backtesting Layer    : 3-year rolling performance
+   [OK] Validation Layer     : Symmetry, constraints, convergence checks
+   [OK] Visualization Layer  : 11+ graphs, metric tables, comparison reports
+----------------------------------------------------------------------------------------------------------------------------------
+
+
+[SAVE] DATA FILES EXPORTED  (21 files):
+----------------------------------------------------------------------------------------------------------------------------------
+     [OK] Input matrices              :  01-04 (covariance, returns, price data)
+     [OK] QUBO matrix                 :  05-06 (matrix and diagonal terms)
+     [OK] QUBO inputs                 :  7 files (expected returns, downside risk, etc.)
+     [OK] Constants                   :  3 files (fixed, adaptive, formulas)
+     [OK] Portfolio weights           :  07 (Classical & Quantum)
+     [OK] Portfolio values            :  10-11 (daily performance and benchmarks)
+     [OK] Metrics report              :  12 (comprehensive summary)
+     [OK] Documentation               :  3 files (guide, reference, dictionary)
+----------------------------------------------------------------------------------------------------------------------------------
+
+[VISUAL] GRAPHS GENERATED:
+----------------------------------------------------------------------------------------------------------------------------------
+     [OK] Enhanced quantum comparison      :  2 graphs
+     [OK] Multi-dataset comparison         :  5 graphs
+     [OK] Original comparison              :  4 graphs
+     [DATA] TOTAL VISUALIZATIONS            :  11 graphs
+----------------------------------------------------------------------------------------------------------------------------------
+
+==================================================================================================================================
+                                                  [OK] RUN COMPLETED SUCCESSFULLY
+==================================================================================================================================
+
+[CHECK] OUTPUT DIRECTORIES:
+----------------------------------------------------------------------------------------------------------------------------------
+     [DIR] Output directory (graphs)    :  C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\outputs
+     [DIR] Data (matrices) folder       :  C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\data
+----------------------------------------------------------------------------------------------------------------------------------
+
+[CONFIG] CONFIGURATION SUMMARY:
+----------------------------------------------------------------------------------------------------------------------------------
+     * K (portfolio size)            :  15 assets
+     * N (universe size)             :  680 assets
+     * K_RATIO                       :  0.0221 (2.21%)
+     * Training period               :  12 years
+     * Test period                   :  3 years
+     * Risk-free rate                :  5.0%
+----------------------------------------------------------------------------------------------------------------------------------
+
+[INFO] NEXT STEPS:
+----------------------------------------------------------------------------------------------------------------------------------
+     1. Review graphs in                 : C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\outputs
+     2. Analyze data matrices in         : C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\data
+     3. Read documentation              : C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\data/00_DATA_FOLDER_GUIDE.txt
+     4. Check comprehensive metrics     : C:\Users\kisho\Downloads\Portfolio-Optimization-Quantum\data/12_COMPREHENSIVE_METRICS_REPORT.txt
+----------------------------------------------------------------------------------------------------------------------------------
+

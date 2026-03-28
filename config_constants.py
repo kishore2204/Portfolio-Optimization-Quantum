@@ -167,8 +167,8 @@ MAX_ASSETS_PER_SECTOR = 4
 RISK_FREE_RATE = 0.05
 """Risk-free rate (5%) for Sharpe ratio calculation"""
 
-TRANSACTION_COST = 0.001
-"""Transaction cost coefficient (0.1% per unit turnover)"""
+TRANSACTION_COST = 0.0015
+"""Transaction cost coefficient (0.15% per unit turnover)"""
 
 
 # ============================================================================
