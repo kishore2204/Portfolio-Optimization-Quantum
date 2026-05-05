@@ -40,15 +40,15 @@ QUANTUM-INSPIRED PORTFOLIO OPTIMIZATION - COMPREHENSIVE METRICS REPORT
 
 [4] QUANTUM PORTFOLIO (QUBO + Annealing + Sharpe)
 --------------------------------------------------------------------------------
-  Selected Assets:                   15
-  Portfolio Concentration (HHI):     0.0990
+  Selected Assets:                   13
+  Portfolio Concentration (HHI):     0.1005
   Max Weight:                        0.1200
   Top 5 Assets by Weight:
+    - HINDUNILVR: 0.1200
     - SOLARINDS: 0.1200
+    - VINATIORGA: 0.1200
     - SUPREMEIND: 0.1200
-    - SCHAEFFLER: 0.1200
-    - PIIND: 0.1200
-    - HINDUNILVR: 0.1142
+    - GARFIBRES: 0.1200
 
 
 [5] QUBO CONFIGURATION
@@ -70,18 +70,18 @@ QUANTUM-INSPIRED PORTFOLIO OPTIMIZATION - COMPREHENSIVE METRICS REPORT
     Maximum Drawdown:              -0.2591 (-25.91%)
 
   Portfolio: Quantum
-    Total Return:                   0.6043 (60.43%)
-    Annualized Return:             0.1888 (18.88%)
-    Annualized Volatility:         0.1363 (13.63%)
-    Sharpe Ratio (rf=5%):          1.0183
-    Maximum Drawdown:              -0.2231 (-22.31%)
+    Total Return:                   0.5377 (53.77%)
+    Annualized Return:             0.1718 (17.18%)
+    Annualized Volatility:         0.1307 (13.07%)
+    Sharpe Ratio (rf=5%):          0.9320
+    Maximum Drawdown:              -0.1917 (-19.17%)
 
   Portfolio: Quantum_Rebalanced
-    Total Return:                   1.1846 (118.46%)
-    Annualized Return:             0.3121 (31.21%)
-    Annualized Volatility:         0.1689 (16.89%)
-    Sharpe Ratio (rf=5%):          1.5515
-    Maximum Drawdown:              -0.2190 (-21.90%)
+    Total Return:                   1.1798 (117.98%)
+    Annualized Return:             0.3112 (31.12%)
+    Annualized Volatility:         0.1680 (16.80%)
+    Sharpe Ratio (rf=5%):          1.5543
+    Maximum Drawdown:              -0.2580 (-25.80%)
 
   Benchmarks:
     BSE_500:
@@ -114,7 +114,7 @@ QUANTUM-INSPIRED PORTFOLIO OPTIMIZATION - COMPREHENSIVE METRICS REPORT
 [7] PORTFOLIO COMPARISON SUMMARY
 --------------------------------------------------------------------------------
   Classical vs Quantum:
-    Quantum Outperformance:        0.1700 (17.00%)
+    Quantum Outperformance:        0.1035 (10.35%)
 
 
 [8] CONFIGURATION PARAMETERS

@@ -69,11 +69,12 @@ def _plot_graph_1_cumulative_returns(portfolio_values: dict, output_dir: Path) -
             ax.plot(x, y, label=name, linewidth=2.5, color=colors.get(name), alpha=0.8, 
                    marker='o', markersize=6)
     
-    ax.set_xlabel("Date", fontsize=12, fontweight="bold")
-    ax.set_ylabel("Cumulative Returns (%)", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Date", fontsize=18, fontweight="bold")
+    ax.set_ylabel("Cumulative Returns (%)", fontsize=18, fontweight="bold")
     ax.set_title("Cumulative Returns: Quantum vs Quantum_Rebalanced", 
-                fontsize=14, fontweight="bold")
-    ax.legend(fontsize=11, loc="best")
+                fontsize=20, fontweight="bold")
+    ax.legend(fontsize=15, loc="best")
+    ax.tick_params(labelsize=13)
     ax.grid(True, alpha=0.3)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
     
@@ -103,11 +104,12 @@ def _plot_graph_2_rolling_sharpe(portfolio_values: dict, output_dir: Path) -> No
             ax.plot(rolling_sharpe.index, rolling_sharpe.values, 
                    label=name, linewidth=2.5, color=colors.get(name), alpha=0.8)
     
-    ax.set_xlabel("Date", fontsize=12, fontweight="bold")
-    ax.set_ylabel("Rolling Sharpe Ratio (252-day)", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Date", fontsize=18, fontweight="bold")
+    ax.set_ylabel("Rolling Sharpe Ratio (252-day)", fontsize=18, fontweight="bold")
     ax.set_title("Rolling 1-Year Sharpe Ratio: Quantum vs Quantum_Rebalanced", 
-                fontsize=14, fontweight="bold")
-    ax.legend(fontsize=11, loc="best")
+                fontsize=20, fontweight="bold")
+    ax.legend(fontsize=15, loc="best")
+    ax.tick_params(labelsize=13)
     ax.grid(True, alpha=0.3)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
     
@@ -133,11 +135,16 @@ def _plot_graph_3_drawdown_analysis(portfolio_values: dict, output_dir: Path) ->
             ax.plot(portfolio_values[name].index, drawdown, 
                    linewidth=1.5, color=colors.get(name))
     
-    ax.set_xlabel("Date", fontsize=12, fontweight="bold")
-    ax.set_ylabel("Drawdown (%)", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Date", fontsize=20, fontweight="bold")
+    ax.set_ylabel("Drawdown (%)", fontsize=20, fontweight="bold")
     ax.set_title("Drawdown Analysis: Quantum vs Quantum_Rebalanced", 
-                fontsize=14, fontweight="bold")
-    ax.legend(fontsize=11, loc="best")
+                fontsize=24, fontweight="bold")
+    ax.legend(fontsize=17, loc="best")
+    ax.tick_params(labelsize=15)
+    for label in ax.get_xticklabels():
+        label.set_fontweight('bold')
+    for label in ax.get_yticklabels():
+        label.set_fontweight('bold')
     ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
@@ -175,9 +182,12 @@ def _plot_graph_4_monthly_returns(portfolio_values: dict, output_dir: Path) -> N
             patch.set_facecolor(color)
             patch.set_alpha(0.7)
         
-        ax.set_ylabel("Monthly Returns (%)", fontsize=12, fontweight="bold")
+        ax.set_ylabel("Monthly Returns (%)", fontsize=20, fontweight="bold")
         ax.set_title("Monthly Returns Distribution: Quantum vs Quantum_Rebalanced", 
-                    fontsize=14, fontweight="bold")
+                    fontsize=24, fontweight="bold")
+        ax.tick_params(labelsize=15)
+        for label in ax.get_yticklabels():
+            label.set_fontweight('bold')
         ax.grid(True, alpha=0.3, axis="y")
         
         # Add statistics
@@ -262,12 +272,17 @@ def _plot_graph_5_risk_return_scatter(
                    (data["volatility"] * 100, data["return"] * 100),
                    xytext=(5, -10), textcoords="offset points", fontsize=9, style="italic")
     
-    ax.set_xlabel("Risk (Annualized Volatility %)", fontsize=12, fontweight="bold")
-    ax.set_ylabel("Return (Annualized %)", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Risk (Annualized Volatility %)", fontsize=20, fontweight="bold")
+    ax.set_ylabel("Return (Annualized %)", fontsize=20, fontweight="bold")
     ax.set_title("Risk-Return Profile: Portfolios vs Benchmarks", 
-                fontsize=14, fontweight="bold")
+                fontsize=24, fontweight="bold")
     ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=11, loc="best", scatterpoints=1)
+    ax.legend(fontsize=17, loc="best", scatterpoints=1)
+    ax.tick_params(labelsize=15)
+    for label in ax.get_xticklabels():
+        label.set_fontweight('bold')
+    for label in ax.get_yticklabels():
+        label.set_fontweight('bold')
     
     plt.tight_layout()
     plt.savefig(output_dir / "G5_risk_return_scatter_all.png", dpi=300, bbox_inches="tight")
@@ -290,11 +305,12 @@ def _plot_all_strategies_cumulative(portfolio_values: dict, output_dir: Path) ->
             ax.plot(cumulative_returns.index, cumulative_returns.values,
                    label=name, linewidth=2.5, color=colors.get(name), alpha=0.85)
     
-    ax.set_xlabel("Date", fontsize=12, fontweight="bold")
-    ax.set_ylabel("Cumulative Returns (%)", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Date", fontsize=18, fontweight="bold")
+    ax.set_ylabel("Cumulative Returns (%)", fontsize=18, fontweight="bold")
     ax.set_title("All Strategies: Classical vs Quantum vs Quantum_Rebalanced",
-                fontsize=14, fontweight="bold")
-    ax.legend(fontsize=11, loc="best")
+                fontsize=20, fontweight="bold")
+    ax.legend(fontsize=15, loc="best")
+    ax.tick_params(labelsize=13)
     ax.grid(True, alpha=0.3)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
     
@@ -323,10 +339,13 @@ def _plot_classical_quantum_rebalanced_detailed(portfolio_values: dict, output_d
             ax.plot(cumulative_returns.index, cumulative_returns.values,
                    label=name, linewidth=2.5, color=colors.get(name), alpha=0.85)
     
-    ax.set_ylabel("Cumulative Returns (%)", fontsize=11, fontweight="bold")
+    ax.set_ylabel("Cumulative Returns (%)", fontsize=18, fontweight="bold")
     ax.set_title("All Three Strategies Comparison",
-                fontsize=13, fontweight="bold")
-    ax.legend(fontsize=10, loc="best")
+                fontsize=22, fontweight="bold")
+    ax.legend(fontsize=15, loc="best")
+    ax.tick_params(labelsize=14)
+    for label in ax.get_yticklabels():
+        label.set_fontweight('bold')
     ax.grid(True, alpha=0.3)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
     
@@ -343,11 +362,16 @@ def _plot_classical_quantum_rebalanced_detailed(portfolio_values: dict, output_d
                    label=name, linewidth=linewidth, color=colors.get(name), 
                    linestyle=linestyle, alpha=alpha)
     
-    ax.set_xlabel("Date", fontsize=11, fontweight="bold")
-    ax.set_ylabel("Cumulative Returns (%)", fontsize=11, fontweight="bold")
+    ax.set_xlabel("Date", fontsize=18, fontweight="bold")
+    ax.set_ylabel("Cumulative Returns (%)", fontsize=18, fontweight="bold")
     ax.set_title("Quantum Strategy Focus (Classical shown as reference)",
-                fontsize=13, fontweight="bold")
-    ax.legend(fontsize=10, loc="best")
+                fontsize=22, fontweight="bold")
+    ax.legend(fontsize=15, loc="best")
+    ax.tick_params(labelsize=14)
+    for label in ax.get_xticklabels():
+        label.set_fontweight('bold')
+    for label in ax.get_yticklabels():
+        label.set_fontweight('bold')
     ax.grid(True, alpha=0.3)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
     
@@ -374,11 +398,12 @@ def _plot_graph_1_with_classical(portfolio_values: dict, output_dir: Path) -> No
             ax.plot(x, y, label=name, linewidth=2.5, color=colors[name], alpha=0.8,
                    marker='o', markersize=6)
     
-    ax.set_xlabel("Date", fontsize=12, fontweight="bold")
-    ax.set_ylabel("Cumulative Returns (%)", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Date", fontsize=18, fontweight="bold")
+    ax.set_ylabel("Cumulative Returns (%)", fontsize=18, fontweight="bold")
     ax.set_title("Cumulative Returns: Classical vs Quantum vs Quantum_Rebalanced", 
-                fontsize=14, fontweight="bold")
-    ax.legend(fontsize=11, loc="best")
+                fontsize=20, fontweight="bold")
+    ax.legend(fontsize=15, loc="best")
+    ax.tick_params(labelsize=13)
     ax.grid(True, alpha=0.3)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
     
@@ -474,11 +499,12 @@ def create_15y_cumulative_returns_graph(
                     alpha=0.85
                 )
         
-        ax.set_xlabel("Date", fontsize=12, fontweight="bold")
-        ax.set_ylabel("Cumulative Returns (%)", fontsize=12, fontweight="bold")
+        ax.set_xlabel("Date", fontsize=18, fontweight="bold")
+        ax.set_ylabel("Cumulative Returns (%)", fontsize=18, fontweight="bold")
         ax.set_title("15-Year Cumulative Returns: Classical vs Quantum vs Quantum_Rebalanced",
-                    fontsize=14, fontweight="bold")
-        ax.legend(fontsize=11, loc="best")
+                    fontsize=20, fontweight="bold")
+        ax.legend(fontsize=15, loc="best")
+        ax.tick_params(labelsize=13)
         ax.grid(True, alpha=0.3)
         ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
         

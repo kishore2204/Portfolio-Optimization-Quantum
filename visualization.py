@@ -15,7 +15,7 @@ def _style():
 def _savefig(path: Path):
     path.parent.mkdir(parents=True, exist_ok=True)
     plt.tight_layout()
-    plt.savefig(path, dpi=180)
+    plt.savefig(path, dpi=300, bbox_inches="tight")
     plt.close()
 
 
@@ -39,54 +39,78 @@ def plot_comparisons(
     _style()
 
     # 1) Classical vs Quantum vs Quantum+Rebalancing
-    plt.figure(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(14, 8))
     for name in ["Classical", "Quantum", "Quantum_Rebalanced"]:
         if name in portfolio_values:
             x, y = _sample_series_quarterly(portfolio_values[name])
-            plt.plot(x, y, label=name, linewidth=2.0, marker='o', markersize=6)
-    plt.title("Portfolio Value: Classical vs Quantum vs Quantum+Rebalancing")
-    plt.xlabel("Time")
-    plt.ylabel("Portfolio Value")
-    plt.legend()
+            ax.plot(x, y, label=name, linewidth=3, marker='o', markersize=10)
+    ax.set_title("Portfolio Value: Classical vs Quantum vs Quantum+Rebalancing", fontsize=24, fontweight="bold")
+    ax.set_xlabel("Time", fontsize=20, fontweight="bold")
+    ax.set_ylabel("Portfolio Value", fontsize=20, fontweight="bold")
+    ax.legend(fontsize=17, loc="best")
+    ax.tick_params(labelsize=15)
+    for label in ax.get_xticklabels():
+        label.set_fontweight('bold')
+    for label in ax.get_yticklabels():
+        label.set_fontweight('bold')
+    ax.grid(True, alpha=0.3)
     _savefig(out / "1_classical_vs_quantum_vs_rebalanced.png")
 
     # 2) Quantum vs Quantum+Rebalancing
-    plt.figure(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(14, 8))
     for name in ["Quantum", "Quantum_Rebalanced"]:
         if name in portfolio_values:
             x, y = _sample_series_quarterly(portfolio_values[name])
-            plt.plot(x, y, label=name, linewidth=2.0, marker='o', markersize=6)
-    plt.title("Quantum vs Quantum+Rebalancing")
-    plt.xlabel("Time")
-    plt.ylabel("Portfolio Value")
-    plt.legend()
+            ax.plot(x, y, label=name, linewidth=3, marker='o', markersize=10)
+    ax.set_title("Quantum vs Quantum+Rebalancing", fontsize=24, fontweight="bold")
+    ax.set_xlabel("Time", fontsize=20, fontweight="bold")
+    ax.set_ylabel("Portfolio Value", fontsize=20, fontweight="bold")
+    ax.legend(fontsize=17, loc="best")
+    ax.tick_params(labelsize=15)
+    for label in ax.get_xticklabels():
+        label.set_fontweight('bold')
+    for label in ax.get_yticklabels():
+        label.set_fontweight('bold')
+    ax.grid(True, alpha=0.3)
     _savefig(out / "2_quantum_vs_rebalanced.png")
 
     # 3) Quantum vs Quantum+Rebalancing vs Benchmarks
-    plt.figure(figsize=(13, 7))
+    fig, ax = plt.subplots(figsize=(15, 8))
     for name in ["Quantum", "Quantum_Rebalanced"]:
         if name in portfolio_values:
             x, y = _sample_series_quarterly(portfolio_values[name])
-            plt.plot(x, y, label=name, linewidth=2.2, marker='o', markersize=6)
+            ax.plot(x, y, label=name, linewidth=3, marker='o', markersize=10)
     for name, series in benchmark_values.items():
         x, y = _sample_series_quarterly(series)
-        plt.plot(x, y, label=name, linewidth=1.4, alpha=0.9, marker='s', markersize=4)
-    plt.title("Quantum Portfolios vs Benchmarks")
-    plt.xlabel("Time")
-    plt.ylabel("Portfolio Value")
-    plt.legend(ncol=2)
+        ax.plot(x, y, label=name, linewidth=2, alpha=0.9, marker='s', markersize=8)
+    ax.set_title("Quantum Portfolios vs Benchmarks", fontsize=24, fontweight="bold")
+    ax.set_xlabel("Time", fontsize=20, fontweight="bold")
+    ax.set_ylabel("Portfolio Value", fontsize=20, fontweight="bold")
+    ax.legend(ncol=2, fontsize=17, loc="best")
+    ax.tick_params(labelsize=15)
+    for label in ax.get_xticklabels():
+        label.set_fontweight('bold')
+    for label in ax.get_yticklabels():
+        label.set_fontweight('bold')
+    ax.grid(True, alpha=0.3)
     _savefig(out / "3_quantum_rebalanced_vs_benchmarks.png")
 
     # 4) Rebalanced vs Non-Rebalanced Portfolio
-    plt.figure(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(14, 8))
     if "Quantum" in portfolio_values:
         x, y = _sample_series_quarterly(portfolio_values["Quantum"])
-        plt.plot(x, y, label="Non-Rebalanced", linewidth=2.0, marker='o', markersize=6)
+        ax.plot(x, y, label="Non-Rebalanced", linewidth=3, marker='o', markersize=10)
     if "Quantum_Rebalanced" in portfolio_values:
         x, y = _sample_series_quarterly(portfolio_values["Quantum_Rebalanced"])
-        plt.plot(x, y, label="Rebalanced", linewidth=2.0, marker='o', markersize=6)
-    plt.title("Rebalanced vs Non-Rebalanced Quantum Portfolio")
-    plt.xlabel("Time")
-    plt.ylabel("Portfolio Value")
-    plt.legend()
+        ax.plot(x, y, label="Rebalanced", linewidth=3, marker='o', markersize=10)
+    ax.set_title("Rebalanced vs Non-Rebalanced Quantum Portfolio", fontsize=24, fontweight="bold")
+    ax.set_xlabel("Time", fontsize=20, fontweight="bold")
+    ax.set_ylabel("Portfolio Value", fontsize=20, fontweight="bold")
+    ax.legend(fontsize=17, loc="best")
+    ax.tick_params(labelsize=15)
+    for label in ax.get_xticklabels():
+        label.set_fontweight('bold')
+    for label in ax.get_yticklabels():
+        label.set_fontweight('bold')
+    ax.grid(True, alpha=0.3)
     _savefig(out / "4_rebalanced_vs_nonrebalanced.png")

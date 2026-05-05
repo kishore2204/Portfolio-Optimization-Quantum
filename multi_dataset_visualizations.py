@@ -178,14 +178,19 @@ def _create_cumulative_returns_comparison(
         markersize=4,
     )
 
-    ax.set_xlabel("Date", fontsize=12, fontweight="bold")
-    ax.set_ylabel("Cumulative Returns (%)", fontsize=12, fontweight="bold")
+    ax.set_xlabel("Date", fontsize=20, fontweight="bold")
+    ax.set_ylabel("Cumulative Returns (%)", fontsize=20, fontweight="bold")
     ax.set_title(
         f"Cumulative Returns: Quantum vs Rebalanced vs {dataset_name}",
-        fontsize=14,
+        fontsize=24,
         fontweight="bold",
     )
-    ax.legend(fontsize=11, loc="best")
+    ax.legend(fontsize=17, loc="best")
+    ax.tick_params(labelsize=15)
+    for label in ax.get_xticklabels():
+        label.set_fontweight('bold')
+    for label in ax.get_yticklabels():
+        label.set_fontweight('bold')
     ax.grid(True, alpha=0.3)
     ax.axhline(y=0, color="black", linestyle="--", linewidth=0.8, alpha=0.5)
 
